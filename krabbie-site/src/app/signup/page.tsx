@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { Suspense, useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { sanitizeSlug, isValidSlug, shopUrl } from '@/lib/utils'
 import type { SignupForm } from '@/types'
@@ -49,6 +50,15 @@ const TEMPLATES = [
 ]
 
 export default function SignupPage() {
+  return (
+    <Suspense>
+      <SignupContent />
+    </Suspense>
+  )
+}
+
+function SignupContent() {
+  const searchParams = useSearchParams()
   const [step, setStep]         = useState<1 | 2 | 3>(1)
   const [carIdx, setCarIdx]     = useState(0)
   const [preview, setPreview]   = useState<string | null>(null)
@@ -101,6 +111,16 @@ export default function SignupPage() {
     setLoading(false)
     setStep(3)
   }
+
+  useEffect(() => {
+    const tParam = searchParams.get('template')
+    if (!tParam) return
+    const idx = TEMPLATES.findIndex(t => t.id === tParam && t.available)
+    if (idx !== -1) {
+      setCarIdx(idx)
+      setField('templateId', tParam)
+    }
+  }, [])
 
   const current = TEMPLATES[carIdx]
 
