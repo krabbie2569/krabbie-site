@@ -3,10 +3,11 @@ export const dynamic = 'force-dynamic'
 import { useState } from 'react'
 
 const SERVICES = [
-  { id: '1', name: 'นวดแผนไทย', desc: 'ผ่อนคลายกล้ามเนื้อ บำรุงร่างกาย', duration: 60,  price: 350 },
-  { id: '2', name: 'สปาหน้า',   desc: 'ดูแลผิวหน้า ลดสิว เพิ่มความชุ่มชื้น',  duration: 90,  price: 590 },
-  { id: '3', name: 'ตัดผม',     desc: 'ตัด-แต่ง ทรงสวยด้วยมืออาชีพ',      duration: 45,  price: 200 },
-  { id: '4', name: 'อบไอน้ำ',   desc: 'ล้างสารพิษ เพิ่มพลังงาน',          duration: 30,  price: 250 },
+  { id: '1', name: 'นวดแผนไทย',          desc: 'ผ่อนคลายกล้ามเนื้อด้วยศาสตร์ดั้งเดิม บำรุงร่างกาย',   duration: 60,  price: 350 },
+  { id: '2', name: 'ทำเล็บเจล (มือ+เท้า)', desc: 'เล็บสวย สีไม่ลอก ทนนาน 3-4 สัปดาห์',                duration: 90,  price: 550 },
+  { id: '3', name: 'คลีนิกหน้า + บีบสิว', desc: 'ดูแลผิวหน้า ลดสิว ล้างพอร์ บำรุงผิวลึก',             duration: 75,  price: 490 },
+  { id: '4', name: 'สปาตัวทั้งตัว',       desc: 'สครับ + มาร์ค + นวดผ่อนคลาย ผิวนุ่มเนียน',            duration: 120, price: 890 },
+  { id: '5', name: 'ทำสีผม (Balayage)',   desc: 'ระบายสีธรรมชาติ ดูแพง ไม่ต้องรีทัชบ่อย',              duration: 150, price: 1200 },
 ]
 
 export default function DemoBookingService() {
@@ -21,8 +22,8 @@ export default function DemoBookingService() {
 
       <section className="bg-krabbie-dark text-center py-10 px-6">
         <div className="w-14 h-14 rounded-full bg-orange-500 flex items-center justify-center text-2xl mx-auto mb-3">💆</div>
-        <h1 className="font-syne text-white text-2xl font-extrabold mb-1">ร้านนวด สบายใจ</h1>
-        <p className="text-gray-400 text-xs mb-2">นวดแผนไทย · สปา · ผ่อนคลาย</p>
+        <h1 className="font-syne text-white text-2xl font-extrabold mb-1">Sabai Beauty Studio</h1>
+        <p className="text-gray-400 text-xs mb-2">นวด · สปา · ทำเล็บ · คลีนิกหน้า</p>
         <div className="flex justify-center gap-3 mt-3 flex-wrap">
           <span className="text-xs bg-orange-500/20 text-orange-300 px-3 py-1 rounded-full">📍 เชียงใหม่</span>
           <span className="text-xs bg-teal-DEFAULT/20 text-teal-DEFAULT px-3 py-1 rounded-full">⏰ 10:00–21:00</span>

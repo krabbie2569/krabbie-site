@@ -80,36 +80,56 @@ export default function NewShopPage() {
           {/* TEMPLATE PICKER */}
           <div>
             <label className="block text-sm font-semibold mb-3">เลือก Template</label>
-            <div className="space-y-2">
-              {TEMPLATES.map(t => (
+
+            {/* Available — phone frame previews */}
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              {TEMPLATES.filter(t => !t.soon).map(t => (
                 <button
                   key={t.id}
                   type="button"
-                  disabled={!!t.soon}
-                  onClick={() => !t.soon && setTemplateId(t.id)}
-                  className={`w-full text-left rounded-krabbie border-2 transition-all p-4 ${
-                    t.soon ? 'opacity-40 cursor-not-allowed border-krabbie-border bg-gray-50' :
-                    templateId === t.id ? 'border-orange-500 bg-orange-50 shadow-md' :
-                    'border-krabbie-border hover:border-orange-300 bg-white'
+                  onClick={() => setTemplateId(t.id)}
+                  className={`flex flex-col items-center gap-3 p-3 rounded-2xl border-2 transition-all ${
+                    templateId === t.id
+                      ? 'border-orange-500 bg-orange-50 shadow-lg'
+                      : 'border-krabbie-border bg-white hover:border-orange-300'
                   }`}
                 >
-                  <div className="flex items-center gap-4">
-                    <span className="text-3xl w-10 text-center flex-shrink-0">{t.emoji}</span>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-0.5">
-                        <span className="font-bold text-sm">{t.name}</span>
-                        {t.soon && <span className="badge-soon text-[0.6rem]">เร็วๆ นี้</span>}
-                        {templateId === t.id && !t.soon && <span className="text-xs text-orange-500 font-semibold ml-auto">✓ เลือกแล้ว</span>}
-                      </div>
-                      <div className="text-xs text-gray-500">{t.desc}</div>
-                      {t.pills.length > 0 && (
-                        <div className="flex gap-1 mt-2 flex-wrap">
-                          {t.pills.map(p => <span key={p} className="text-[0.65rem] bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">{p}</span>)}
-                        </div>
-                      )}
+                  {/* Phone frame */}
+                  <div style={{
+                    width: '130px', height: '260px',
+                    border: `4px solid ${templateId === t.id ? '#ff6b00' : '#1a0f00'}`,
+                    borderRadius: '18px',
+                    overflow: 'hidden',
+                    position: 'relative',
+                    background: '#f9f9f9',
+                    boxShadow: templateId === t.id ? '0 8px 24px rgba(255,107,0,0.25)' : '0 4px 16px rgba(0,0,0,0.12)',
+                    flexShrink: 0,
+                  }}>
+                    <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: '28px', height: '6px', background: templateId === t.id ? '#ff6b00' : '#1a0f00', borderRadius: '0 0 6px 6px', zIndex: 10 }} />
+                    <div style={{ width: '390px', height: '844px', transformOrigin: 'top left', transform: 'scale(0.333)', pointerEvents: 'none' }}>
+                      <iframe src={`/demo/${t.id}`} style={{ width: '390px', height: '844px', border: 'none' }} title={t.name} loading="lazy" />
                     </div>
                   </div>
+                  {/* Label */}
+                  <div className="text-center">
+                    <div className={`font-bold text-sm mb-0.5 ${templateId === t.id ? 'text-orange-500' : ''}`}>{t.name}</div>
+                    <div className="text-[0.7rem] text-gray-400 leading-snug">{t.desc}</div>
+                  </div>
+                  {templateId === t.id && (
+                    <div className="text-xs font-bold text-orange-500">✓ เลือกแล้ว</div>
+                  )}
                 </button>
+              ))}
+            </div>
+
+            {/* Coming soon — small list */}
+            <div className="space-y-2 opacity-40">
+              {TEMPLATES.filter(t => !!t.soon).map(t => (
+                <div key={t.id} className="flex items-center gap-3 rounded-krabbie border-2 border-krabbie-border bg-gray-50 px-4 py-3 cursor-not-allowed">
+                  <span className="text-2xl">{t.emoji}</span>
+                  <span className="font-semibold text-sm text-gray-400">{t.name}</span>
+                  <span className="badge-soon text-[0.6rem] ml-1">เร็วๆ นี้</span>
+                </div>
               ))}
             </div>
           </div>

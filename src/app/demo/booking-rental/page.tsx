@@ -340,8 +340,8 @@ export default function DemoBookingRental() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: GRAD, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem' }}>📷</div>
           <div>
-            <div style={{ fontWeight: 800, fontSize: '1rem', background: GRAD, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>BoBBoB Camera</div>
-            <div style={{ fontSize: '0.6rem', color: '#9CA3AF', letterSpacing: '2px', textTransform: 'uppercase' }}>Rental · Korat</div>
+            <div style={{ fontWeight: 800, fontSize: '1rem', background: GRAD, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>BoBBoB Camera Korat</div>
+            <div style={{ fontSize: '0.6rem', color: '#9CA3AF', letterSpacing: '2px', textTransform: 'uppercase' }}>Stylist &amp; Camera Rental</div>
           </div>
         </div>
         {/* Desktop nav */}
@@ -376,10 +376,10 @@ export default function DemoBookingRental() {
               <span style={{ fontSize: '0.72rem', letterSpacing: '2px', color: PINK, textTransform: 'uppercase', fontWeight: 600 }}>เปิดให้เช่าทุกวัน 09:00–20:00</span>
             </div>
             <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3.2rem)', fontWeight: 800, lineHeight: 1.1, marginBottom: '12px', background: GRAD, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-              BoBBoB Camera<br />Rental
+              BoBBoB<br />Camera Korat
             </h1>
             <p style={{ color: '#4B5563', fontSize: '1rem', lineHeight: 1.7, marginBottom: '24px' }}>
-              เช่ากล้องและชุดสำหรับถ่ายรูป<br />ราคาถูก คุณภาพดี บริการรวดเร็ว
+              สไตลิสต์และช่างภาพมืออาชีพ<br />ให้เช่าเสื้อผ้าแฟชั่นและกล้องคอมแพคคุณภาพสูง
             </p>
             <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
               <button
