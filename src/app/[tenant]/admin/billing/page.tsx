@@ -1,12 +1,13 @@
 import { getTenantBySlug } from '@/lib/tenant'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServerSupabaseClient } from '@/lib/supabase.server'
 import { notFound } from 'next/navigation'
 import SlipUploader from '@/components/payment/SlipUploader'
 
-interface Props { params: { tenant: string } }
+interface Props { params: Promise<{ tenant: string }> }
 
 export default async function BillingPage({ params }: Props) {
-  const tenant = await getTenantBySlug(params.tenant)
+  const { tenant: tenantSlug } = await params
+  const tenant = await getTenantBySlug(tenantSlug)
   if (!tenant) notFound()
 
   const supabase = await createServerSupabaseClient()
@@ -66,7 +67,7 @@ export default async function BillingPage({ params }: Props) {
         <div className="card">
           <div className="sec-label mb-4">ชำระเงิน / ต่ออายุ</div>
           <SlipUploader
-            tenantSlug={params.tenant}
+            tenantSlug={tenantSlug}
             currentPlan={(tenant.plan_type as 'standard' | 'pro') ?? 'standard'}
             onSuccess={() => {}}
           />

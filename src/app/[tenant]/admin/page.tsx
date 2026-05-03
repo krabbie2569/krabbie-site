@@ -1,5 +1,5 @@
 import { getTenantBySlug, parseTenantSettings } from '@/lib/tenant'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServerSupabaseClient } from '@/lib/supabase.server'
 import { notFound } from 'next/navigation'
 import { formatDateTH, formatTime, formatPrice } from '@/lib/utils'
 import { BOOKING_STATUS_LABEL, BOOKING_STATUS_COLOR } from '@/types'
@@ -7,11 +7,12 @@ import type { Booking, Service } from '@/types'
 import StatsCard from '@/components/admin/StatsCard'
 
 interface Props {
-  params: { tenant: string }
+  params: Promise<{ tenant: string }>
 }
 
 export default async function TenantAdminPage({ params }: Props) {
-  const tenant = await getTenantBySlug(params.tenant)
+  const { tenant: tenantSlug } = await params
+  const tenant = await getTenantBySlug(tenantSlug)
   if (!tenant) notFound()
 
   const supabase = await createServerSupabaseClient()
