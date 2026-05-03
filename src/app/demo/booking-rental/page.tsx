@@ -22,7 +22,7 @@ function ItemCard({ item, onBook }: { item: any; onBook: () => void }) {
         <p style={{fontWeight:600,color:'#1a1a2e',fontSize:'12px',marginBottom:'2px'}}>{item.name}</p>
         <p style={{fontSize:'10px',color:'#9CA3AF',marginBottom:'4px'}}>{item.desc}</p>
         <p style={{background:PINK,WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',fontWeight:700,fontSize:'12px'}}>฿{item.price}/วัน</p>
-        {item.hours.length > 0 && (
+        {item.hours?.length > 0 && (
           <div style={{display:'flex',gap:'3px',marginTop:'3px',flexWrap:'wrap'}}>
             {item.hours.map((h: any, i: number) => (
               <span key={i} style={{fontSize:'9px',color:'#9C27B0',background:'rgba(156,39,176,0.08)',padding:'1px 5px',borderRadius:'20px',fontWeight:600}}>{h.h}ชม.=฿{h.p}</span>
