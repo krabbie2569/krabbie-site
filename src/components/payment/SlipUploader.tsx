@@ -14,7 +14,7 @@ const PLANS = {
   pro:      { name: 'Pro',      price: 390, color: 'teal'   },
 }
 
-type UploadState = 'idle' | 'uploading' | 'verifying' | 'done' | 'error'
+type UploadState = 'idle' | 'uploading' | 'done' | 'error'
 
 export default function SlipUploader({ tenantSlug, currentPlan, onSuccess }: Props) {
   const [selectedPlan, setSelectedPlan] = useState<'standard' | 'pro'>(currentPlan)
@@ -58,12 +58,10 @@ export default function SlipUploader({ tenantSlug, currentPlan, onSuccess }: Pro
     setState('uploading')
 
     const form = new FormData()
-    form.append('slip',        file)
-    form.append('tenantSlug',  tenantSlug)
-    form.append('planType',    selectedPlan)
-    form.append('months',      String(months))
-
-    setState('verifying')
+    form.append('slip',       file)
+    form.append('tenantSlug', tenantSlug)
+    form.append('planType',   selectedPlan)
+    form.append('months',     String(months))
 
     try {
       const res  = await fetch('/api/payment/upload-slip', { method: 'POST', body: form })
@@ -205,18 +203,17 @@ export default function SlipUploader({ tenantSlug, currentPlan, onSuccess }: Pro
         </div>
       ) : (
         <button
-          disabled={!file || state === 'uploading' || state === 'verifying'}
+          disabled={!file || state === 'uploading'}
           onClick={handleSubmit}
           className="btn-primary w-full disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {state === 'uploading' ? '⏳ กำลังอัพโหลด...' :
-           state === 'verifying' ? '🔍 กำลังตรวจสลิปอัตโนมัติ...' :
            `ส่งสลิป ${totalAmount.toLocaleString()} ฿ →`}
         </button>
       )}
 
       <p className="text-xs text-gray-400 text-center mt-3 font-mono">
-        ระบบตรวจสลิปอัตโนมัติ · ถ้าไม่ผ่านจะมี admin ตรวจสอบอีกครั้ง
+        admin จะตรวจสอบและเปิดใช้งานภายใน 1-2 ชั่วโมง
       </p>
     </div>
   )
