@@ -6,12 +6,12 @@ import type { Metadata } from 'next'
 
 interface Props {
   children: React.ReactNode
-  params: { tenant: string }
+  params: Promise<{ tenant: string }>
 }
 
-// Generate metadata per tenant (shop name as page title)
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const tenant = await getTenantBySlug(params.tenant)
+  const { tenant: tenantSlug } = await params
+  const tenant = await getTenantBySlug(tenantSlug)
   if (!tenant) return { title: 'ไม่พบร้านค้า' }
   return {
     title: {
@@ -23,7 +23,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function TenantLayout({ children, params }: Props) {
-  const tenant = await getTenantBySlug(params.tenant)
+  const { tenant: tenantSlug } = await params
+  const tenant = await getTenantBySlug(tenantSlug)
 
   if (!tenant) notFound()
   if (!isTenantActive(tenant)) {

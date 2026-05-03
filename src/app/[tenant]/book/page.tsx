@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { use, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useBooking } from '@/hooks/useBooking'
 import ServiceSelector from '@/components/booking/ServiceSelector'
@@ -10,12 +10,13 @@ import BookingForm from '@/components/booking/BookingForm'
 import type { BookingDraft } from '@/types'
 
 interface Props {
-  params: { tenant: string }
+  params: Promise<{ tenant: string }>
 }
 
 const STEP_LABELS = ['เลือกบริการ', 'เลือกวันเวลา', 'ข้อมูลของคุณ', 'ยืนยัน']
 
 export default function BookPage({ params }: Props) {
+  const { tenant } = use(params)
   const searchParams = useSearchParams()
   const preselectedService = searchParams.get('service')
 
@@ -31,7 +32,7 @@ export default function BookPage({ params }: Props) {
     customerNote:  '',
   })
 
-  const { submitBooking, loading, bookingRef } = useBooking(params.tenant)
+  const { submitBooking, loading, bookingRef } = useBooking(tenant)
 
   function updateDraft(patch: Partial<BookingDraft>) {
     setDraft(prev => ({ ...prev, ...patch }))
@@ -53,7 +54,7 @@ export default function BookPage({ params }: Props) {
             {bookingRef}
           </div>
           <button
-            onClick={() => window.location.href = `/${params.tenant}`}
+            onClick={() => window.location.href = `/${tenant}`}
             className="btn-outline w-full"
           >
             กลับหน้าร้าน
@@ -96,7 +97,7 @@ export default function BookPage({ params }: Props) {
 
         {step === 1 && (
           <ServiceSelector
-            tenantId={params.tenant}
+            tenantId={tenant}
             selectedId={draft.serviceId}
             onSelect={(id) => { updateDraft({ serviceId: id }); setStep(2) }}
           />
@@ -110,7 +111,7 @@ export default function BookPage({ params }: Props) {
             />
             {draft.date && (
               <TimeSlotGrid
-                tenantId={params.tenant}
+                tenantId={tenant}
                 serviceId={draft.serviceId!}
                 date={draft.date}
                 selectedSlotId={draft.slotId}
