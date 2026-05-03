@@ -143,22 +143,37 @@
 
 .waveWrap {
   position: absolute;
-  bottom: 14%; left: 0; right: 0;
-  overflow: hidden; height: 60px;
+  bottom: 13%; left: 0; right: 0;
+  overflow: hidden; height: 80px;
 }
 
 .wave {
   position: absolute;
-  bottom: 0; left: -100%; right: -100%;
-  height: 60px;
-  background: radial-gradient(ellipse 80px 30px at 50% 100%,rgba(255,255,255,0.4),transparent);
+  bottom: 0; left: -200%; width: 400%;
+  height: 80px;
 }
 
-@keyframes wave1 { 0% { transform: translateX(0); } 100% { transform: translateX(25%);  } }
-@keyframes wave2 { 0% { transform: translateX(0); } 100% { transform: translateX(-25%); } }
+.wave svg {
+  width: 100%; height: 100%;
+}
 
-.w1 { animation: wave1 5s linear infinite; }
-.w2 { animation: wave2 7s linear infinite; opacity: 0.6; }
+@keyframes wave1 {
+  0%   { transform: translateX(0);    }
+  100% { transform: translateX(25%);  }
+}
+@keyframes wave2 {
+  0%   { transform: translateX(0);    }
+  100% { transform: translateX(-25%); }
+}
+@keyframes wave3 {
+  0%   { transform: translateX(0) scaleY(0.8); }
+  50%  { transform: translateX(12.5%) scaleY(1.1); }
+  100% { transform: translateX(25%) scaleY(0.8); }
+}
+
+.w1 { animation: wave1 6s ease-in-out infinite; }
+.w2 { animation: wave2 9s ease-in-out infinite; opacity: 0.5; }
+.w3 { animation: wave3 4s ease-in-out infinite; opacity: 0.3; }
 
 .foamLine {
   position: absolute;
@@ -480,7 +495,7 @@
   color: #0D1B2A;
 }
 
-.step p { font-size: 0.85rem; color: #667788; line-height: 1.6; }
+.step p { font-size: 0.85rem; color: #4A5F72; line-height: 1.6; }
 
 /* ══ TEMPLATES ══ */
 .templates { padding: 6rem 2rem; background: white; }
@@ -585,7 +600,7 @@
 
 .pricingEyebrow { color: #F4D03F; }
 .pricingH { color: white; }
-.pricingP { color: rgba(255,255,255,0.65); max-width: 480px; }
+.pricingP { color: rgba(255,255,255,0.85); max-width: 480px; }
 
 .priceCards {
   display: grid;
@@ -635,7 +650,7 @@
   font-size: 0.68rem;
   letter-spacing: 3px;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.6);
+  color: rgba(255,255,255,0.75);
   margin-bottom: 0.6rem;
 }
 
@@ -649,9 +664,9 @@
 }
 
 .planPrice sup { font-size: 1.4rem; vertical-align: super; }
-.planPrice sub { font-size: 1rem; color: rgba(255,255,255,0.5); }
+.planPrice sub { font-size: 1rem; color: rgba(255,255,255,0.7); }
 
-.planDesc { font-size: 0.82rem; color: rgba(255,255,255,0.55); margin-bottom: 1.5rem; }
+.planDesc { font-size: 0.82rem; color: rgba(255,255,255,0.80); margin-bottom: 1.5rem; }
 
 .planFeatures { list-style: none; margin-bottom: 1.8rem; padding: 0; }
 
@@ -739,7 +754,7 @@
 }
 
 .whoName { font-weight: 700; font-size: 0.85rem; color: #0D1B2A; }
-.whoRole { font-size: 0.72rem; color: #889; }
+.whoRole { font-size: 0.72rem; color: #556677; }
 
 /* ══ CTA ══ */
 .cta {
@@ -761,7 +776,7 @@
 }
 
 .ctaH { color: white; }
-.ctaP { color: rgba(255,255,255,0.6); margin: 1rem auto 2.5rem; max-width: 400px; line-height: 1.7; }
+.ctaP { color: rgba(255,255,255,0.78); margin: 1rem auto 2.5rem; max-width: 400px; line-height: 1.7; }
 .ctaBtns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
 
 /* ══ FOOTER ══ */
@@ -777,22 +792,22 @@
   border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 
-.ftBrandP { font-size: 0.8rem; color: #445566; max-width: 200px; line-height: 1.6; margin-top: 0.6rem; }
-.ftBrandMotto { font-family: 'Space Mono', monospace; font-size: 0.68rem; color: #334455; margin-top: 0.6rem; }
+.ftBrandP { font-size: 0.8rem; color: #8299B2; max-width: 200px; line-height: 1.6; margin-top: 0.6rem; }
+.ftBrandMotto { font-family: 'Space Mono', monospace; font-size: 0.68rem; color: #6B8499; margin-top: 0.6rem; }
 
 .ftColH {
   font-family: 'Space Mono', monospace;
   font-size: 0.62rem;
   letter-spacing: 3px;
   text-transform: uppercase;
-  color: #334455;
+  color: #8299B2;
   margin-bottom: 0.8rem;
 }
 
 .ftColA {
   display: block;
   font-size: 0.82rem;
-  color: #556677;
+  color: #8299B2;
   text-decoration: none;
   margin-bottom: 0.4rem;
   transition: color 0.2s;
@@ -808,7 +823,7 @@
   gap: 0.5rem;
   font-family: 'Space Mono', monospace;
   font-size: 0.7rem;
-  color: #334455;
+  color: #6B8499;
 }
 
 .ftOrange { color: #FF5500; }

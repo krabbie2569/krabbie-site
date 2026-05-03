@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import styles from './page.module.css'
 import ScrollReveal from '@/components/ScrollReveal'
+import TemplatesSection from '@/components/TemplatesSection'
 
 export default function HomePage() {
   const s = styles
@@ -58,8 +59,21 @@ export default function HomePage() {
         <div className={s.seaBack} />
         <div className={s.seaMid} />
         <div className={s.waveWrap}>
-          <div className={`${s.wave} ${s.w1}`} />
-          <div className={`${s.wave} ${s.w2}`} />
+          <div className={`${s.wave} ${s.w1}`}>
+            <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M0,40 C180,80 360,0 540,40 C720,80 900,0 1080,40 C1260,80 1350,20 1440,40 L1440,80 L0,80 Z" fill="rgba(255,255,255,0.55)"/>
+            </svg>
+          </div>
+          <div className={`${s.wave} ${s.w2}`}>
+            <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M0,55 C120,20 300,70 480,45 C660,20 840,65 1020,40 C1200,15 1320,55 1440,35 L1440,80 L0,80 Z" fill="rgba(255,255,255,0.45)"/>
+            </svg>
+          </div>
+          <div className={`${s.wave} ${s.w3}`}>
+            <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M0,30 C240,65 480,10 720,45 C960,80 1200,15 1440,50 L1440,80 L0,80 Z" fill="rgba(255,255,255,0.3)"/>
+            </svg>
+          </div>
         </div>
         <div className={s.foamLine} />
         <div className={s.beach} />
@@ -112,39 +126,7 @@ export default function HomePage() {
             เลือก Template<br /><em className={s.secHem}>ที่ใช่สำหรับคุณ</em>
           </h2>
           <p className={`${s.secP} reveal`}>ทุก template มีหน้าลูกค้า + Admin ครบ พร้อมแจ้งเตือน real-time</p>
-          <div className={s.tmplGrid}>
-            {[
-              {
-                grad: s.tg1, badge: 'จองบริการ', title: 'เว็บจองบริการ',
-                desc: 'ช่างภาพ · เสริมสวย · สนามกีฬา · ชุดเช่า · สปา · ที่พักและอีกมาก',
-                pills: ['เลือกวันเวลา', 'อัพสลิป', 'admin ยืนยัน'],
-              },
-              {
-                grad: s.tg2, badge: 'ขายของ', title: 'เว็บขายของ',
-                desc: 'เสื้อผ้า · handmade · เบเกอรี่ pre-order · ของมือสอง · สินค้าทั่วไป',
-                pills: ['ตะกร้าสินค้า', 'จัดการสต็อก', 'อัพสลิป'],
-              },
-              {
-                grad: s.tg3, badge: 'QR อาหาร', title: 'QR เมนูร้านอาหาร',
-                desc: 'สแกน QR ต่อโต๊ะ · สั่งอาหาร · แจ้งครัว real-time · ปริ้นใบเสร็จ',
-                pills: ['QR รายโต๊ะ', 'real-time', 'ใบเสร็จ'],
-              },
-            ].map(({ grad, badge, title, desc, pills }) => (
-              <div key={title} className={`${s.tmplCard} reveal`}>
-                <div className={`${s.tmplTop} ${grad}`}>
-                  <div className={s.tmplMascot}>🦀</div>
-                  <div className={s.tmplBadge}>{badge}</div>
-                </div>
-                <div className={s.tmplBody}>
-                  <h3>{title}</h3>
-                  <p>{desc}</p>
-                  <div className={s.pills}>
-                    {pills.map(p => <span key={p} className={s.pill}>{p}</span>)}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+          <TemplatesSection />
         </div>
       </section>
 
