@@ -54,10 +54,12 @@ const TEMPLATES = [
 export default function TemplatesSection() {
   const [preview, setPreview] = useState<string | null>(null)
   const [previewTitle, setPreviewTitle] = useState('')
+  const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop')
 
   function openPreview(path: string, title: string) {
     setPreview(path)
     setPreviewTitle(title)
+    setViewMode('desktop')
   }
 
   return (
@@ -112,37 +114,80 @@ export default function TemplatesSection() {
       {/* PREVIEW MODAL */}
       {preview && (
         <div
-          style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.75)',backdropFilter:'blur(8px)',zIndex:1000,display:'flex',alignItems:'center',justifyContent:'center',padding:'16px'}}
+          style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.82)',backdropFilter:'blur(10px)',zIndex:1000,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'16px',gap:'14px'}}
           onClick={() => setPreview(null)}
         >
-          <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:'16px'}} onClick={e => e.stopPropagation()}>
-
-            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',width:'100%',maxWidth:'320px'}}>
-              <span style={{color:'white',fontSize:'0.85rem',fontWeight:600,opacity:0.9}}>{previewTitle}</span>
+          {/* TOP BAR */}
+          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',width:'100%',maxWidth:'1000px'}} onClick={e => e.stopPropagation()}>
+            <span style={{color:'white',fontSize:'0.9rem',fontWeight:700,opacity:0.95}}>{previewTitle}</span>
+            <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
+              {/* VIEW TOGGLE */}
+              <div style={{display:'flex',background:'rgba(255,255,255,0.1)',borderRadius:'100px',padding:'3px',gap:'2px'}}>
+                <button
+                  onClick={() => setViewMode('desktop')}
+                  style={{padding:'5px 14px',borderRadius:'100px',border:'none',fontSize:'0.75rem',fontWeight:700,cursor:'pointer',transition:'all 0.15s',
+                    background: viewMode==='desktop' ? 'white' : 'transparent',
+                    color:      viewMode==='desktop' ? '#0D1B2A' : 'rgba(255,255,255,0.6)',
+                  }}
+                >🖥️ เดสก์ท็อป</button>
+                <button
+                  onClick={() => setViewMode('mobile')}
+                  style={{padding:'5px 14px',borderRadius:'100px',border:'none',fontSize:'0.75rem',fontWeight:700,cursor:'pointer',transition:'all 0.15s',
+                    background: viewMode==='mobile' ? 'white' : 'transparent',
+                    color:      viewMode==='mobile' ? '#0D1B2A' : 'rgba(255,255,255,0.6)',
+                  }}
+                >📱 มือถือ</button>
+              </div>
               <button
                 onClick={() => setPreview(null)}
-                style={{width:'36px',height:'36px',borderRadius:'50%',background:'rgba(255,255,255,0.2)',border:'none',color:'white',fontSize:'1.1rem',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}
-              >
-                ✕
-              </button>
+                style={{width:'36px',height:'36px',borderRadius:'50%',background:'rgba(255,255,255,0.15)',border:'none',color:'white',fontSize:'1.1rem',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}
+              >✕</button>
             </div>
+          </div>
 
-            {/* PHONE FRAME */}
-            <div style={{position:'relative',width:'320px'}}>
-              <div style={{position:'absolute',top:'12px',left:'50%',transform:'translateX(-50%)',width:'96px',height:'20px',background:'black',borderRadius:'100px',zIndex:10}} />
-              <div style={{borderRadius:'42px',overflow:'hidden',boxShadow:'0 24px 80px rgba(0,0,0,0.6)',border:'8px solid #1a1a2e',background:'#1a1a2e',height:'620px',position:'relative'}}>
+          {/* FRAME */}
+          <div onClick={e => e.stopPropagation()}>
+            {viewMode === 'desktop' ? (
+              /* BROWSER FRAME */
+              <div style={{width:'min(90vw,1000px)',borderRadius:'12px',overflow:'hidden',boxShadow:'0 32px 100px rgba(0,0,0,0.7)',border:'1px solid rgba(255,255,255,0.1)'}}>
+                {/* Browser chrome */}
+                <div style={{background:'#2d2d2d',padding:'10px 16px',display:'flex',alignItems:'center',gap:'8px'}}>
+                  <div style={{display:'flex',gap:'6px'}}>
+                    <div style={{width:'12px',height:'12px',borderRadius:'50%',background:'#ff5f57'}} />
+                    <div style={{width:'12px',height:'12px',borderRadius:'50%',background:'#febc2e'}} />
+                    <div style={{width:'12px',height:'12px',borderRadius:'50%',background:'#28c840'}} />
+                  </div>
+                  <div style={{flex:1,background:'#3d3d3d',borderRadius:'6px',padding:'4px 12px',fontFamily:'monospace',fontSize:'0.72rem',color:'rgba(255,255,255,0.5)',textAlign:'center'}}>
+                    yourshop.krabbie.com
+                  </div>
+                </div>
                 <iframe
                   src={preview}
-                  style={{width:'100%',height:'100%',border:'none',display:'block',borderRadius:'36px'}}
+                  style={{width:'100%',height:'min(72vh,620px)',border:'none',display:'block'}}
                   title="Template preview"
                 />
               </div>
-              <div style={{position:'absolute',bottom:'12px',left:'50%',transform:'translateX(-50%)',width:'96px',height:'4px',background:'rgba(255,255,255,0.35)',borderRadius:'100px'}} />
-            </div>
+            ) : (
+              /* PHONE FRAME */
+              <div style={{position:'relative',width:'320px'}}>
+                <div style={{position:'absolute',top:'12px',left:'50%',transform:'translateX(-50%)',width:'96px',height:'20px',background:'black',borderRadius:'100px',zIndex:10}} />
+                <div style={{borderRadius:'42px',overflow:'hidden',boxShadow:'0 24px 80px rgba(0,0,0,0.6)',border:'8px solid #1a1a2e',background:'#1a1a2e',height:'620px',position:'relative'}}>
+                  <iframe
+                    src={preview}
+                    style={{width:'100%',height:'100%',border:'none',display:'block',borderRadius:'36px'}}
+                    title="Template preview mobile"
+                  />
+                </div>
+                <div style={{position:'absolute',bottom:'12px',left:'50%',transform:'translateX(-50%)',width:'96px',height:'4px',background:'rgba(255,255,255,0.35)',borderRadius:'100px'}} />
+              </div>
+            )}
+          </div>
 
+          {/* CTA */}
+          <div onClick={e => e.stopPropagation()}>
             <Link
               href={`/signup?template=${TEMPLATES.find(t => t.demoPath === preview)?.id ?? ''}`}
-              style={{padding:'12px 32px',borderRadius:'100px',background:'#FF5500',color:'white',fontWeight:700,fontSize:'0.9rem',textDecoration:'none',boxShadow:'0 4px 24px rgba(255,85,0,0.5)',transition:'transform 0.15s'}}
+              style={{padding:'12px 32px',borderRadius:'100px',background:'#FF5500',color:'white',fontWeight:700,fontSize:'0.9rem',textDecoration:'none',boxShadow:'0 4px 24px rgba(255,85,0,0.5)',display:'inline-block'}}
               onClick={() => setPreview(null)}
             >
               ✓ ใช้ Template นี้ →
