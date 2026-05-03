@@ -6,7 +6,7 @@ export interface Database {
       tenants: {
         Row: {
           id: string
-          slug: string
+          slug: string                  // subdomain: shop.krabbie.com
           name: string
           template_id: string
           owner_email: string
@@ -16,13 +16,12 @@ export interface Database {
           trial_ends_at: string | null
           activated_at: string | null
           expires_at: string | null
-          settings: Json
+          settings: Json               // { primaryColor, logoUrl, lineId, ... }
           created_at: string
           updated_at: string
         }
         Insert: Omit<Database['public']['Tables']['tenants']['Row'], 'id' | 'created_at' | 'updated_at'>
         Update: Partial<Database['public']['Tables']['tenants']['Insert']>
-        Relationships: []
       }
 
       services: {
@@ -39,7 +38,6 @@ export interface Database {
         }
         Insert: Omit<Database['public']['Tables']['services']['Row'], 'id' | 'created_at'>
         Update: Partial<Database['public']['Tables']['services']['Insert']>
-        Relationships: []
       }
 
       staff: {
@@ -53,7 +51,6 @@ export interface Database {
         }
         Insert: Omit<Database['public']['Tables']['staff']['Row'], 'id' | 'created_at'>
         Update: Partial<Database['public']['Tables']['staff']['Insert']>
-        Relationships: []
       }
 
       time_slots: {
@@ -62,16 +59,15 @@ export interface Database {
           tenant_id: string
           service_id: string
           staff_id: string | null
-          date: string
-          start_time: string
-          end_time: string
+          date: string                 // YYYY-MM-DD
+          start_time: string           // HH:MM
+          end_time: string             // HH:MM
           is_booked: boolean
-          is_blocked: boolean
+          is_blocked: boolean          // manual block by owner
           created_at: string
         }
         Insert: Omit<Database['public']['Tables']['time_slots']['Row'], 'id' | 'created_at'>
         Update: Partial<Database['public']['Tables']['time_slots']['Insert']>
-        Relationships: []
       }
 
       bookings: {
@@ -92,7 +88,6 @@ export interface Database {
         }
         Insert: Omit<Database['public']['Tables']['bookings']['Row'], 'id' | 'created_at' | 'updated_at'>
         Update: Partial<Database['public']['Tables']['bookings']['Insert']>
-        Relationships: []
       }
 
       templates: {
@@ -110,7 +105,6 @@ export interface Database {
         }
         Insert: Omit<Database['public']['Tables']['templates']['Row'], 'id' | 'created_at'>
         Update: Partial<Database['public']['Tables']['templates']['Insert']>
-        Relationships: []
       }
 
       payments: {
@@ -120,24 +114,18 @@ export interface Database {
           amount: number
           method: 'promptpay' | 'bank_transfer'
           status: 'pending' | 'paid' | 'failed' | 'refunded'
-          plan_type: 'standard' | 'pro'
-          review_status: 'pending' | 'auto_approved' | 'admin_approved' | 'rejected'
           slip_url: string | null
           paid_at: string | null
           months: number
-          transaction_ref: string | null
-          verified_amount: number | null
-          verify_method: string | null
-          verify_raw: Json | null
+          plan_type: 'standard' | 'pro'
+          review_status: 'pending' | 'admin_approved' | 'rejected'
           rejection_reason: string | null
           reviewed_by: string | null
           reviewed_at: string | null
-          verified_at: string | null
           created_at: string
         }
         Insert: Omit<Database['public']['Tables']['payments']['Row'], 'id' | 'created_at'>
         Update: Partial<Database['public']['Tables']['payments']['Insert']>
-        Relationships: []
       }
     }
 
@@ -154,10 +142,6 @@ export interface Database {
       booking_status: 'pending' | 'confirmed' | 'cancelled' | 'completed' | 'no_show'
       payment_status: 'pending' | 'paid' | 'failed' | 'refunded'
       template_category: 'booking' | 'shop' | 'food' | 'portfolio'
-    }
-
-    CompositeTypes: {
-      [_ in never]: never
     }
   }
 }

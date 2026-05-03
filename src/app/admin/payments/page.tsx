@@ -81,9 +81,6 @@ export default function AdminPaymentsPage() {
     load()
   }
 
-  const counts: Record<string, number> = {}
-  // realtime count would need separate queries — simplified here
-
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="bg-krabbie-dark px-6 py-4 flex items-center gap-3">

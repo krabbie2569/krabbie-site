@@ -15,9 +15,9 @@ export default async function TenantAdminPage({ params }: Props) {
   const tenant = await getTenantBySlug(tenantSlug)
   if (!tenant) notFound()
 
-  const supabase = await createServerSupabaseClient()
+  const supabase = await createServerSupabaseClient() as any
 
-  const [{ data: bookingsRaw }, { data: services }] = await Promise.all([
+  const [{ data: bookings }, { data: services }] = await Promise.all([
     supabase
       .from('bookings')
       .select('*, services(name), time_slots(date, start_time, end_time)')
@@ -31,11 +31,11 @@ export default async function TenantAdminPage({ params }: Props) {
       .order('sort_order'),
   ])
 
-  const bookings = bookingsRaw as any[] | null
   const today = new Date().toISOString().slice(0, 10)
-  const todayBookings  = bookings?.filter(b => b.time_slots?.date === today) ?? []
-  const pendingCount   = bookings?.filter(b => b.status === 'pending').length ?? 0
-  const confirmedCount = bookings?.filter(b => b.status === 'confirmed').length ?? 0
+  const bookingsRaw = bookings as any[] | null
+  const todayBookings  = bookingsRaw?.filter((b: any) => b.time_slots?.date === today) ?? []
+  const pendingCount   = bookingsRaw?.filter((b: any) => b.status === 'pending').length ?? 0
+  const confirmedCount = bookingsRaw?.filter((b: any) => b.status === 'confirmed').length ?? 0
 
   return (
     <div className="min-h-screen bg-gray-50 pb-16">

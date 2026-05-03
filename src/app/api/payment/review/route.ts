@@ -3,7 +3,6 @@ import { createServiceClient } from '@/lib/supabase.server'
 
 // Super admin: approve หรือ reject payment ด้วยตัวเอง
 export async function POST(req: NextRequest) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const supabase = createServiceClient() as any
 
   const { paymentId, action, reason, adminEmail } = await req.json() as {
@@ -20,9 +19,9 @@ export async function POST(req: NextRequest) {
   // Fetch payment
   const { data: payment } = await supabase
     .from('payments')
-    .select('*')
+    .select('*, tenants(id, plan_type)')
     .eq('id', paymentId)
-    .single() as { data: Record<string, any> | null; error: unknown }
+    .single()
 
   if (!payment) {
     return NextResponse.json({ error: 'ไม่พบ payment' }, { status: 404 })

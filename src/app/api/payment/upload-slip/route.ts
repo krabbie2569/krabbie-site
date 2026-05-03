@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase.server'
-import { uploadSlip } from '@/lib/cloudinary'
 
 const PLAN_PRICE: Record<string, number> = {
   standard: 150,
@@ -8,7 +7,6 @@ const PLAN_PRICE: Record<string, number> = {
 }
 
 export async function POST(req: NextRequest) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const supabase = createServiceClient() as any
 
   const form       = await req.formData()
@@ -25,33 +23,38 @@ export async function POST(req: NextRequest) {
     .from('tenants')
     .select('id')
     .eq('slug', tenantSlug)
-    .single() as { data: Record<string, any> | null; error: unknown }
+    .single()
 
   if (!tenant) {
     return NextResponse.json({ error: 'ไม่พบร้านค้า' }, { status: 404 })
   }
 
-  // Upload to Cloudinary
   const bytes    = await slipFile.arrayBuffer()
   const buffer   = Buffer.from(bytes)
-  let slipUrl: string
+  const ext      = slipFile.type.split('/')[1] ?? 'jpg'
+  const filename = `${tenant.id}/${Date.now()}.${ext}`
 
-  try {
-    slipUrl = await uploadSlip(buffer, slipFile.type, `krabbie/slips/${tenant.id}`)
-  } catch {
+  const { error: uploadErr } = await supabase.storage
+    .from('payment-slips')
+    .upload(filename, buffer, { contentType: slipFile.type, upsert: false })
+
+  if (uploadErr) {
     return NextResponse.json({ error: 'อัพโหลดรูปไม่สำเร็จ' }, { status: 500 })
   }
 
-  // Save payment record — pending manual review
-  const amount = PLAN_PRICE[planType] * months
+  const { data: { publicUrl } } = supabase.storage
+    .from('payment-slips')
+    .getPublicUrl(filename)
+
+  const expectedAmount = PLAN_PRICE[planType] * months
   const { error: payErr } = await supabase
     .from('payments')
     .insert({
       tenant_id:     tenant.id,
-      amount,
+      amount:        expectedAmount,
       method:        'promptpay',
       status:        'pending',
-      slip_url:      slipUrl,
+      slip_url:      publicUrl,
       months,
       plan_type:     planType,
       review_status: 'pending',
@@ -63,6 +66,6 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({
     status:  'pending_review',
-    message: '📋 รับสลิปแล้ว admin จะตรวจสอบภายใน 1-2 ชั่วโมง',
+    message: '📋 รูปสลิปได้รับแล้ว กำลังรอ admin ตรวจสอบ (ปกติภายใน 1-2 ชั่วโมง)',
   })
 }
