@@ -22,6 +22,7 @@ export interface Database {
         }
         Insert: Omit<Database['public']['Tables']['tenants']['Row'], 'id' | 'created_at' | 'updated_at'>
         Update: Partial<Database['public']['Tables']['tenants']['Insert']>
+        Relationships: []
       }
 
       services: {
@@ -38,6 +39,7 @@ export interface Database {
         }
         Insert: Omit<Database['public']['Tables']['services']['Row'], 'id' | 'created_at'>
         Update: Partial<Database['public']['Tables']['services']['Insert']>
+        Relationships: []
       }
 
       staff: {
@@ -51,6 +53,7 @@ export interface Database {
         }
         Insert: Omit<Database['public']['Tables']['staff']['Row'], 'id' | 'created_at'>
         Update: Partial<Database['public']['Tables']['staff']['Insert']>
+        Relationships: []
       }
 
       time_slots: {
@@ -59,15 +62,16 @@ export interface Database {
           tenant_id: string
           service_id: string
           staff_id: string | null
-          date: string                 // YYYY-MM-DD
-          start_time: string           // HH:MM
-          end_time: string             // HH:MM
+          date: string
+          start_time: string
+          end_time: string
           is_booked: boolean
-          is_blocked: boolean          // manual block by owner
+          is_blocked: boolean
           created_at: string
         }
         Insert: Omit<Database['public']['Tables']['time_slots']['Row'], 'id' | 'created_at'>
         Update: Partial<Database['public']['Tables']['time_slots']['Insert']>
+        Relationships: []
       }
 
       bookings: {
@@ -88,6 +92,7 @@ export interface Database {
         }
         Insert: Omit<Database['public']['Tables']['bookings']['Row'], 'id' | 'created_at' | 'updated_at'>
         Update: Partial<Database['public']['Tables']['bookings']['Insert']>
+        Relationships: []
       }
 
       templates: {
@@ -105,6 +110,7 @@ export interface Database {
         }
         Insert: Omit<Database['public']['Tables']['templates']['Row'], 'id' | 'created_at'>
         Update: Partial<Database['public']['Tables']['templates']['Insert']>
+        Relationships: []
       }
 
       payments: {
@@ -131,6 +137,7 @@ export interface Database {
         }
         Insert: Omit<Database['public']['Tables']['payments']['Row'], 'id' | 'created_at'>
         Update: Partial<Database['public']['Tables']['payments']['Insert']>
+        Relationships: []
       }
     }
 
@@ -147,6 +154,10 @@ export interface Database {
       booking_status: 'pending' | 'confirmed' | 'cancelled' | 'completed' | 'no_show'
       payment_status: 'pending' | 'paid' | 'failed' | 'refunded'
       template_category: 'booking' | 'shop' | 'food' | 'portfolio'
+    }
+
+    CompositeTypes: {
+      [_ in never]: never
     }
   }
 }
