@@ -105,29 +105,6 @@ export default function DemoBookingRental() {
         </div>
       </section>
 
-      {/* MINI CALENDAR */}
-      <section style={{padding:'40px 20px'}}>
-        <p style={{fontSize:'9px',letterSpacing:'4px',color:'#E91E8C',textTransform:'uppercase',marginBottom:'8px',textAlign:'center'}}>Booking Calendar</p>
-        <h2 style={{fontFamily:'Georgia,serif',fontSize:'22px',fontWeight:600,color:'#1a1a2e',marginBottom:'20px',textAlign:'center'}}>ตารางการจอง</h2>
-        <div style={{background:'white',borderRadius:'16px',border:'1px solid rgba(233,30,140,0.1)',overflow:'hidden',maxWidth:'320px',margin:'0 auto',boxShadow:'0 4px 24px rgba(233,30,140,0.08)'}}>
-          <div style={{display:'grid',gridTemplateColumns:'repeat(7,1fr)',borderBottom:'1px solid rgba(233,30,140,0.08)'}}>
-            {['อา','จ','อ','พ','พฤ','ศ','ส'].map(d => (
-              <div key={d} style={{padding:'8px 2px',textAlign:'center',fontSize:'10px',fontWeight:600,color:'#E91E8C'}}>{d}</div>
-            ))}
-          </div>
-          <div style={{display:'grid',gridTemplateColumns:'repeat(7,1fr)',padding:'4px'}}>
-            {[null,null,null,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31].map((d,i) => (
-              <div key={i} style={{padding:'4px 2px',textAlign:'center'}}>
-                <div style={{width:'24px',height:'24px',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'10px',fontWeight:d===7||d===15?700:400,background:d===7?'linear-gradient(135deg,#E91E8C,#9C27B0)':d===15?'rgba(233,30,140,0.08)':'transparent',color:d===7?'white':d===15?'#E91E8C':'#374151',margin:'0 auto',position:'relative'}}>
-                  {d}
-                  {(d===7||d===12||d===15)&&d&&<span style={{position:'absolute',bottom:'1px',left:'50%',transform:'translateX(-50%)',width:'4px',height:'4px',borderRadius:'50%',background:d===7?'white':'#F59E0B'}}/>}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* REVIEWS */}
       <section style={{padding:'40px 0',background:'linear-gradient(180deg,#FFF0F8,#FDFBFF)'}}>
         <h2 style={{fontFamily:'Georgia,serif',fontSize:'22px',fontWeight:600,color:'#1a1a2e',marginBottom:'20px',textAlign:'center',padding:'0 20px'}}>รีวิวจากลูกค้า</h2>

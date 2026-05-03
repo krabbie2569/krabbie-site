@@ -80,6 +80,83 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* TEMPLATES */}
+      <section className="max-w-4xl mx-auto px-6 py-16">
+        <div className="sec-label mb-4">Templates ที่มี</div>
+        <h2 className="text-2xl mb-2">เลือก Template ที่ใช่สำหรับธุรกิจของคุณ</h2>
+        <p className="text-gray-500 text-sm mb-10">พร้อมใช้งานทันที ไม่ต้องเขียนโค้ด</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          {[
+            {
+              id: 'booking-service',
+              emoji: '📅',
+              name: 'ระบบจองบริการ',
+              desc: 'นวด · ฝึกสอน · ช่างภาพ · ซ่อม',
+              tags: ['ร้านนวด', 'โค้ชส่วนตัว', 'ช่างภาพ'],
+              color: '#ff6b00',
+              bg: 'linear-gradient(135deg,#fff8f0,#ffe0c0)',
+            },
+            {
+              id: 'booking-rental',
+              emoji: '📷',
+              name: 'ระบบเช่าสินค้า',
+              desc: 'กล้อง · เสื้อผ้า · อุปกรณ์',
+              tags: ['ร้านเช่ากล้อง', 'เช่าชุด', 'เช่าอุปกรณ์'],
+              color: '#E91E8C',
+              bg: 'linear-gradient(135deg,#fff0f8,#f8e0ff)',
+            },
+            {
+              id: 'shop-general',
+              emoji: '🛍️',
+              name: 'ร้านขายสินค้าออนไลน์',
+              desc: 'เสื้อผ้า · handmade · ของตกแต่งบ้าน',
+              tags: ['ร้าน handmade', 'ของตกแต่ง', 'ของฝาก'],
+              color: '#1E293B',
+              bg: 'linear-gradient(135deg,#f1f5f9,#e2e8f0)',
+            },
+            {
+              id: 'food-qr-menu',
+              emoji: '🍜',
+              name: 'QR เมนูดิจิทัล',
+              desc: 'ร้านอาหาร · คาเฟ่ · บาร์เครื่องดื่ม',
+              tags: ['ร้านอาหาร', 'คาเฟ่', 'ฟู้ดทรัค'],
+              color: '#6F4E37',
+              bg: 'linear-gradient(135deg,#fff8f0,#fde8d0)',
+            },
+          ].map((t) => (
+            <div key={t.id} style={{ background: t.bg }} className="rounded-2xl p-6 hover:scale-[1.01] hover:shadow-lg transition-all">
+              <div className="flex items-start gap-4 mb-4">
+                <div className="text-4xl leading-none">{t.emoji}</div>
+                <div>
+                  <h3 className="font-syne font-bold text-base mb-0.5" style={{ color: t.color }}>{t.name}</h3>
+                  <p className="text-gray-500 text-xs">{t.desc}</p>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-1.5 mb-5">
+                {t.tags.map(tag => (
+                  <span key={tag} className="text-[10px] font-mono px-2 py-0.5 rounded-full"
+                    style={{ background: `${t.color}18`, color: t.color }}>
+                    {tag}
+                  </span>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <Link href={`/demo/${t.id}`} target="_blank"
+                  className="flex-1 text-center py-2 rounded-xl border-2 text-xs font-bold transition-all hover:opacity-80"
+                  style={{ borderColor: t.color, color: t.color, background: 'white' }}>
+                  👁 ดูตัวอย่าง
+                </Link>
+                <Link href={`/signup?template=${t.id}`}
+                  className="flex-1 text-center py-2 rounded-xl text-xs font-bold text-white transition-all hover:opacity-90"
+                  style={{ background: t.color }}>
+                  ใช้ Template นี้ →
+                </Link>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* PRICING */}
       <section id="pricing" className="bg-krabbie-dark py-16 px-6">
         <div className="max-w-3xl mx-auto text-center">
