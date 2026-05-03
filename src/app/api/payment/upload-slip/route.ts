@@ -1,3 +1,5 @@
+export const runtime = 'edge'
+
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase.server'
 
@@ -29,14 +31,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'ไม่พบร้านค้า' }, { status: 404 })
   }
 
-  const bytes    = await slipFile.arrayBuffer()
-  const buffer   = Buffer.from(bytes)
   const ext      = slipFile.type.split('/')[1] ?? 'jpg'
   const filename = `${tenant.id}/${Date.now()}.${ext}`
 
   const { error: uploadErr } = await supabase.storage
     .from('payment-slips')
-    .upload(filename, buffer, { contentType: slipFile.type, upsert: false })
+    .upload(filename, slipFile, { contentType: slipFile.type, upsert: false })
 
   if (uploadErr) {
     return NextResponse.json({ error: 'อัพโหลดรูปไม่สำเร็จ' }, { status: 500 })

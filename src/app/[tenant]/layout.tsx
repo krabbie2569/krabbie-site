@@ -1,3 +1,5 @@
+export const runtime = 'edge'
+
 import { headers } from 'next/headers'
 import { notFound } from 'next/navigation'
 import { getTenantBySlug, parseTenantSettings, isTenantActive } from '@/lib/tenant'
