@@ -2,17 +2,23 @@
 
 export const runtime = 'edge'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 
 const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL ?? 'operations@4k.co.th'
 
 export default function LoginPage() {
-  const [email, setEmail]       = useState('')
-  const [password, setPassword] = useState('')
-  const [loading, setLoading]   = useState(false)
-  const [error, setError]       = useState<string | null>(null)
+  const [email, setEmail]           = useState('')
+  const [password, setPassword]     = useState('')
+  const [loading, setLoading]       = useState(false)
+  const [error, setError]           = useState<string | null>(null)
+  const [justRegistered, setJustRegistered] = useState(false)
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('registered') === '1') setJustRegistered(true)
+  }, [])
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault()
@@ -41,21 +47,9 @@ export default function LoginPage() {
       return
     }
 
-    // Tenant owner → their admin dashboard
-    const { data: tenant } = await supabase
-      .from('tenants')
-      .select('slug')
-      .eq('owner_email', email.toLowerCase())
-      .single()
-
-    if (tenant?.slug) {
-      window.location.href = `/${tenant.slug}/admin`
-      return
-    }
-
-    setError('ไม่พบบัญชีในระบบ กรุณาติดต่อ support')
-    await supabase.auth.signOut()
-    setLoading(false)
+    // Regular user → dashboard
+    const next = new URLSearchParams(window.location.search).get('next')
+    window.location.href = next || '/dashboard'
   }
 
   return (
@@ -71,6 +65,12 @@ export default function LoginPage() {
           </Link>
           <p className="font-mono text-gray-400 text-xs mt-2">เข้าสู่ระบบจัดการร้านค้า</p>
         </div>
+
+        {justRegistered && (
+          <div className="bg-teal-light border border-teal-DEFAULT/30 text-teal-dark text-sm rounded-lg px-4 py-3 mb-4 text-center">
+            ✓ สมัครสำเร็จแล้ว! เข้าสู่ระบบเพื่อเริ่มใช้งาน
+          </div>
+        )}
 
         <div className="card">
           <form onSubmit={handleLogin} className="space-y-4">

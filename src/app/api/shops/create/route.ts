@@ -1,0 +1,76 @@
+export const runtime = 'edge'
+
+import { NextRequest, NextResponse } from 'next/server'
+import { createServerSupabaseClient, createServiceClient } from '@/lib/supabase.server'
+import { isValidSlug } from '@/lib/utils'
+
+export async function POST(req: NextRequest) {
+  const supabaseAuth = await createServerSupabaseClient() as any
+  const { data: { user } } = await supabaseAuth.auth.getUser()
+
+  if (!user) {
+    return NextResponse.json({ error: 'กรุณาเข้าสู่ระบบก่อน' }, { status: 401 })
+  }
+
+  const { shopName, slug, templateId, ownerPhone } = await req.json()
+
+  if (!shopName || !slug) {
+    return NextResponse.json({ error: 'กรุณากรอกชื่อร้านและ URL' }, { status: 400 })
+  }
+  if (!isValidSlug(slug)) {
+    return NextResponse.json({ error: 'URL ไม่ถูกต้อง' }, { status: 400 })
+  }
+
+  const supabase = createServiceClient() as any
+
+  const { data: existing } = await supabase
+    .from('tenants')
+    .select('id')
+    .eq('slug', slug)
+    .maybeSingle()
+
+  if (existing) {
+    return NextResponse.json({ error: `"${slug}" ถูกใช้แล้ว กรุณาเลือกชื่ออื่น` }, { status: 409 })
+  }
+
+  const trialEnds = new Date()
+  trialEnds.setDate(trialEnds.getDate() + 14)
+
+  const { data: tenant, error } = await supabase
+    .from('tenants')
+    .insert({
+      slug,
+      name:          shopName,
+      template_id:   templateId || 'booking-service',
+      owner_email:   user.email,
+      owner_phone:   ownerPhone || '',
+      plan:          'trial',
+      plan_type:     'standard',
+      auth_user_id:  user.id,
+      trial_ends_at: trialEnds.toISOString(),
+      settings: {
+        primaryColor:   '#ff6b00',
+        logoUrl:        null,
+        lineId:         null,
+        lineNotify:     false,
+        pushEnabled:    false,
+        maxAdvanceDays: 30,
+        autoConfirm:    true,
+        businessHours:  defaultHours(),
+      },
+    })
+    .select('slug')
+    .single()
+
+  if (error || !tenant) {
+    return NextResponse.json({ error: 'สร้างร้านไม่สำเร็จ กรุณาลองใหม่' }, { status: 500 })
+  }
+
+  return NextResponse.json({ data: { slug: tenant.slug } })
+}
+
+function defaultHours() {
+  const day    = { open: true,  start: '09:00', end: '18:00' }
+  const closed = { open: false, start: '09:00', end: '18:00' }
+  return { monday: day, tuesday: day, wednesday: day, thursday: day, friday: day, saturday: day, sunday: closed }
+}
