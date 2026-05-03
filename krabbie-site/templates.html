@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Krabbie.com — เลือก Template เว็บสำเร็จรูป</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&family=Syne:wght@700;800&family=Space+Mono:wght@400;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #fff8f0;
+    --dark: #1a0f00;
+    --orange: #ff6b00;
+    --coral: #ff4d4d;
+    --yellow: #ffd166;
+    --teal: #06d6a0;
+    --navy: #073b4c;
+    --card: #fff;
+    --border: #ffe0c0;
+  }
+
+  body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--dark); overflow-x: hidden; }
+
+  /* ── NAV ── */
+  .nav {
+    background: var(--dark);
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav-logo { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; }
+  .nav-logo .logo-text { font-family: 'Syne', sans-serif; color: white; font-size: 1.2rem; font-weight: 800; }
+  .nav-logo .logo-text span { color: var(--orange); }
+  .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+  .nav-links a { color: #888; text-decoration: none; font-size: 0.85rem; transition: color 0.15s; }
+  .nav-links a:hover { color: white; }
+  .nav-cta {
+    background: var(--orange);
+    color: white !important;
+    padding: 0.45rem 1.2rem;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.85rem !important;
+  }
+  .nav-cta:hover { background: #e55f00 !important; color: white !important; }
+
+  /* ── HERO ── */
+  .hero {
+    background: var(--dark);
+    padding: 4rem 2rem 3rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '🦀';
+    position: absolute;
+    font-size: 28rem;
+    opacity: 0.03;
+    top: -8rem;
+    left: 50%;
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+  .hero-tag { font-family: 'Space Mono', monospace; font-size: 0.65rem; color: var(--orange); letter-spacing: 4px; text-transform: uppercase; margin-bottom: 1rem; display: block; }
+  .hero h1 { font-family: 'Syne', sans-serif; font-size: clamp(2rem, 6vw, 3.5rem); color: white; font-weight: 800; line-height: 1.1; margin-bottom: 1rem; }
+  .hero h1 span { color: var(--orange); }
+  .hero p { color: #888; font-size: 1rem; max-width: 500px; margin: 0 auto 1.5rem; line-height: 1.6; }
+  .hero-slogan { font-family: 'Space Mono', monospace; color: var(--yellow); font-size: 0.85rem; margin-bottom: 2rem; }
+  .hero-price {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.3rem;
+    background: rgba(255,107,0,0.15);
+    border: 1px solid rgba(255,107,0,0.3);
+    border-radius: 8px;
+    padding: 0.6rem 1.2rem;
+  }
+  .hero-price .amount { font-family: 'Syne', sans-serif; color: var(--orange); font-size: 1.8rem; font-weight: 800; }
+  .hero-price .unit { color: #888; font-size: 0.85rem; }
+
+  /* ── FILTER BAR ── */
+  .filter-bar { max-width: 900px; margin: 0 auto; padding: 2rem 2rem 0; display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .filter-btn {
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    border: 2px solid var(--border);
+    background: white;
+    font-family: 'Sarabun', sans-serif;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    color: #666;
+  }
+  .filter-btn:hover { border-color: var(--orange); color: var(--orange); }
+  .filter-btn.active { background: var(--orange); border-color: var(--orange); color: white; font-weight: 700; }
+
+  /* ── TEMPLATE GRID ── */
+  .templates-section { max-width: 900px; margin: 0 auto; padding: 1.5rem 2rem 4rem; }
+  .templates-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.5rem; }
+
+  .template-card {
+    background: white;
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.2s;
+    cursor: pointer;
+    position: relative;
+  }
+  .template-card:hover { border-color: var(--orange); transform: translateY(-4px); box-shadow: 0 16px 40px rgba(255,107,0,0.12); }
+  .template-card.unavailable { opacity: 0.65; cursor: default; }
+  .template-card.unavailable:hover { transform: none; box-shadow: none; border-color: var(--border); }
+
+  /* CARD PREVIEW */
+  .card-preview {
+    height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .preview-booking { background: linear-gradient(135deg, #fff0e0, #ffe0c0); }
+  .preview-shop    { background: linear-gradient(135deg, #f0f0ff, #e0e0ff); }
+  .preview-menu    { background: linear-gradient(135deg, #f0fff8, #d0fff0); }
+  .preview-port    { background: linear-gradient(135deg, #fff8f0, #ffeedd); }
+  .preview-coming  { background: linear-gradient(135deg, #f5f5f5, #ebebeb); }
+
+  /* Mini mock-up inside preview */
+  .mockup {
+    width: 120px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    overflow: hidden;
+    font-size: 0;
+  }
+  .mockup-bar { height: 8px; }
+  .mockup-body { padding: 6px; display: flex; flex-direction: column; gap: 4px; }
+  .mockup-line { height: 5px; border-radius: 3px; }
+  .mockup-line.wide { width: 100%; }
+  .mockup-line.med { width: 70%; }
+  .mockup-line.short { width: 45%; }
+  .mockup-btn { height: 14px; border-radius: 4px; margin-top: 2px; }
+  .mockup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; margin-top: 2px; }
+  .mockup-slot { height: 18px; border-radius: 3px; }
+
+  .coming-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .coming-badge { background: #f5f5f5; color: #aaa; font-family: 'Space Mono', monospace; font-size: 0.7rem; padding: 0.4rem 0.8rem; border-radius: 4px; border: 1px solid #e0e0e0; }
+
+  /* CARD BODY */
+  .card-body { padding: 1.2rem; }
+  .card-category { font-family: 'Space Mono', monospace; font-size: 0.6rem; color: var(--orange); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 0.4rem; }
+  .card-name { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; margin-bottom: 0.3rem; }
+  .card-desc { font-size: 0.8rem; color: #888; line-height: 1.5; margin-bottom: 1rem; }
+  .card-features { display: flex; flex-direction: column; gap: 0.25rem; margin-bottom: 1rem; }
+  .card-feat { font-size: 0.78rem; color: #555; display: flex; align-items: center; gap: 0.4rem; }
+  .card-feat::before { content: '✓'; color: var(--teal); font-weight: 700; flex-shrink: 0; }
+  .card-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 0.8rem; border-top: 1px solid #f5f5f5; }
+  .card-price .p-num { font-family: 'Space Mono', monospace; font-size: 1rem; font-weight: 700; color: var(--orange); }
+  .card-price .p-unit { font-size: 0.72rem; color: #aaa; }
+  .card-status-live { background: #e0fff5; color: #049e76; font-family: 'Space Mono', monospace; font-size: 0.6rem; padding: 0.2rem 0.6rem; border-radius: 3px; }
+  .card-status-soon { background: #fff0e0; color: var(--orange); font-family: 'Space Mono', monospace; font-size: 0.6rem; padding: 0.2rem 0.6rem; border-radius: 3px; }
+
+  /* TRY BTN */
+  .try-btn {
+    display: block;
+    width: 100%;
+    padding: 0.65rem;
+    background: var(--orange);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Sarabun', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 0.8rem;
+    transition: background 0.15s;
+    text-align: center;
+  }
+  .try-btn:hover { background: #e55f00; }
+  .try-btn.disabled { background: #f0f0f0; color: #bbb; cursor: not-allowed; }
+
+  /* ── HOW IT WORKS ── */
+  .how-section { background: var(--dark); padding: 3rem 2rem; }
+  .how-inner { max-width: 800px; margin: 0 auto; text-align: center; }
+  .how-inner .sec-label { font-family: 'Space Mono', monospace; font-size: 0.65rem; color: var(--orange); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 1rem; display: block; }
+  .how-inner h2 { font-family: 'Syne', sans-serif; color: white; font-size: 1.6rem; margin-bottom: 2rem; }
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+  .step { text-align: center; }
+  .step-num { width: 44px; height: 44px; background: var(--orange); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-weight: 800; color: white; font-size: 1.1rem; margin: 0 auto 0.8rem; }
+  .step h3 { color: white; font-size: 0.95rem; margin-bottom: 0.4rem; }
+  .step p { color: #666; font-size: 0.8rem; line-height: 1.5; }
+
+  /* ── CTA SECTION ── */
+  .cta-section { padding: 4rem 2rem; text-align: center; }
+  .cta-inner { max-width: 500px; margin: 0 auto; }
+  .cta-inner .crab-icon { font-size: 3rem; margin-bottom: 1rem; }
+  .cta-inner h2 { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem; }
+  .cta-inner h2 span { color: var(--orange); }
+  .cta-inner p { color: #888; font-size: 0.9rem; margin-bottom: 2rem; }
+  .cta-btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--orange);
+    color: white;
+    padding: 0.8rem 2rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    border: none;
+    cursor: pointer;
+    font-family: 'Sarabun', sans-serif;
+    transition: background 0.15s;
+  }
+  .btn-primary:hover { background: #e55f00; }
+  .btn-outline {
+    background: transparent;
+    color: var(--dark);
+    padding: 0.8rem 2rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    border: 2px solid var(--border);
+    cursor: pointer;
+    font-family: 'Sarabun', sans-serif;
+    transition: border-color 0.15s;
+  }
+  .btn-outline:hover { border-color: var(--orange); color: var(--orange); }
+
+  .free-trial-note { font-family: 'Space Mono', monospace; font-size: 0.7rem; color: var(--teal); margin-top: 1rem; }
+
+  /* ── FOOTER ── */
+  .footer { background: var(--dark); padding: 1.5rem 2rem; text-align: center; font-family: 'Space Mono', monospace; font-size: 0.72rem; color: #444; }
+  .footer span { color: var(--orange); }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: white;
+    border-radius: 16px;
+    max-width: 480px;
+    width: 100%;
+    padding: 2rem;
+    position: relative;
+  }
+  .modal-close {
+    position: absolute;
+    top: 1rem; right: 1rem;
+    background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #aaa;
+  }
+  .modal h3 { font-family: 'Syne', sans-serif; font-size: 1.2rem; margin-bottom: 0.4rem; }
+  .modal p { color: #888; font-size: 0.85rem; margin-bottom: 1.5rem; line-height: 1.6; }
+  .form-group { margin-bottom: 1rem; }
+  .form-group label { display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 0.3rem; }
+  .form-group input, .form-group select {
+    width: 100%;
+    padding: 0.6rem 0.9rem;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-family: 'Sarabun', sans-serif;
+    font-size: 0.88rem;
+    transition: border-color 0.15s;
+    background: white;
+  }
+  .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--orange); }
+  .subdomain-row { display: flex; align-items: center; gap: 0; }
+  .subdomain-row input { border-radius: 8px 0 0 8px; }
+  .subdomain-suffix { background: #f5f5f5; border: 2px solid var(--border); border-left: none; padding: 0.6rem 0.8rem; border-radius: 0 8px 8px 0; font-family: 'Space Mono', monospace; font-size: 0.78rem; color: #888; white-space: nowrap; }
+  .modal-note { background: #f0fff8; border: 1px solid #c0ffe0; border-radius: 8px; padding: 0.7rem 1rem; font-size: 0.78rem; color: #049e76; margin-bottom: 1.2rem; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a class="nav-logo" href="#">
+    <span style="font-size:1.3rem">🦀</span>
+    <div class="logo-text">Krabbie<span>.com</span></div>
+  </a>
+  <div class="nav-links">
+    <a href="#">ราคา</a>
+    <a href="#">ตัวอย่างเว็บ</a>
+    <a href="#">FAQ</a>
+    <a href="#" class="nav-cta" onclick="openModal()">เริ่มใช้งาน ฟรี!</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <span class="hero-tag">เว็บสำเร็จรูป · พร้อมใช้ทันที</span>
+  <h1>เลือก Template<br><span>ที่ใช่สำหรับร้านคุณ</span></h1>
+  <p>ไม่ต้องเขียนโค้ด ไม่ต้องจ้างโปรแกรมเมอร์ สมัครแล้วได้เว็บทันที พร้อม subdomain ของตัวเอง</p>
+  <div class="hero-slogan">"เว็บง่ายๆ แค่หนีบเดียว" 🦀</div>
+  <div class="hero-price">
+    <span class="amount">150</span>
+    <span class="unit">฿ / เดือน · ยกเลิกได้ทุกเมื่อ</span>
+  </div>
+</div>
+
+<!-- FILTER -->
+<div class="filter-bar">
+  <button class="filter-btn active" onclick="filterTemplates(this, 'all')">ทั้งหมด</button>
+  <button class="filter-btn" onclick="filterTemplates(this, 'booking')">จองบริการ</button>
+  <button class="filter-btn" onclick="filterTemplates(this, 'shop')">ขายสินค้า</button>
+  <button class="filter-btn" onclick="filterTemplates(this, 'food')">ร้านอาหาร</button>
+  <button class="filter-btn" onclick="filterTemplates(this, 'portfolio')">Portfolio</button>
+</div>
+
+<!-- TEMPLATES GRID -->
+<div class="templates-section">
+  <div class="templates-grid" id="templatesGrid">
+
+    <!-- 1: จองบริการ -->
+    <div class="template-card" data-cat="booking" onclick="openModal('จองบริการ')">
+      <div class="card-preview preview-booking">
+        <div class="mockup">
+          <div class="mockup-bar" style="background:#ff6b00"></div>
+          <div class="mockup-body">
+            <div class="mockup-line wide" style="background:#ffe0c0"></div>
+            <div class="mockup-line med" style="background:#ffd0a0"></div>
+            <div class="mockup-grid">
+              <div class="mockup-slot" style="background:#fff0e0;border:1px solid #ffd0a0"></div>
+              <div class="mockup-slot" style="background:#fff0e0;border:1px solid #ffd0a0"></div>
+              <div class="mockup-slot" style="background:#ff6b00;border-radius:3px"></div>
+              <div class="mockup-slot" style="background:#fff0e0;border:1px solid #ffd0a0"></div>
+            </div>
+            <div class="mockup-btn" style="background:#ff6b00;border-radius:4px"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-category">บริการ</div>
+        <div class="card-name">ระบบจองบริการ</div>
+        <div class="card-desc">เหมาะสำหรับร้านนวด · ฝึกสอน · ช่างภาพ · ซ่อมแซม · บริการรายชั่วโมง</div>
+        <div class="card-features">
+          <div class="card-feat">ปฏิทินจองออนไลน์ 24/7</div>
+          <div class="card-feat">แจ้งเตือน Line / Push</div>
+          <div class="card-feat">จัดการคิว + cancel</div>
+          <div class="card-feat">รองรับหลายบริการ</div>
+          <div class="card-feat">subdomain ของตัวเอง</div>
+        </div>
+        <div class="card-footer">
+          <div class="card-price"><span class="p-num">150 ฿</span><span class="p-unit"> /เดือน</span></div>
+          <span class="card-status-live">✓ พร้อมใช้งาน</span>
+        </div>
+        <button class="try-btn">เลือก Template นี้ →</button>
+      </div>
+    </div>
+
+    <!-- 2: นวดแผนไทย (variant) -->
+    <div class="template-card" data-cat="booking" onclick="openModal('สปา & นวด')">
+      <div class="card-preview preview-booking">
+        <div class="mockup">
+          <div class="mockup-bar" style="background:#D62839"></div>
+          <div class="mockup-body">
+            <div class="mockup-line wide" style="background:#ffe0e0"></div>
+            <div class="mockup-line short" style="background:#ffb0b0"></div>
+            <div class="mockup-grid">
+              <div class="mockup-slot" style="background:#D62839;border-radius:3px"></div>
+              <div class="mockup-slot" style="background:#D62839;border-radius:3px"></div>
+              <div class="mockup-slot" style="background:#ffe0e0;border:1px solid #ffb0b0"></div>
+              <div class="mockup-slot" style="background:#D62839;border-radius:3px"></div>
+            </div>
+            <div class="mockup-btn" style="background:#D62839;border-radius:4px"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-category">บริการ · สปา</div>
+        <div class="card-name">สปา &amp; นวดแผนไทย</div>
+        <div class="card-desc">Template เฉพาะทางสำหรับร้านสปา · นวดแผนไทย · อโรมา · ออนเซ็น</div>
+        <div class="card-features">
+          <div class="card-feat">เลือกประเภทนวด + ราคา</div>
+          <div class="card-feat">จองนักนวดเฉพาะคน</div>
+          <div class="card-feat">แพ็คเกจ / คูปอง</div>
+          <div class="card-feat">ดีไซน์สไตล์ผ่อนคลาย</div>
+        </div>
+        <div class="card-footer">
+          <div class="card-price"><span class="p-num">150 ฿</span><span class="p-unit"> /เดือน</span></div>
+          <span class="card-status-live">✓ พร้อมใช้งาน</span>
+        </div>
+        <button class="try-btn">เลือก Template นี้ →</button>
+      </div>
+    </div>
+
+    <!-- 3: ขายสินค้า (coming) -->
+    <div class="template-card unavailable" data-cat="shop">
+      <div class="card-preview preview-shop">
+        <div class="mockup">
+          <div class="mockup-bar" style="background:#5b5bd6"></div>
+          <div class="mockup-body">
+            <div class="mockup-grid">
+              <div class="mockup-slot" style="background:#e0e0ff;border-radius:3px;height:28px"></div>
+              <div class="mockup-slot" style="background:#e0e0ff;border-radius:3px;height:28px"></div>
+            </div>
+            <div class="mockup-line med" style="background:#c0c0f0;margin-top:3px"></div>
+            <div class="mockup-btn" style="background:#5b5bd6;border-radius:4px"></div>
+          </div>
+        </div>
+        <div class="coming-overlay">
+          <span class="coming-badge">PHASE 3</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-category">ขายสินค้า</div>
+        <div class="card-name">ร้านขายสินค้าออนไลน์</div>
+        <div class="card-desc">เสื้อผ้า · งาน handmade · ของขวัญ · สินค้าทั่วไป พร้อมตะกร้าสินค้า</div>
+        <div class="card-features">
+          <div class="card-feat">catalog สินค้า + รูปภาพ</div>
+          <div class="card-feat">ตะกร้า + checkout</div>
+          <div class="card-feat">ชำระ PromptPay / โอน</div>
+          <div class="card-feat">แจ้งออเดอร์ทันที</div>
+        </div>
+        <div class="card-footer">
+          <div class="card-price"><span class="p-num">150 ฿</span><span class="p-unit"> /เดือน</span></div>
+          <span class="card-status-soon">⏳ เร็วๆ นี้</span>
+        </div>
+        <button class="try-btn disabled" disabled>เร็วๆ นี้ — แจ้งเตือนฉัน</button>
+      </div>
+    </div>
+
+    <!-- 4: QR เมนู (coming) -->
+    <div class="template-card unavailable" data-cat="food">
+      <div class="card-preview preview-menu">
+        <div class="mockup">
+          <div class="mockup-bar" style="background:#06d6a0"></div>
+          <div class="mockup-body">
+            <div class="mockup-line wide" style="background:#c0fff0"></div>
+            <div class="mockup-grid">
+              <div class="mockup-slot" style="background:#e0fff8;border-radius:3px;height:22px"></div>
+              <div class="mockup-slot" style="background:#e0fff8;border-radius:3px;height:22px"></div>
+              <div class="mockup-slot" style="background:#06d6a0;border-radius:3px;height:22px"></div>
+              <div class="mockup-slot" style="background:#e0fff8;border-radius:3px;height:22px"></div>
+            </div>
+            <div class="mockup-line short" style="background:#a0ffe8"></div>
+          </div>
+        </div>
+        <div class="coming-overlay">
+          <span class="coming-badge">PHASE 3</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-category">ร้านอาหาร</div>
+        <div class="card-name">QR เมนูดิจิทัล</div>
+        <div class="card-desc">ร้านอาหาร · คาเฟ่ · ร้านเครื่องดื่ม ลูกค้าสแกน QR ดูเมนูได้ทันที</div>
+        <div class="card-features">
+          <div class="card-feat">เมนูพร้อมรูป + ราคา</div>
+          <div class="card-feat">แก้ไขเมนูได้ real-time</div>
+          <div class="card-feat">ออกใบเสร็จดิจิทัล</div>
+          <div class="card-feat">รองรับหลายโต๊ะ</div>
+        </div>
+        <div class="card-footer">
+          <div class="card-price"><span class="p-num">150 ฿</span><span class="p-unit"> /เดือน</span></div>
+          <span class="card-status-soon">⏳ เร็วๆ นี้</span>
+        </div>
+        <button class="try-btn disabled" disabled>เร็วๆ นี้ — แจ้งเตือนฉัน</button>
+      </div>
+    </div>
+
+    <!-- 5: Portfolio (coming) -->
+    <div class="template-card unavailable" data-cat="portfolio">
+      <div class="card-preview preview-port">
+        <div class="mockup">
+          <div class="mockup-bar" style="background:#ffd166"></div>
+          <div class="mockup-body">
+            <div class="mockup-line short" style="background:#ffd166"></div>
+            <div class="mockup-grid">
+              <div class="mockup-slot" style="background:#fff0c0;border-radius:3px;height:24px"></div>
+              <div class="mockup-slot" style="background:#fff0c0;border-radius:3px;height:24px"></div>
+              <div class="mockup-slot" style="background:#ffd166;border-radius:3px;height:24px"></div>
+              <div class="mockup-slot" style="background:#fff0c0;border-radius:3px;height:24px"></div>
+            </div>
+          </div>
+        </div>
+        <div class="coming-overlay">
+          <span class="coming-badge">PHASE 3</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-category">Portfolio</div>
+        <div class="card-name">Portfolio &amp; Landing Page</div>
+        <div class="card-desc">ช่างภาพ · นักออกแบบ · Freelance · เจ้าของธุรกิจที่ต้องการหน้าแนะนำตัว</div>
+        <div class="card-features">
+          <div class="card-feat">Gallery รูปภาพ</div>
+          <div class="card-feat">แบบฟอร์มติดต่อ</div>
+          <div class="card-feat">ลิงก์ social media</div>
+          <div class="card-feat">SEO พื้นฐาน</div>
+        </div>
+        <div class="card-footer">
+          <div class="card-price"><span class="p-num">150 ฿</span><span class="p-unit"> /เดือน</span></div>
+          <span class="card-status-soon">⏳ เร็วๆ นี้</span>
+        </div>
+        <button class="try-btn disabled" disabled>เร็วๆ นี้ — แจ้งเตือนฉัน</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="how-section">
+  <div class="how-inner">
+    <span class="sec-label">วิธีใช้งาน</span>
+    <h2>3 ขั้นตอน ได้เว็บทันที</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>เลือก Template</h3>
+        <p>เลือก template ที่เหมาะกับธุรกิจ แล้วกรอกชื่อร้านและ subdomain ที่ต้องการ</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>ชำระ &amp; Activate</h3>
+        <p>โอน PromptPay 150 ฿ ระบบ activate เว็บให้อัตโนมัติภายใน 5 นาที</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>แชร์ลิงก์ร้าน</h3>
+        <p>ได้เว็บที่ <strong style="color:var(--orange)">ชื่อร้าน.krabbie.com</strong> ทันที แชร์ให้ลูกค้าจองได้เลย!</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="cta-section">
+  <div class="cta-inner">
+    <div class="crab-icon">🦀</div>
+    <h2>พร้อมมีเว็บ<span>เป็นของตัวเอง?</span></h2>
+    <p>ทดลองใช้ฟรี 1 เดือน ไม่ต้องใช้บัตรเครดิต ยกเลิกได้ทุกเมื่อ</p>
+    <div class="cta-btns">
+      <button class="btn-primary" onclick="openModal()">🦀 เริ่มทดลองฟรี 1 เดือน</button>
+      <button class="btn-outline">ดูตัวอย่างเว็บ Demo</button>
+    </div>
+    <div class="free-trial-note">✓ ฟรี 1 เดือน · ✓ ไม่ต้องใช้บัตรเครดิต · ✓ ยกเลิกได้ทุกเมื่อ</div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <div style="font-size:1.5rem;margin-bottom:0.4rem">🦀</div>
+  <div><span>Krabbie.com</span> · เว็บสำเร็จรูปให้เช่า</div>
+  <div style="margin-top:0.3rem">"เว็บง่ายๆ แค่หนีบเดียว"</div>
+</div>
+
+<!-- MODAL: สมัครใช้งาน -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h3>🦀 สมัครทดลองใช้ฟรี 1 เดือน</h3>
+    <p>เลือก template และกรอกข้อมูลร้านของคุณ — ได้เว็บทันทีหลัง activate</p>
+    <div class="modal-note">✓ ทดลองใช้ฟรี 1 เดือนเต็ม · ไม่ต้องชำระจนกว่าจะพอใจ</div>
+    <div class="form-group">
+      <label>Template ที่เลือก</label>
+      <select id="templateSelect">
+        <option>ระบบจองบริการ</option>
+        <option>สปา &amp; นวดแผนไทย</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>ชื่อร้าน</label>
+      <input type="text" placeholder="เช่น ร้านนวดสบาย, สตูดิโอถ่ายภาพ">
+    </div>
+    <div class="form-group">
+      <label>Subdomain (ที่อยู่เว็บ)</label>
+      <div class="subdomain-row">
+        <input type="text" placeholder="ชื่อร้าน" id="subdomainInput" oninput="sanitizeSubdomain(this)">
+        <span class="subdomain-suffix">.krabbie.com</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>เบอร์โทร / Line ID (สำหรับแจ้งเตือน)</label>
+      <input type="text" placeholder="0812345678 หรือ Line ID">
+    </div>
+    <button class="try-btn" onclick="submitForm()">ยืนยันและเริ่มใช้งาน →</button>
+  </div>
+</div>
+
+<script>
+  let selectedTemplate = 'ระบบจองบริการ';
+
+  function filterTemplates(btn, cat) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.template-card').forEach(card => {
+      if (cat === 'all' || card.dataset.cat === cat) {
+        card.style.display = '';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  }
+
+  function openModal(template) {
+    if (template) {
+      selectedTemplate = template;
+      const sel = document.getElementById('templateSelect');
+      for (let i = 0; i < sel.options.length; i++) {
+        if (sel.options[i].text.includes(template) || template.includes(sel.options[i].text)) {
+          sel.selectedIndex = i;
+          break;
+        }
+      }
+    }
+    document.getElementById('modalOverlay').classList.add('open');
+  }
+
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('open');
+  }
+
+  function closeModalOutside(e) {
+    if (e.target === document.getElementById('modalOverlay')) closeModal();
+  }
+
+  function sanitizeSubdomain(input) {
+    input.value = input.value.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/--+/g, '-');
+  }
+
+  function submitForm() {
+    const subdomain = document.getElementById('subdomainInput').value;
+    if (!subdomain) { alert('กรุณากรอก subdomain ของร้านด้วยนะครับ 🦀'); return; }
+    alert(`✅ สมัครสำเร็จ!\n\nเว็บของคุณจะอยู่ที่:\nhttps://${subdomain}.krabbie.com\n\n(ระบบอยู่ระหว่าง Phase 1 — จะ activate จริงเมื่อพร้อม)`);
+    closeModal();
+  }
+</script>
+</body>
+</html>
