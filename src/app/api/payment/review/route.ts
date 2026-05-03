@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServiceClient } from '@/lib/supabase'
+import { createServiceClient } from '@/lib/supabase.server'
 
 // Super admin: approve หรือ reject payment ด้วยตัวเอง
 export async function POST(req: NextRequest) {

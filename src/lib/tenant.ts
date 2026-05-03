@@ -1,5 +1,5 @@
 import type { Tenant, TenantSettings } from '@/types'
-import { createServerSupabaseClient } from './supabase'
+import { createServerSupabaseClient } from './supabase.server'
 
 const APP_DOMAIN = process.env.NEXT_PUBLIC_APP_DOMAIN ?? 'krabbie.com'
 

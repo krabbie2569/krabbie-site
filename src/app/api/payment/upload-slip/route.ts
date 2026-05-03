@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServiceClient } from '@/lib/supabase'
+import { createServiceClient } from '@/lib/supabase.server'
 import { verifySlip, validatePayment } from '@/lib/slip-verify'
 
 const PLAN_PRICE: Record<string, number> = {
