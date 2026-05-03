@@ -46,6 +46,7 @@ CREATE TABLE IF NOT EXISTS rental_reviews (
   rating        SMALLINT NOT NULL CHECK (rating BETWEEN 1 AND 5),
   comment       TEXT,
   images        TEXT[] NOT NULL DEFAULT '{}',
+  likes         INT NOT NULL DEFAULT 0,
   created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
