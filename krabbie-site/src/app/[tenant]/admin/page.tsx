@@ -6,6 +6,7 @@ import { formatPrice } from '@/lib/utils'
 import type { Service } from '@/types'
 import StatsCard from '@/components/admin/StatsCard'
 import BookingList from '@/components/admin/BookingList'
+import LogoutButton from '@/components/admin/LogoutButton'
 
 interface Props {
   params: Promise<{ tenant: string }>
@@ -55,7 +56,15 @@ export default async function TenantAdminPage({ params }: Props) {
             <span className="font-mono text-gray-500 text-xs ml-2">Admin</span>
           </div>
         </div>
-        <span className="badge-trial">{tenant.plan === 'trial' ? 'ทดลองใช้' : 'Active'}</span>
+        <div className="flex items-center gap-3">
+          <span className={`text-[0.6rem] font-mono px-2 py-0.5 rounded ${
+            tenant.plan === 'trial' ? 'badge-trial' :
+            (tenant as any).plan_type === 'pro' ? 'bg-teal-light text-teal-dark' : 'badge-live'
+          }`}>
+            {tenant.plan === 'trial' ? 'ทดลองใช้' : (tenant as any).plan_type === 'pro' ? 'Pro 299฿' : 'Standard 150฿'}
+          </span>
+          <LogoutButton />
+        </div>
       </div>
 
       {/* QUICK NAV */}
