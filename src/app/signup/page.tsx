@@ -7,22 +7,19 @@ import type { SignupForm } from '@/types'
 
 const TEMPLATES = [
   { id: 'booking-service', name: 'ระบบจองบริการ', emoji: '📅', desc: 'นวด · ฝึกสอน · ช่างภาพ · ซ่อม', available: true },
-  { id: 'booking-spa',     name: 'สปา & นวดแผนไทย', emoji: '🌿', desc: 'สปา · อโรมา · นวดแผนไทย', available: true },
-  { id: 'shop',            name: 'ร้านขายสินค้า',   emoji: '🛍️', desc: 'เร็วๆ นี้', available: false },
-  { id: 'qr-menu',         name: 'QR เมนูร้านอาหาร', emoji: '🍜', desc: 'เร็วๆ นี้', available: false },
+  { id: 'booking-rental',  name: 'เช่าสินค้า',    emoji: '📷', desc: 'กล้อง · ชุด · อุปกรณ์ · ของตกแต่ง', available: true },
+  { id: 'shop',            name: 'ร้านขายสินค้า',  emoji: '🛍️', desc: 'เร็วๆ นี้', available: false },
+  { id: 'qr-menu',         name: 'QR เมนูอาหาร',   emoji: '🍜', desc: 'เร็วๆ นี้', available: false },
 ]
 
 export default function SignupPage() {
-  const [step, setStep] = useState<1 | 2 | 3>(1)
-  const [form, setForm] = useState<SignupForm>({
-    templateId: '',
-    shopName:   '',
-    slug:       '',
-    ownerEmail: '',
-    ownerPhone: '',
-  })
-  const [loading, setLoading] = useState(false)
-  const [slugError, setSlugError] = useState('')
+  const [step, setStep]         = useState<1 | 2 | 3>(1)
+  const [form, setForm]         = useState<SignupForm>({ templateId: '', shopName: '', slug: '', ownerEmail: '', ownerPhone: '', password: '' })
+  const [confirmPass, setConfirmPass] = useState('')
+  const [loading, setLoading]   = useState(false)
+  const [slugError, setSlugError]     = useState('')
+  const [passError, setPassError]     = useState('')
+  const [apiError, setApiError]       = useState('')
 
   function setField<K extends keyof SignupForm>(key: K, value: SignupForm[K]) {
     setForm(prev => ({ ...prev, [key]: value }))
@@ -31,36 +28,58 @@ export default function SignupPage() {
   function handleSlugChange(raw: string) {
     const clean = sanitizeSlug(raw)
     setField('slug', clean)
-    if (clean && !isValidSlug(clean)) {
-      setSlugError('ใช้ตัวอักษรภาษาอังกฤษพิมพ์เล็กและตัวเลขเท่านั้น')
-    } else {
-      setSlugError('')
-    }
+    setSlugError(clean && !isValidSlug(clean) ? 'ใช้ตัวอักษรพิมพ์เล็กและตัวเลขเท่านั้น' : '')
   }
 
   function autoSlug(name: string) {
-    if (!form.slug) {
-      const generated = sanitizeSlug(name)
-      setField('slug', generated)
-    }
+    if (!form.slug) setField('slug', sanitizeSlug(name))
+  }
+
+  function validateStep2() {
+    if (!form.ownerEmail) return 'กรุณาใส่อีเมล'
+    if (!form.password || form.password.length < 8) return 'รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร'
+    if (form.password !== confirmPass) return 'รหัสผ่านไม่ตรงกัน'
+    return ''
   }
 
   async function handleSubmit() {
+    const err = validateStep2()
+    if (err) { setPassError(err); return }
+    setPassError('')
+    setApiError('')
     setLoading(true)
-    // TODO: call POST /api/signup
-    await new Promise(r => setTimeout(r, 1200))
-    setLoading(false)
-    setStep(3)
+
+    try {
+      const res = await fetch('/api/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      })
+      const json = await res.json()
+      if (!res.ok) {
+        setApiError(json.error ?? 'เกิดข้อผิดพลาด กรุณาลองใหม่')
+        setLoading(false)
+        return
+      }
+      setStep(3)
+    } catch {
+      setApiError('ไม่สามารถเชื่อมต่อได้ กรุณาลองใหม่')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
     <main className="min-h-screen bg-krabbie-bg flex flex-col">
 
-      {/* NAV */}
       <nav className="bg-krabbie-dark px-6 py-4 flex items-center gap-3">
         <Link href="/" className="text-2xl">🦀</Link>
         <span className="font-syne text-white font-extrabold">
           Krabbie<span className="text-orange-500">.com</span>
+        </span>
+        <span className="ml-auto font-mono text-gray-500 text-xs">
+          มีบัญชีแล้ว?{' '}
+          <Link href="/login" className="text-orange-400 hover:underline">เข้าสู่ระบบ</Link>
         </span>
       </nav>
 
@@ -84,7 +103,7 @@ export default function SignupPage() {
             </span>
           </div>
 
-          {/* STEP 1: CHOOSE TEMPLATE */}
+          {/* STEP 1 */}
           {step === 1 && (
             <div>
               <h1 className="font-syne text-2xl font-bold mb-1">เลือก Template ที่ใช่</h1>
@@ -118,15 +137,21 @@ export default function SignupPage() {
             </div>
           )}
 
-          {/* STEP 2: SHOP INFO */}
+          {/* STEP 2 */}
           {step === 2 && (
             <div>
               <h1 className="font-syne text-2xl font-bold mb-1">ข้อมูลร้านของคุณ</h1>
-              <p className="text-gray-500 text-sm mb-6">กรอกข้อมูลเพื่อสร้างเว็บร้านของคุณ</p>
+              <p className="text-gray-500 text-sm mb-6">กรอกข้อมูลเพื่อสร้างเว็บร้านและบัญชีล็อกอิน</p>
 
               <div className="bg-orange-50 border border-orange-200 rounded-lg px-4 py-3 text-sm text-orange-700 mb-5">
-                🎉 ทดลองใช้ฟรี 1 เดือน — ไม่ต้องชำระจนกว่าจะพอใจ
+                🎉 ทดลองใช้ฟรี 14 วัน — ไม่ต้องชำระจนกว่าจะพอใจ
               </div>
+
+              {apiError && (
+                <div className="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3 mb-4 font-mono">
+                  {apiError}
+                </div>
+              )}
 
               <div className="space-y-4">
                 <div>
@@ -139,7 +164,7 @@ export default function SignupPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold mb-1">Subdomain (ที่อยู่เว็บ) *</label>
+                  <label className="block text-sm font-semibold mb-1">Subdomain *</label>
                   <div className="flex">
                     <input
                       className="input rounded-r-none border-r-0"
@@ -166,7 +191,7 @@ export default function SignupPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold mb-1">อีเมล</label>
+                  <label className="block text-sm font-semibold mb-1">อีเมล * <span className="font-normal text-gray-400">(ใช้ล็อกอิน)</span></label>
                   <input
                     className="input"
                     type="email"
@@ -175,14 +200,35 @@ export default function SignupPage() {
                     onChange={e => setField('ownerEmail', e.target.value)}
                   />
                 </div>
+                <div>
+                  <label className="block text-sm font-semibold mb-1">รหัสผ่าน * <span className="font-normal text-gray-400">(อย่างน้อย 8 ตัว)</span></label>
+                  <input
+                    className="input"
+                    type="password"
+                    placeholder="••••••••"
+                    value={form.password}
+                    onChange={e => setField('password', e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold mb-1">ยืนยันรหัสผ่าน *</label>
+                  <input
+                    className="input"
+                    type="password"
+                    placeholder="••••••••"
+                    value={confirmPass}
+                    onChange={e => setConfirmPass(e.target.value)}
+                  />
+                  {passError && <p className="text-red-500 text-xs mt-1">{passError}</p>}
+                </div>
               </div>
 
               <div className="flex gap-3 mt-6">
                 <button onClick={() => setStep(1)} className="btn-outline flex-1">← ย้อนกลับ</button>
                 <button
-                  disabled={!form.shopName || !form.slug || !!slugError || !form.ownerPhone || loading}
+                  disabled={!form.shopName || !form.slug || !!slugError || !form.ownerPhone || !form.ownerEmail || loading}
                   onClick={handleSubmit}
-                  className="btn-primary flex-2 flex-1 disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="btn-primary flex-1 disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   {loading ? 'กำลังสร้าง...' : 'สร้างเว็บร้าน →'}
                 </button>
@@ -190,21 +236,24 @@ export default function SignupPage() {
             </div>
           )}
 
-          {/* STEP 3: SUCCESS */}
+          {/* STEP 3 */}
           {step === 3 && (
             <div className="text-center">
               <div className="text-6xl mb-4">🦀</div>
               <h1 className="font-syne text-2xl font-bold mb-2">สร้างร้านสำเร็จแล้ว!</h1>
               <p className="text-gray-500 text-sm mb-4">เว็บของคุณพร้อมใช้งานที่</p>
-              <div className="bg-orange-50 border border-orange-200 rounded-lg px-4 py-3 font-mono text-orange-600 text-sm mb-6">
+              <div className="bg-orange-50 border border-orange-200 rounded-lg px-4 py-3 font-mono text-orange-600 text-sm mb-4">
                 {form.slug ? shopUrl(form.slug) : 'yourshop.krabbie.com'}
               </div>
               <p className="text-xs text-gray-400 mb-6 font-mono">
-                ✓ ทดลองฟรี 1 เดือน · ชำระ 150 ฿ ต่อเมื่อพอใจ
+                ✓ ทดลองฟรี 14 วัน · ล็อกอินได้ด้วยอีเมล {form.ownerEmail}
               </p>
-              <a href={form.slug ? shopUrl(form.slug) : '#'} className="btn-primary block mb-3">
-                เข้าเว็บร้านของฉัน →
-              </a>
+              <Link
+                href="/login"
+                className="btn-primary block mb-3"
+              >
+                เข้าสู่ระบบจัดการร้าน →
+              </Link>
               <Link href="/" className="text-gray-400 text-sm hover:text-orange-500 transition-colors">
                 กลับหน้าหลัก
               </Link>

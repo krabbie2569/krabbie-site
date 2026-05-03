@@ -115,6 +115,14 @@ export default function LoginPage() {
               {loading ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบ →'}
             </button>
           </form>
+
+          {email.trim().toLowerCase() !== 'adminkrab' && (
+            <div className="text-center mt-3">
+              <Link href="/forgot-password" className="font-mono text-xs text-gray-400 hover:text-orange-500 transition-colors">
+                ลืมรหัสผ่าน?
+              </Link>
+            </div>
+          )}
         </div>
 
         <p className="text-center font-mono text-xs text-gray-400 mt-4">

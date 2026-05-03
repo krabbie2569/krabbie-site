@@ -102,6 +102,7 @@ export interface SignupForm {
   slug:        string      // subdomain
   ownerEmail:  string
   ownerPhone:  string
+  password:    string
 }
 
 // ── Super admin stats ──────────────────────────────────────────────────────

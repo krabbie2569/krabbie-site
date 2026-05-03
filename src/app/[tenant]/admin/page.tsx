@@ -5,6 +5,7 @@ import { formatDateTH, formatTime, formatPrice } from '@/lib/utils'
 import { BOOKING_STATUS_LABEL, BOOKING_STATUS_COLOR } from '@/types'
 import type { Booking, Service } from '@/types'
 import StatsCard from '@/components/admin/StatsCard'
+import BookingActions from '@/components/admin/BookingActions'
 
 interface Props {
   params: Promise<{ tenant: string }>
@@ -101,16 +102,7 @@ export default async function TenantAdminPage({ params }: Props) {
                     {BOOKING_STATUS_LABEL[b.status as keyof typeof BOOKING_STATUS_LABEL]}
                   </span>
                 </div>
-                {b.status === 'pending' && (
-                  <div className="flex gap-2 mt-3">
-                    <button className="flex-1 text-xs bg-teal-light text-teal-dark font-semibold py-1.5 rounded-lg hover:bg-teal-DEFAULT/20 transition-colors">
-                      ✓ ยืนยัน
-                    </button>
-                    <button className="flex-1 text-xs bg-red-50 text-red-500 font-semibold py-1.5 rounded-lg hover:bg-red-100 transition-colors">
-                      ✕ ยกเลิก
-                    </button>
-                  </div>
-                )}
+                {b.status === 'pending' && <BookingActions bookingId={b.id} />}
               </div>
             ))}
             {(!bookings || bookings.length === 0) && (

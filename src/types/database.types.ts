@@ -17,6 +17,7 @@ export interface Database {
           activated_at: string | null
           expires_at: string | null
           settings: Json               // { primaryColor, logoUrl, lineId, ... }
+          auth_user_id: string | null
           created_at: string
           updated_at: string
         }

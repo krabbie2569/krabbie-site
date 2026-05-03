@@ -7,14 +7,16 @@ import type { SignupForm } from '@/types'
 
 export async function POST(req: NextRequest) {
   const body: SignupForm = await req.json()
-  const { templateId, shopName, slug, ownerEmail, ownerPhone } = body
+  const { templateId, shopName, slug, ownerEmail, ownerPhone, password } = body
 
-  // Validate
-  if (!templateId || !shopName || !slug || !ownerPhone) {
+  if (!templateId || !shopName || !slug || !ownerPhone || !ownerEmail || !password) {
     return NextResponse.json({ error: 'กรุณากรอกข้อมูลให้ครบถ้วน' }, { status: 400 })
   }
   if (!isValidSlug(slug)) {
     return NextResponse.json({ error: 'Subdomain ไม่ถูกต้อง' }, { status: 400 })
+  }
+  if (password.length < 8) {
+    return NextResponse.json({ error: 'รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร' }, { status: 400 })
   }
 
   const supabase = createServiceClient() as any
@@ -24,15 +26,40 @@ export async function POST(req: NextRequest) {
     .from('tenants')
     .select('id')
     .eq('slug', slug)
-    .single()
+    .maybeSingle()
 
   if (existing) {
     return NextResponse.json({ error: `"${slug}" ถูกใช้แล้ว กรุณาเลือกชื่ออื่น` }, { status: 409 })
   }
 
-  // Create tenant (trial = 30 days)
+  // Check email not already registered
+  const { data: existingEmail } = await supabase
+    .from('tenants')
+    .select('id')
+    .eq('owner_email', ownerEmail.toLowerCase())
+    .maybeSingle()
+
+  if (existingEmail) {
+    return NextResponse.json({ error: 'อีเมลนี้มีบัญชีอยู่แล้ว กรุณาเข้าสู่ระบบ' }, { status: 409 })
+  }
+
+  // Create Supabase Auth user first
+  const { data: authData, error: authErr } = await supabase.auth.admin.createUser({
+    email: ownerEmail.toLowerCase(),
+    password,
+    email_confirm: true,
+    user_metadata: { shop_name: shopName, slug },
+  })
+
+  if (authErr || !authData?.user) {
+    const msg = authErr?.message?.includes('already registered')
+      ? 'อีเมลนี้มีบัญชีอยู่แล้ว กรุณาเข้าสู่ระบบ'
+      : 'สร้างบัญชีไม่สำเร็จ กรุณาลองใหม่'
+    return NextResponse.json({ error: msg }, { status: 400 })
+  }
+
   const trialEnds = new Date()
-  trialEnds.setDate(trialEnds.getDate() + 30)
+  trialEnds.setDate(trialEnds.getDate() + 14)
 
   const { data: tenant, error } = await supabase
     .from('tenants')
@@ -40,11 +67,13 @@ export async function POST(req: NextRequest) {
       slug,
       name:          shopName,
       template_id:   templateId,
-      owner_email:   ownerEmail || '',
+      owner_email:   ownerEmail.toLowerCase(),
       owner_phone:   ownerPhone,
       plan:          'trial',
+      plan_type:     'standard',
+      auth_user_id:  authData.user.id,
       trial_ends_at: trialEnds.toISOString(),
-      settings:      {
+      settings: {
         primaryColor:   '#ff6b00',
         logoUrl:        null,
         lineId:         null,
@@ -59,11 +88,10 @@ export async function POST(req: NextRequest) {
     .single()
 
   if (error || !tenant) {
+    // Cleanup auth user if tenant creation failed
+    await supabase.auth.admin.deleteUser(authData.user.id)
     return NextResponse.json({ error: 'สร้างร้านไม่สำเร็จ กรุณาลองใหม่' }, { status: 500 })
   }
-
-  // TODO: setup Cloudflare DNS subdomain via API
-  // TODO: send welcome notification
 
   return NextResponse.json({ data: { slug: tenant.slug }, error: null }, { status: 201 })
 }
