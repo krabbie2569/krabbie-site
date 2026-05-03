@@ -25,7 +25,7 @@ export function useTenant(slug: string): UseTenantResult {
       .select('*')
       .eq('slug', slug)
       .single()
-      .then(({ data, error: err }) => {
+      .then(({ data, error: err }: { data: any; error: any }) => {
         if (err) setError(err.message)
         else setTenant(data)
         setLoading(false)

@@ -29,7 +29,7 @@ export default function TimeSlotGrid({ tenantId, serviceId, date, selectedSlotId
       .eq('date', date)
       .eq('is_blocked', false)
       .order('start_time')
-      .then(({ data }) => { setSlots(data ?? []); setLoading(false) })
+      .then(({ data }: { data: any[] | null }) => { setSlots(data ?? []); setLoading(false) })
   }, [tenantId, serviceId, date])
 
   if (loading) {

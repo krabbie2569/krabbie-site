@@ -23,7 +23,7 @@ export default function ServiceSelector({ tenantId, selectedId, onSelect }: Prop
       .eq('tenant_id', tenantId)
       .eq('is_active', true)
       .order('sort_order')
-      .then(({ data }) => { setServices(data ?? []); setLoading(false) })
+      .then(({ data }: { data: any[] | null }) => { setServices(data ?? []); setLoading(false) })
   }, [tenantId])
 
   if (loading) {
