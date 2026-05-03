@@ -14,7 +14,7 @@ export default async function TenantAdminPage({ params }: Props) {
   const tenant = await getTenantBySlug(params.tenant)
   if (!tenant) notFound()
 
-  const supabase = createServerSupabaseClient()
+  const supabase = await createServerSupabaseClient()
 
   const [{ data: bookings }, { data: services }] = await Promise.all([
     supabase

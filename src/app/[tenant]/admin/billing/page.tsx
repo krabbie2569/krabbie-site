@@ -9,7 +9,7 @@ export default async function BillingPage({ params }: Props) {
   const tenant = await getTenantBySlug(params.tenant)
   if (!tenant) notFound()
 
-  const supabase = createServerSupabaseClient()
+  const supabase = await createServerSupabaseClient()
   const { data: payments } = await supabase
     .from('payments')
     .select('*')

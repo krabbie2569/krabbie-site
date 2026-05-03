@@ -18,7 +18,7 @@ export function extractSlugFromHost(host: string): string | null {
 
 // Fetch tenant row from DB by slug (used in server components/middleware)
 export async function getTenantBySlug(slug: string): Promise<Tenant | null> {
-  const supabase = createServerSupabaseClient()
+  const supabase = await createServerSupabaseClient()
   const { data } = await supabase
     .from('tenants')
     .select('*')

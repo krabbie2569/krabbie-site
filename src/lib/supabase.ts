@@ -11,8 +11,8 @@ export function createClient() {
 }
 
 // Server client — use in Server Components, Route Handlers, Server Actions
-export function createServerSupabaseClient() {
-  const cookieStore = cookies()
+export async function createServerSupabaseClient() {
+  const cookieStore = await cookies()
   return createServerClient<Database>(supabaseUrl, supabaseAnon, {
     cookies: {
       getAll() {
