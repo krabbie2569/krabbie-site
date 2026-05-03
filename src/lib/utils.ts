@@ -51,13 +51,14 @@ export function isValidSlug(slug: string): boolean {
   return /^[a-z0-9][a-z0-9-]{1,61}[a-z0-9]$/.test(slug)
 }
 
-// Build shop URL
+// Build shop URL — path-based until custom domain is ready
 export function shopUrl(slug: string): string {
-  const domain = process.env.NEXT_PUBLIC_APP_DOMAIN ?? 'krabbie.com'
-  if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
-    return `http://localhost:3000?tenant=${slug}`
+  if (typeof window !== 'undefined') {
+    return `${window.location.origin}/${slug}`
   }
-  return `https://${slug}.${domain}`
+  // SSR fallback
+  const domain = process.env.NEXT_PUBLIC_APP_DOMAIN ?? 'krabbie.com'
+  return `https://${domain}/${slug}`
 }
 
 // Duration in human-readable Thai: 90 → "1 ชั่วโมง 30 นาที"
