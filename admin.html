@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Krabbie Admin — Dashboard</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&family=Syne:wght@700;800&family=Space+Mono:wght@400;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #f5f5f5;
+    --dark: #1a0f00;
+    --orange: #ff6b00;
+    --coral: #ff4d4d;
+    --yellow: #ffd166;
+    --teal: #06d6a0;
+    --navy: #073b4c;
+    --card: #fff;
+    --border: #e8e8e8;
+    --sidebar-w: 220px;
+  }
+
+  body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--dark); display: flex; min-height: 100vh; }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: var(--sidebar-w);
+    background: var(--dark);
+    min-height: 100vh;
+    position: fixed;
+    top: 0; left: 0;
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+  }
+  .sidebar-logo {
+    padding: 1.5rem 1.2rem;
+    border-bottom: 1px solid #2a1f10;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .sidebar-logo .logo-icon { font-size: 1.6rem; }
+  .sidebar-logo .logo-text { font-family: 'Syne', sans-serif; color: white; font-size: 1.1rem; font-weight: 800; }
+  .sidebar-logo .logo-text span { color: var(--orange); }
+  .sidebar-logo .logo-sub { font-family: 'Space Mono', monospace; font-size: 0.55rem; color: #555; letter-spacing: 2px; margin-top: 1px; }
+
+  .nav-section { padding: 1rem 0; flex: 1; }
+  .nav-label { font-family: 'Space Mono', monospace; font-size: 0.55rem; color: #444; letter-spacing: 3px; text-transform: uppercase; padding: 0.5rem 1.2rem 0.3rem; }
+  .nav-item {
+    display: flex; align-items: center; gap: 0.7rem;
+    padding: 0.65rem 1.2rem;
+    color: #888;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    border-left: 3px solid transparent;
+  }
+  .nav-item:hover { color: white; background: #2a1f10; }
+  .nav-item.active { color: white; background: #2a1f10; border-left-color: var(--orange); }
+  .nav-item .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
+
+  .sidebar-bottom { padding: 1rem 1.2rem; border-top: 1px solid #2a1f10; }
+  .sidebar-bottom .version { font-family: 'Space Mono', monospace; font-size: 0.6rem; color: #333; }
+
+  /* ── MAIN ── */
+  .main { margin-left: var(--sidebar-w); flex: 1; }
+
+  .topbar {
+    background: white;
+    border-bottom: 1px solid var(--border);
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+  .topbar-title { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700; }
+  .topbar-right { display: flex; align-items: center; gap: 1rem; }
+  .phase-badge { background: #fff0e0; color: var(--orange); font-family: 'Space Mono', monospace; font-size: 0.65rem; padding: 0.3rem 0.8rem; border-radius: 20px; font-weight: 700; }
+  .topbar-date { font-size: 0.8rem; color: #999; font-family: 'Space Mono', monospace; }
+
+  .content { padding: 2rem; }
+
+  /* ── STATS GRID ── */
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem; }
+  .stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.2rem 1.4rem;
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px; height: 100%;
+  }
+  .stat-card.orange::after { background: var(--orange); }
+  .stat-card.teal::after { background: var(--teal); }
+  .stat-card.yellow::after { background: var(--yellow); }
+  .stat-card.coral::after { background: var(--coral); }
+  .stat-label { font-family: 'Space Mono', monospace; font-size: 0.6rem; color: #999; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 0.5rem; }
+  .stat-value { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; line-height: 1; margin-bottom: 0.3rem; }
+  .stat-card.orange .stat-value { color: var(--orange); }
+  .stat-card.teal .stat-value { color: #049e76; }
+  .stat-card.yellow .stat-value { color: #b38600; }
+  .stat-card.coral .stat-value { color: var(--coral); }
+  .stat-sub { font-size: 0.75rem; color: #aaa; }
+  .stat-icon { position: absolute; top: 1rem; right: 1.2rem; font-size: 1.5rem; opacity: 0.2; }
+
+  /* ── SECTION TITLE ── */
+  .sec-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--orange);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+  .sec-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .sec-h { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; margin-bottom: 1rem; }
+
+  /* ── TWO COLUMN LAYOUT ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+  .one-col { margin-bottom: 2rem; }
+
+  /* ── CARD ── */
+  .card { background: white; border-radius: 12px; border: 1px solid var(--border); padding: 1.5rem; }
+
+  /* ── PHASE TRACKER ── */
+  .phase-track { display: flex; flex-direction: column; gap: 1rem; }
+  .pt-row { display: flex; gap: 1rem; align-items: flex-start; }
+  .pt-dot-col { display: flex; flex-direction: column; align-items: center; gap: 0; padding-top: 2px; }
+  .pt-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Space Mono', monospace; font-size: 0.65rem; font-weight: 700; flex-shrink: 0; }
+  .pt-line { width: 2px; height: 28px; background: var(--border); }
+  .pt-dot.done { background: var(--teal); color: white; }
+  .pt-dot.active { background: var(--orange); color: white; }
+  .pt-dot.todo { background: var(--border); color: #aaa; }
+  .pt-row:last-child .pt-line { display: none; }
+  .pt-body { flex: 1; }
+  .pt-label { font-weight: 700; font-size: 0.9rem; margin-bottom: 0.2rem; }
+  .pt-period { font-family: 'Space Mono', monospace; font-size: 0.65rem; color: #aaa; margin-bottom: 0.5rem; }
+  .pt-tasks { display: flex; flex-direction: column; gap: 0.3rem; }
+  .pt-task {
+    display: flex; align-items: center; gap: 0.5rem;
+    font-size: 0.8rem; color: #555;
+    background: #f9f9f9;
+    padding: 0.35rem 0.7rem;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+  }
+  .pt-task .tick { font-size: 0.8rem; }
+  .pt-task.done-task { color: #aaa; text-decoration: line-through; }
+  .pt-task.done-task .tick { color: var(--teal); }
+  .pt-task.active-task { border-color: var(--orange); background: #fff8f0; color: var(--dark); }
+  .pt-task.active-task .tick { color: var(--orange); }
+
+  /* ── REVENUE TABLE ── */
+  .rev-table { width: 100%; border-collapse: collapse; }
+  .rev-table th {
+    text-align: left;
+    padding: 0.6rem 1rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 2px solid var(--border);
+    background: #fafafa;
+  }
+  .rev-table td { padding: 0.75rem 1rem; font-size: 0.85rem; border-bottom: 1px solid #f5f5f5; }
+  .rev-table .num { font-family: 'Space Mono', monospace; }
+  .rev-table .profit { color: #049e76; font-weight: 700; }
+  .rev-table .breakeven { color: #999; }
+  .rev-table tr.highlight td { background: #fff8f0; }
+  .rev-table tr:hover td { background: #fafafa; }
+  .bep-badge { background: #e0fff5; color: #049e76; font-size: 0.6rem; padding: 0.1rem 0.4rem; border-radius: 3px; font-family: 'Space Mono', monospace; margin-left: 0.4rem; }
+
+  /* ── TEMPLATE LIST ── */
+  .template-list { display: flex; flex-direction: column; gap: 0.8rem; }
+  .template-row {
+    display: flex; align-items: center; gap: 1rem;
+    padding: 1rem 1.2rem;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    transition: border-color 0.15s;
+  }
+  .template-row:hover { border-color: var(--orange); }
+  .template-thumb { width: 44px; height: 44px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0; }
+  .template-info { flex: 1; }
+  .template-name { font-weight: 700; font-size: 0.9rem; margin-bottom: 0.15rem; }
+  .template-desc { font-size: 0.75rem; color: #888; }
+  .t-status { font-family: 'Space Mono', monospace; font-size: 0.6rem; padding: 0.2rem 0.6rem; border-radius: 3px; }
+  .t-status.live { background: #e0fff5; color: #049e76; }
+  .t-status.soon { background: #fff0e0; color: var(--orange); }
+  .t-status.planned { background: #f5f5f5; color: #aaa; }
+
+  /* ── STACK LIST ── */
+  .stack-list { display: flex; flex-direction: column; gap: 0.6rem; }
+  .stack-row-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0.7rem 1rem;
+    background: #fafafa;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  .stack-name { font-weight: 600; font-size: 0.85rem; }
+  .stack-note { font-size: 0.72rem; color: #aaa; margin-top: 0.1rem; }
+  .badge { font-family: 'Space Mono', monospace; font-size: 0.6rem; padding: 0.2rem 0.6rem; border-radius: 3px; white-space: nowrap; }
+  .badge.free { background: #e0fff5; color: #049e76; }
+  .badge.paid { background: #fff0e0; color: var(--orange); }
+
+  /* ── NOTES ── */
+  .notes-list { display: flex; flex-direction: column; gap: 0.6rem; }
+  .note-item { padding: 0.8rem 1rem; border-radius: 8px; font-size: 0.82rem; border-left: 3px solid; }
+  .note-item.info { background: #f0f8ff; border-color: #4a90e2; color: #1a3a6b; }
+  .note-item.warn { background: #fffbf0; border-color: var(--yellow); color: #7a5c00; }
+  .note-item.ok   { background: #f0fff8; border-color: var(--teal); color: #035c43; }
+  .note-item strong { display: block; margin-bottom: 0.2rem; font-size: 0.8rem; font-family: 'Space Mono', monospace; }
+
+  /* ── MASCOT AREA ── */
+  .mascot-bar {
+    background: var(--dark);
+    border-radius: 12px;
+    padding: 1.2rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    margin-bottom: 2rem;
+  }
+  .mascot-bar svg { flex-shrink: 0; }
+  .mascot-bar-text h3 { font-family: 'Syne', sans-serif; color: white; font-size: 1rem; margin-bottom: 0.2rem; }
+  .mascot-bar-text p { color: #888; font-size: 0.8rem; }
+  .mascot-bar-right { margin-left: auto; font-family: 'Space Mono', monospace; font-size: 0.7rem; color: var(--yellow); text-align: right; line-height: 1.6; }
+
+  @media (max-width: 900px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .two-col { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">🦀</div>
+    <div>
+      <div class="logo-text">Krabbie<span>.com</span></div>
+      <div class="logo-sub">ADMIN DASHBOARD</div>
+    </div>
+  </div>
+
+  <nav class="nav-section">
+    <div class="nav-label">Overview</div>
+    <div class="nav-item active" onclick="setActive(this)"><span class="nav-icon">📊</span> Dashboard</div>
+    <div class="nav-item" onclick="setActive(this)"><span class="nav-icon">📈</span> Revenue</div>
+
+    <div class="nav-label" style="margin-top:1rem">จัดการ</div>
+    <div class="nav-item" onclick="setActive(this)"><span class="nav-icon">🏪</span> ร้านค้า</div>
+    <div class="nav-item" onclick="setActive(this)"><span class="nav-icon">🎨</span> Templates</div>
+    <div class="nav-item" onclick="setActive(this)"><span class="nav-icon">💳</span> การชำระเงิน</div>
+    <div class="nav-item" onclick="setActive(this)"><span class="nav-icon">🌐</span> Subdomains</div>
+
+    <div class="nav-label" style="margin-top:1rem">System</div>
+    <div class="nav-item" onclick="setActive(this)"><span class="nav-icon">⚙️</span> Settings</div>
+    <div class="nav-item" onclick="setActive(this)"><span class="nav-icon">🔔</span> Notifications</div>
+    <div class="nav-item" onclick="setActive(this)"><span class="nav-icon">📋</span> Logs</div>
+  </nav>
+
+  <div class="sidebar-bottom">
+    <div class="version">v0.1.0-mvp · Phase 1</div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-title">Dashboard Overview</div>
+    <div class="topbar-right">
+      <span class="phase-badge">⚡ PHASE 1 — MVP</span>
+      <span class="topbar-date" id="dateDisplay"></span>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- MASCOT BAR -->
+    <div class="mascot-bar">
+      <svg width="60" height="65" viewBox="0 0 110 120">
+        <ellipse cx="55" cy="72" rx="38" ry="30" fill="#FF6B35"/>
+        <ellipse cx="55" cy="68" rx="34" ry="26" fill="#FF8C5A"/>
+        <ellipse cx="55" cy="65" rx="20" ry="14" fill="#FF6B35" opacity="0.5"/>
+        <rect x="38" y="44" width="5" height="12" rx="2" fill="#FF6B35"/>
+        <rect x="67" y="44" width="5" height="12" rx="2" fill="#FF6B35"/>
+        <circle cx="40" cy="42" r="10" fill="white"/>
+        <circle cx="70" cy="42" r="10" fill="white"/>
+        <circle cx="42" cy="41" r="6" fill="#1a0f00"/>
+        <circle cx="72" cy="41" r="6" fill="#1a0f00"/>
+        <circle cx="44" cy="39" r="2" fill="white"/>
+        <circle cx="74" cy="39" r="2" fill="white"/>
+        <path d="M44 72 Q55 82 66 72" stroke="#1a0f00" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <ellipse cx="10" cy="70" rx="14" ry="11" fill="#FF6B35"/>
+        <ellipse cx="100" cy="70" rx="14" ry="11" fill="#FF6B35"/>
+        <line x1="28" y1="85" x2="15" y2="100" stroke="#FF6B35" stroke-width="4" stroke-linecap="round"/>
+        <line x1="38" y1="90" x2="28" y2="108" stroke="#FF6B35" stroke-width="4" stroke-linecap="round"/>
+        <line x1="72" y1="85" x2="85" y2="100" stroke="#FF6B35" stroke-width="4" stroke-linecap="round"/>
+        <line x1="62" y1="90" x2="72" y2="108" stroke="#FF6B35" stroke-width="4" stroke-linecap="round"/>
+      </svg>
+      <div class="mascot-bar-text">
+        <h3>ยินดีต้อนรับ, Admin 🦀</h3>
+        <p>Krabbie.com — เว็บสำเร็จรูปให้เช่า · "เว็บง่ายๆ แค่หนีบเดียว"</p>
+      </div>
+      <div class="mascot-bar-right">
+        BEP: 6 ร้าน<br>
+        เป้า Phase 2: 10 ร้าน<br>
+        เป้า Phase 3: 50 ร้าน
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-grid">
+      <div class="stat-card orange">
+        <div class="stat-icon">🏪</div>
+        <div class="stat-label">ร้านค้าทั้งหมด</div>
+        <div class="stat-value">0</div>
+        <div class="stat-sub">เป้า Phase 2: 10 ร้าน</div>
+      </div>
+      <div class="stat-card teal">
+        <div class="stat-icon">💰</div>
+        <div class="stat-label">MRR (บาท/เดือน)</div>
+        <div class="stat-value">0 ฿</div>
+        <div class="stat-sub">BEP ที่ 900 ฿/เดือน</div>
+      </div>
+      <div class="stat-card yellow">
+        <div class="stat-icon">🎨</div>
+        <div class="stat-label">Templates พร้อมใช้</div>
+        <div class="stat-value">1</div>
+        <div class="stat-sub">จองบริการ · Phase 1</div>
+      </div>
+      <div class="stat-card coral">
+        <div class="stat-icon">⚡</div>
+        <div class="stat-label">Phase ปัจจุบัน</div>
+        <div class="stat-value">01</div>
+        <div class="stat-sub">MVP · เดือน 1-2</div>
+      </div>
+    </div>
+
+    <!-- PHASE + REVENUE -->
+    <div class="two-col">
+
+      <!-- PHASE TRACKER -->
+      <div class="card">
+        <div class="sec-title">แผนงาน</div>
+        <div class="sec-h">Progress Tracker</div>
+        <div class="phase-track">
+
+          <div class="pt-row">
+            <div class="pt-dot-col">
+              <div class="pt-dot active">P1</div>
+              <div class="pt-line"></div>
+            </div>
+            <div class="pt-body">
+              <div class="pt-label">สร้าง MVP</div>
+              <div class="pt-period">เดือน 1-2</div>
+              <div class="pt-tasks">
+                <div class="pt-task active-task"><span class="tick">→</span> Refactor เป็น template จองบริการ</div>
+                <div class="pt-task active-task"><span class="tick">→</span> Multi-tenant + RLS</div>
+                <div class="pt-task active-task"><span class="tick">→</span> Auto subdomain Cloudflare API</div>
+                <div class="pt-task active-task"><span class="tick">→</span> Web Push Notification</div>
+                <div class="pt-task active-task"><span class="tick">→</span> Deploy → krabbie.pages.dev</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-row">
+            <div class="pt-dot-col">
+              <div class="pt-dot todo">P2</div>
+              <div class="pt-line"></div>
+            </div>
+            <div class="pt-body">
+              <div class="pt-label">เปิดขาย</div>
+              <div class="pt-period">เดือน 3-4</div>
+              <div class="pt-tasks">
+                <div class="pt-task"><span class="tick">→</span> หน้าขาย + ระบบสมัคร</div>
+                <div class="pt-task"><span class="tick">→</span> PromptPay + auto activate</div>
+                <div class="pt-task"><span class="tick">→</span> Super Admin Dashboard</div>
+                <div class="pt-task"><span class="tick">→</span> ซื้อโดเมน krabbie.com</div>
+                <div class="pt-task"><span class="tick">→</span> 10 ร้านแรก (ทดลองฟรี 1 เดือน)</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-row">
+            <div class="pt-dot-col">
+              <div class="pt-dot todo">P3</div>
+            </div>
+            <div class="pt-body">
+              <div class="pt-label">ขยายตลาด</div>
+              <div class="pt-period">เดือน 5+</div>
+              <div class="pt-tasks">
+                <div class="pt-task"><span class="tick">→</span> Template ขายของ + QR เมนู</div>
+                <div class="pt-task"><span class="tick">→</span> Auto backup ทุกคืน</div>
+                <div class="pt-task"><span class="tick">→</span> อัพ Supabase Pro (6+ ร้าน)</div>
+                <div class="pt-task"><span class="tick">→</span> Marketing + Affiliate</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- REVENUE PROJECTION -->
+      <div class="card">
+        <div class="sec-title">การเงิน</div>
+        <div class="sec-h">Revenue Projection · 150 ฿/ร้าน/เดือน</div>
+        <table class="rev-table">
+          <tr>
+            <th>ร้าน</th>
+            <th>รายได้/เดือน</th>
+            <th>ต้นทุน</th>
+            <th>กำไร</th>
+          </tr>
+          <tr>
+            <td>6 <span class="bep-badge">BEP</span></td>
+            <td class="num">900 ฿</td>
+            <td class="num">~900 ฿</td>
+            <td class="num breakeven">≈ 0</td>
+          </tr>
+          <tr>
+            <td>10</td>
+            <td class="num">1,500 ฿</td>
+            <td class="num">900 ฿</td>
+            <td class="num profit">600 ฿</td>
+          </tr>
+          <tr class="highlight">
+            <td>20</td>
+            <td class="num">3,000 ฿</td>
+            <td class="num">900 ฿</td>
+            <td class="num profit">2,100 ฿</td>
+          </tr>
+          <tr>
+            <td>50</td>
+            <td class="num">7,500 ฿</td>
+            <td class="num">900 ฿</td>
+            <td class="num profit">6,600 ฿</td>
+          </tr>
+          <tr>
+            <td>200</td>
+            <td class="num">30,000 ฿</td>
+            <td class="num">900 ฿</td>
+            <td class="num profit">29,100 ฿</td>
+          </tr>
+        </table>
+        <p style="font-size:0.72rem;color:#bbb;margin-top:0.8rem">* ค่า infra คงที่ เพราะ multi-tenant 1 Supabase project</p>
+      </div>
+
+    </div>
+
+    <!-- TEMPLATES + STACK -->
+    <div class="two-col">
+
+      <!-- TEMPLATES -->
+      <div class="card">
+        <div class="sec-title">Templates</div>
+        <div class="sec-h">Template Inventory</div>
+        <div class="template-list">
+          <div class="template-row">
+            <div class="template-thumb" style="background:#fff0e0">📅</div>
+            <div class="template-info">
+              <div class="template-name">จองบริการ</div>
+              <div class="template-desc">นวด · ฝึกสอน · ช่างภาพ · ซ่อม</div>
+            </div>
+            <span class="t-status live">LIVE</span>
+          </div>
+          <div class="template-row">
+            <div class="template-thumb" style="background:#f0f8ff">🛍️</div>
+            <div class="template-info">
+              <div class="template-name">ขายสินค้า</div>
+              <div class="template-desc">เสื้อผ้า · handmade · ของขวัญ</div>
+            </div>
+            <span class="t-status soon">Phase 3</span>
+          </div>
+          <div class="template-row">
+            <div class="template-thumb" style="background:#f0fff8">🍜</div>
+            <div class="template-info">
+              <div class="template-name">QR เมนูร้านอาหาร</div>
+              <div class="template-desc">เมนูดิจิทัล + ใบเสร็จ</div>
+            </div>
+            <span class="t-status soon">Phase 3</span>
+          </div>
+          <div class="template-row">
+            <div class="template-thumb" style="background:#fafafa">➕</div>
+            <div class="template-info">
+              <div class="template-name">เพิ่ม Template ใหม่</div>
+              <div class="template-desc">ตาม feedback จากลูกค้า</div>
+            </div>
+            <span class="t-status planned">PLANNED</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- STACK -->
+      <div class="card">
+        <div class="sec-title">Infrastructure</div>
+        <div class="sec-h">Tech Stack</div>
+        <div class="stack-list">
+          <div class="stack-row-item">
+            <div><div class="stack-name">Cloudflare Pages + Workers</div><div class="stack-note">Hosting · Wildcard Subdomain · Auto Deploy</div></div>
+            <span class="badge free">ฟรี</span>
+          </div>
+          <div class="stack-row-item">
+            <div><div class="stack-name">Supabase (1 project)</div><div class="stack-note">DB · Auth · Storage · Realtime</div></div>
+            <span class="badge free">Free tier</span>
+          </div>
+          <div class="stack-row-item">
+            <div><div class="stack-name">GitHub (3 repos)</div><div class="stack-note">main-site · admin-dashboard · template-shop</div></div>
+            <span class="badge free">ฟรี</span>
+          </div>
+          <div class="stack-row-item">
+            <div><div class="stack-name">krabbie.com</div><div class="stack-note">Cloudflare Registrar · DNS</div></div>
+            <span class="badge paid">~350 ฿/ปี</span>
+          </div>
+          <div class="stack-row-item">
+            <div><div class="stack-name">Supabase Pro (เมื่อถึง 6 ร้าน)</div><div class="stack-note">อัพเกรดเมื่อรายได้ถึง BEP</div></div>
+            <span class="badge paid">$25/เดือน</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- NOTES -->
+    <div class="one-col">
+      <div class="card">
+        <div class="sec-title">Notes &amp; Decisions</div>
+        <div class="sec-h">สิ่งที่ต้องจำ</div>
+        <div class="notes-list">
+          <div class="note-item ok"><strong>✓ Architecture</strong> Multi-tenant 1 Supabase project · ใช้ tenant_id + RLS ทุกตาราง · ไม่ต้องแยก project ต่อร้าน</div>
+          <div class="note-item ok"><strong>✓ Subdomain Strategy</strong> wildcard CNAME *.krabbie.com → Cloudflare Worker resolve tenant_id จาก subdomain</div>
+          <div class="note-item warn"><strong>⚠ Supabase Free Limit</strong> Free tier รองรับได้ ~500 MB DB · อัพ Pro เมื่อถึง 6 ร้าน ($25/เดือน) · BEP cover ได้พอดี</div>
+          <div class="note-item info"><strong>ℹ Pricing</strong> 150 ฿/เดือน · ทดลองฟรี 1 เดือนสำหรับ 10 ร้านแรก · จ่ายผ่าน PromptPay → auto activate</div>
+          <div class="note-item info"><strong>ℹ GitHub Flow</strong> main (production) · develop (staging) · feature/* → PR เข้า develop ก่อนทุกครั้ง</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+  function setActive(el) {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  const d = new Date();
+  document.getElementById('dateDisplay').textContent =
+    d.toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
+</script>
+</body>
+</html>
