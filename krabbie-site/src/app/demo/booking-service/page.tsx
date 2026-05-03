@@ -123,6 +123,9 @@ export default function DemoBookingService() {
                 onSelect={(slotId) => update({ slotId })}
               />
             )}
+            <div className="mt-3 px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 font-mono text-[0.65rem] text-gray-400 leading-relaxed">
+              💡 เดโม: ถ้าไม่มีเวลาว่าง ให้รัน SQL migration (002_shop_food.sql) ใน Supabase
+            </div>
             <div className="flex gap-3 mt-6">
               <button onClick={() => setStep(1)} className="btn-outline flex-1">← ย้อนกลับ</button>
               <button

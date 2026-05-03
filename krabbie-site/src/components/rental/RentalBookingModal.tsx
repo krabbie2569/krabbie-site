@@ -241,16 +241,42 @@ export default function RentalBookingModal({ item, tenantId, lineUrl, onClose }:
           {/* STEP 1: Calendar */}
           {step === 'calendar' && (
             <div>
-              {/* Selected range display */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '20px' }}>
-                {[{ label: 'รับวันที่', val: dateFrom, active: picking === 'from' }, { label: 'คืนวันที่', val: dateTo, active: picking === 'to' }].map(({ label, val, active }) => (
-                  <div key={label} style={{ padding: '12px', borderRadius: '14px', border: `1.5px solid ${active ? '#E91E8C' : 'rgba(233,30,140,0.15)'}`, background: active ? 'rgba(233,30,140,0.03)' : 'white', textAlign: 'center' }}>
-                    <p style={{ fontSize: '10px', color: '#9CA3AF', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '4px' }}>{label}</p>
-                    <p style={{ fontFamily: 'Georgia,serif', fontSize: '16px', color: val ? '#1a1a2e' : '#D1D5DB', fontWeight: val ? 600 : 400 }}>
-                      {val ? val.slice(5).replace('-', '/') : '—'}
-                    </p>
-                  </div>
-                ))}
+              {/* Selected range display — pill tabs */}
+              <div style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>
+                {[
+                  { label: 'รับวันที่', val: dateFrom, which: 'from' as const },
+                  { label: 'คืนวันที่', val: dateTo,   which: 'to'   as const },
+                ].map(({ label, val, which }) => {
+                  const active = picking === which
+                  return (
+                    <button
+                      key={which}
+                      onClick={() => setPicking(which)}
+                      style={{
+                        flex: 1,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+                        padding: '10px 12px',
+                        borderRadius: '999px',
+                        border: active ? 'none' : '1.5px solid rgba(233,30,140,0.3)',
+                        background: active ? 'linear-gradient(135deg,#E91E8C,#9C27B0)' : 'white',
+                        color: active ? 'white' : '#9CA3AF',
+                        cursor: 'pointer',
+                        fontSize: '13px',
+                        fontWeight: active ? 700 : 400,
+                        transition: 'all 0.2s',
+                        boxShadow: active ? '0 4px 14px rgba(233,30,140,0.3)' : 'none',
+                      }}
+                    >
+                      <span style={{ fontSize: '14px' }}>📅</span>
+                      <span>
+                        {label}
+                        <span style={{ marginLeft: '6px', fontFamily: 'Georgia,serif', fontWeight: 700, color: active ? 'rgba(255,255,255,0.95)' : (val ? '#1a1a2e' : '#D1D5DB') }}>
+                          {val ? val.slice(5).replace('-', '/') : '—'}
+                        </span>
+                      </span>
+                    </button>
+                  )
+                })}
               </div>
 
               {/* Calendar */}

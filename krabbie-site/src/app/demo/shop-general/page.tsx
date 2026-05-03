@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase'
 
 const DEMO_SLUG = 'minimal-studio'
@@ -15,6 +15,21 @@ type Product  = {
 }
 type CartItem = { id: string; name: string; price: number; qty: number; emoji: string }
 
+/* ── FALLBACK STATIC DATA ──────────────────────────────── */
+const FALLBACK_PRODUCTS: Product[] = [
+  { id: 'prod-1',  name: 'แจกันเซรามิกมินิมอล',      description: 'เซรามิกเนื้อดินเผา ดีไซน์เรียบหรู',    price: 390,  compare_price: 450,  image_emoji: '🏺', category: 'เซรามิก'    },
+  { id: 'prod-2',  name: 'ชุดแจกัน 3 ใบ',             description: 'เซ็ตแจกัน 3 ขนาด เข้าชุดกัน',          price: 990,  compare_price: 1200, image_emoji: '🫙', category: 'เซรามิก'    },
+  { id: 'prod-3',  name: 'ถ้วยชาเซรามิก',             description: 'ถ้วยชาขนาด 200ml เคลือบมันวาว',        price: 290,  compare_price: null, image_emoji: '🍵', category: 'เซรามิก'    },
+  { id: 'prod-4',  name: 'เทียนหอม Sandalwood',        description: 'กลิ่นไม้จันทน์ให้ความอบอุ่น',          price: 280,  compare_price: null, image_emoji: '🕯️', category: 'เทียน'      },
+  { id: 'prod-5',  name: 'เทียนหอม Set 3 กลิ่น',      description: 'เซ็ตเทียนหอม 3 กลิ่นคัดพิเศษ',        price: 690,  compare_price: 800,  image_emoji: '🕯️', category: 'เทียน'      },
+  { id: 'prod-6',  name: 'โมบายไม้ไผ่ Boho',           description: 'โมบายสไตล์โบโฮ แขวนตกแต่งบ้าน',       price: 350,  compare_price: null, image_emoji: '🎋', category: 'ของตกแต่ง' },
+  { id: 'prod-7',  name: 'กรอบรูปไม้สัก',              description: 'กรอบรูปไม้สักแท้ หลายขนาด',           price: 250,  compare_price: null, image_emoji: '🖼️', category: 'ของตกแต่ง' },
+  { id: 'prod-8',  name: 'โคมไฟกระดาษข้าว',           description: 'โคมไฟกระดาษข้าวแสงอบอุ่น',            price: 490,  compare_price: null, image_emoji: '🪔', category: 'ของตกแต่ง' },
+  { id: 'prod-9',  name: 'ผ้าพันคอถักมือ',             description: 'ถักมือด้ายวูล นุ่มสบาย',               price: 490,  compare_price: null, image_emoji: '🧣', category: 'ผ้าและพรม' },
+  { id: 'prod-10', name: 'กระเป๋าผ้า Crochet',         description: 'โครเชต์มือทุกใบ ทนทาน',               price: 690,  compare_price: null, image_emoji: '👜', category: 'ผ้าและพรม' },
+  { id: 'prod-11', name: 'พรมทอมือกลม',                description: 'พรมทอมือทรงกลม ขนาด 60cm',            price: 950,  compare_price: 1200, image_emoji: '⭕', category: 'ผ้าและพรม' },
+]
+
 export default function DemoShopGeneral() {
   const [tenantId,   setTenantId]   = useState<string | null>(null)
   const [products,   setProducts]   = useState<Product[]>([])
@@ -27,27 +42,56 @@ export default function DemoShopGeneral() {
   const [loading,    setLoading]    = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [success,    setSuccess]    = useState<string | null>(null)
-  const [orderError, setOrderError] = useState<string | null>(null)
+  const [toast,      setToast]      = useState<string | null>(null)
+  const [cartBounce, setCartBounce] = useState(false)
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     const sb = createClient() as any
     sb.from('tenants').select('id').eq('slug', DEMO_SLUG).single()
       .then(({ data: t }: any) => {
-        if (!t) { setLoading(false); return }
+        if (!t) {
+          loadFallback()
+          return
+        }
         setTenantId(t.id)
         sb.from('products').select('*').eq('tenant_id', t.id).eq('is_active', true).order('sort_order')
           .then(({ data }: any) => {
             const prods: Product[] = data ?? []
-            setProducts(prods)
-            const cats = ['ทั้งหมด', ...Array.from(new Set(prods.map((p: Product) => p.category ?? 'อื่นๆ')))]
-            setCategories(cats as string[])
-            setLoading(false)
+            if (prods.length === 0) {
+              loadFallback()
+            } else {
+              setProducts(prods)
+              const cats = ['ทั้งหมด', ...Array.from(new Set(prods.map((p: Product) => p.category ?? 'อื่นๆ')))]
+              setCategories(cats as string[])
+              setLoading(false)
+            }
           })
+          .catch(() => loadFallback())
       })
+      .catch(() => loadFallback())
   }, [])
+
+  function loadFallback() {
+    setProducts(FALLBACK_PRODUCTS)
+    const cats = ['ทั้งหมด', ...Array.from(new Set(FALLBACK_PRODUCTS.map(p => p.category ?? 'อื่นๆ')))]
+    setCategories(cats as string[])
+    setLoading(false)
+  }
 
   const cartCount = cart.reduce((s, i) => s + i.qty, 0)
   const cartTotal = cart.reduce((s, i) => s + i.price * i.qty, 0)
+
+  function showToast(msg: string) {
+    setToast(msg)
+    if (toastTimer.current) clearTimeout(toastTimer.current)
+    toastTimer.current = setTimeout(() => setToast(null), 1500)
+  }
+
+  function triggerCartBounce() {
+    setCartBounce(true)
+    setTimeout(() => setCartBounce(false), 400)
+  }
 
   function addToCart(p: Product) {
     setCart(prev => {
@@ -55,6 +99,8 @@ export default function DemoShopGeneral() {
       if (ex) return prev.map(c => c.id === p.id ? { ...c, qty: c.qty + 1 } : c)
       return [...prev, { id: p.id, name: p.name, price: p.price, qty: 1, emoji: p.image_emoji }]
     })
+    showToast(`✓ เพิ่ม ${p.name}`)
+    triggerCartBounce()
   }
 
   function removeFromCart(id: string) {
@@ -73,32 +119,35 @@ export default function DemoShopGeneral() {
   }
 
   async function submitOrder() {
-    if (!form.name.trim() || !form.phone.trim() || !tenantId || cart.length === 0) return
+    if (!form.name.trim() || !form.phone.trim() || cart.length === 0) return
     setSubmitting(true)
-    setOrderError(null)
     const orderRef = 'ORD-' + Math.random().toString(36).substring(2, 8).toUpperCase()
-    const sb = createClient() as any
-    const { error } = await sb.from('orders').insert({
-      tenant_id:      tenantId,
-      order_ref:      orderRef,
-      customer_name:  form.name.trim(),
-      customer_phone: form.phone.trim(),
-      address:        form.address.trim() || null,
-      items:          cart.map(i => ({ id: i.id, name: i.name, qty: i.qty, price: i.price })),
-      total:          cartTotal,
-      note:           form.note.trim() || null,
-    })
-    if (error) {
-      setOrderError(error.message)
-      setSubmitting(false)
-    } else {
-      setSuccess(orderRef)
-      setCart([])
-      setCheckout(false)
-      setShowCart(false)
-      setForm({ name: '', phone: '', address: '', note: '' })
-      setSubmitting(false)
+
+    if (tenantId) {
+      try {
+        const sb = createClient() as any
+        await sb.from('orders').insert({
+          tenant_id:      tenantId,
+          order_ref:      orderRef,
+          customer_name:  form.name.trim(),
+          customer_phone: form.phone.trim(),
+          address:        form.address.trim() || null,
+          items:          cart.map(i => ({ id: i.id, name: i.name, qty: i.qty, price: i.price })),
+          total:          cartTotal,
+          note:           form.note.trim() || null,
+        })
+      } catch {
+        // swallow — show success anyway (demo)
+      }
     }
+
+    // Always show success in demo
+    setSuccess(orderRef)
+    setCart([])
+    setCheckout(false)
+    setShowCart(false)
+    setForm({ name: '', phone: '', address: '', note: '' })
+    setSubmitting(false)
   }
 
   const displayProducts = activeCat === 'ทั้งหมด'
@@ -131,6 +180,13 @@ export default function DemoShopGeneral() {
   return (
     <div style={{ minHeight: '100vh', background: LIGHT, fontFamily: 'Sarabun, sans-serif', paddingBottom: '80px' }}>
 
+      {/* TOAST */}
+      {toast && (
+        <div style={{ position: 'fixed', top: '16px', left: '50%', transform: 'translateX(-50%)', background: NAVY, color: 'white', padding: '8px 18px', borderRadius: '999px', fontSize: '13px', fontWeight: 600, zIndex: 200, whiteSpace: 'nowrap', boxShadow: '0 4px 16px rgba(30,41,59,0.35)', pointerEvents: 'none' }}>
+          {toast}
+        </div>
+      )}
+
       {/* DEMO BANNER */}
       <div style={{ background: NAVY, color: 'white', textAlign: 'center', padding: '6px', fontSize: '11px', fontWeight: 700, letterSpacing: '2px' }}>
         ✦ ตัวอย่าง Template — ร้านขายสินค้าออนไลน์ ✦
@@ -144,7 +200,7 @@ export default function DemoShopGeneral() {
         </div>
         {cartCount > 0 && (
           <button onClick={() => { setShowCart(true); setCheckout(false) }}
-            style={{ background: NAVY, color: 'white', border: 'none', borderRadius: '12px', padding: '8px 16px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            style={{ background: NAVY, color: 'white', border: 'none', borderRadius: '12px', padding: '8px 16px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', transform: `scale(${cartBounce ? 1.15 : 1})`, transition: 'transform 0.2s cubic-bezier(0.34,1.56,0.64,1)' }}>
             🛒
             <span style={{ background: ORANGE, borderRadius: '999px', padding: '2px 7px', fontSize: '11px', fontWeight: 700 }}>{cartCount}</span>
           </button>
@@ -228,7 +284,7 @@ export default function DemoShopGeneral() {
       {/* FLOATING CART */}
       {cartCount > 0 && !showCart && (
         <button onClick={() => { setShowCart(true); setCheckout(false) }}
-          style={{ position: 'fixed', bottom: '20px', left: '50%', transform: 'translateX(-50%)', background: NAVY, color: 'white', border: 'none', borderRadius: '999px', padding: '14px 28px', fontSize: '14px', fontWeight: 700, cursor: 'pointer', boxShadow: '0 8px 32px rgba(30,41,59,0.4)', zIndex: 50, display: 'flex', alignItems: 'center', gap: '10px', whiteSpace: 'nowrap' }}>
+          style={{ position: 'fixed', bottom: '20px', left: '50%', transform: `translateX(-50%) scale(${cartBounce ? 1.2 : 1})`, background: NAVY, color: 'white', border: 'none', borderRadius: '999px', padding: '14px 28px', fontSize: '14px', fontWeight: 700, cursor: 'pointer', boxShadow: '0 8px 32px rgba(30,41,59,0.4)', zIndex: 50, display: 'flex', alignItems: 'center', gap: '10px', whiteSpace: 'nowrap', transition: 'transform 0.2s cubic-bezier(0.34,1.56,0.64,1)' }}>
           <span style={{ background: ORANGE, borderRadius: '999px', padding: '2px 8px', fontSize: '12px', fontWeight: 700 }}>{cartCount}</span>
           🛒 ตะกร้า · {cartTotal.toLocaleString()} ฿
         </button>
@@ -299,9 +355,8 @@ export default function DemoShopGeneral() {
                     <span style={{ color: '#64748B', fontSize: '13px' }}>{cartCount} ชิ้น</span>
                     <span style={{ fontWeight: 700, fontSize: '18px', color: NAVY }}>{cartTotal.toLocaleString()} ฿</span>
                   </div>
-                  {orderError && <p style={{ color: '#EF4444', fontSize: '12px', marginBottom: '10px' }}>⚠️ {orderError}</p>}
                   <button onClick={submitOrder} disabled={!form.name.trim() || !form.phone.trim() || submitting}
-                    style={{ width: '100%', padding: '14px', borderRadius: '14px', background: NAVY, color: 'white', border: 'none', fontSize: '15px', fontWeight: 700, cursor: !form.name.trim() || !form.phone.trim() || submitting ? 'not-allowed' : 'pointer', opacity: !form.name.trim() || !form.phone.trim() || submitting ? 0.5 : 1, marginBottom: '8px', transition: 'opacity 0.2s' }}>
+                    style={{ width: '100%', padding: '14px', borderRadius: '14px', background: NAVY, color: 'white', border: 'none', fontSize: '15px', fontWeight: 700, cursor: !form.name.trim() || !form.phone.trim() || submitting ? 'not-allowed' : 'pointer', opacity: !form.name.trim() || !form.phone.trim() || submitting ? 0.7 : 1, marginBottom: '8px', transition: 'opacity 0.2s' }}>
                     {submitting ? 'กำลังส่ง...' : 'ยืนยันสั่งซื้อ →'}
                   </button>
                   <button onClick={() => setCheckout(false)}

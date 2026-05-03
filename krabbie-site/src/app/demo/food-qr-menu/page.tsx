@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase'
 
 const DEMO_SLUG  = 'corner-cafe'
@@ -16,6 +16,38 @@ type MenuItem  = {
 }
 type CartItem  = { id: string; name: string; price: number; qty: number }
 
+/* ── FALLBACK STATIC DATA ──────────────────────────────── */
+const FALLBACK_CATEGORIES: Category[] = [
+  { id: 'cat-1', name: 'Coffee',     icon: '☕', sort_order: 1 },
+  { id: 'cat-2', name: 'Non-Coffee', icon: '🧋', sort_order: 2 },
+  { id: 'cat-3', name: 'Desserts',   icon: '🍰', sort_order: 3 },
+  { id: 'cat-4', name: 'Food',       icon: '🥪', sort_order: 4 },
+]
+
+const FALLBACK_ITEMS: MenuItem[] = [
+  // Coffee
+  { id: 'item-1',  category_id: 'cat-1', name: 'Signature Latte',    description: 'ลาเต้สูตรพิเศษของร้าน',        price: 95,  image_emoji: '☕', is_popular: true  },
+  { id: 'item-2',  category_id: 'cat-1', name: 'Thai Coffee',         description: 'กาแฟโบราณใส่นมข้น',            price: 75,  image_emoji: '🪔', is_popular: true  },
+  { id: 'item-3',  category_id: 'cat-1', name: 'Cold Brew',           description: 'ดริปเย็น 12 ชั่วโมง',          price: 90,  image_emoji: '🧊', is_popular: false },
+  { id: 'item-4',  category_id: 'cat-1', name: 'Americano',           description: 'เอสเปรสโซ่ผสมน้ำร้อน',         price: 65,  image_emoji: '🫖', is_popular: false },
+  { id: 'item-5',  category_id: 'cat-1', name: 'Flat White',          description: 'ไมโครโฟมนุ่มละมุน',             price: 90,  image_emoji: '☕', is_popular: false },
+  // Non-Coffee
+  { id: 'item-6',  category_id: 'cat-2', name: 'Matcha Latte',        description: 'มัทฉะญี่ปุ่นแท้',               price: 95,  image_emoji: '🍵', is_popular: true  },
+  { id: 'item-7',  category_id: 'cat-2', name: 'Thai Milk Tea',        description: 'ชาไทยสูตรดั้งเดิม',            price: 70,  image_emoji: '🧋', is_popular: true  },
+  { id: 'item-8',  category_id: 'cat-2', name: 'Fruit Soda',          description: 'โซดาผลไม้สดชื่น',              price: 75,  image_emoji: '🍹', is_popular: false },
+  { id: 'item-9',  category_id: 'cat-2', name: 'Hojicha Latte',       description: 'ชาโฮจิฉะคั่วหอม',              price: 85,  image_emoji: '🫖', is_popular: false },
+  // Desserts
+  { id: 'item-10', category_id: 'cat-3', name: 'Basque Cheesecake',   description: 'ชีสเค้กไหม้เนื้อนุ่ม',         price: 120, image_emoji: '🍮', is_popular: true  },
+  { id: 'item-11', category_id: 'cat-3', name: 'Mango Sticky Rice',   description: 'ข้าวเหนียวมะม่วงสดใหม่',       price: 85,  image_emoji: '🥭', is_popular: true  },
+  { id: 'item-12', category_id: 'cat-3', name: 'Toasted Waffle',      description: 'วาฟเฟิลกรอบซอสเมเปิ้ล',        price: 110, image_emoji: '🧇', is_popular: false },
+  { id: 'item-13', category_id: 'cat-3', name: 'Banana Bread',        description: 'ขนมปังกล้วยหอมอบสด',           price: 90,  image_emoji: '🍌', is_popular: false },
+  // Food
+  { id: 'item-14', category_id: 'cat-4', name: 'Egg Toast',           description: 'ขนมปังปิ้งไข่ดาว',             price: 75,  image_emoji: '🍳', is_popular: false },
+  { id: 'item-15', category_id: 'cat-4', name: 'Club Sandwich',       description: 'แซนด์วิชคลับ 3 ชั้น',          price: 130, image_emoji: '🥪', is_popular: true  },
+  { id: 'item-16', category_id: 'cat-4', name: 'Pasta Aglio Olio',    description: 'พาสต้ากระเทียมน้ำมันมะกอก',    price: 145, image_emoji: '🍝', is_popular: false },
+  { id: 'item-17', category_id: 'cat-4', name: 'Granola Bowl',        description: 'กราโนล่าโยเกิร์ตผลไม้สด',     price: 110, image_emoji: '🥣', is_popular: true  },
+]
+
 export default function DemoFoodQRMenu() {
   const [tenantId,   setTenantId]   = useState<string | null>(null)
   const [categories, setCategories] = useState<Category[]>([])
@@ -30,29 +62,68 @@ export default function DemoFoodQRMenu() {
   const [loading,    setLoading]    = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [success,    setSuccess]    = useState<string | null>(null)
-  const [orderError, setOrderError] = useState<string | null>(null)
+  const [toast,      setToast]      = useState<string | null>(null)
+  const [cartBounce, setCartBounce] = useState(false)
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     const sb = createClient() as any
     sb.from('tenants').select('id').eq('slug', DEMO_SLUG).single()
       .then(({ data: t }: any) => {
-        if (!t) { setLoading(false); return }
+        if (!t) {
+          // Fall back to static data
+          setCategories(FALLBACK_CATEGORIES)
+          setItems(FALLBACK_ITEMS)
+          setActiveCat(FALLBACK_CATEGORIES[0].id)
+          setLoading(false)
+          return
+        }
         setTenantId(t.id)
         Promise.all([
           sb.from('menu_categories').select('*').eq('tenant_id', t.id).order('sort_order'),
           sb.from('menu_items').select('*').eq('tenant_id', t.id).eq('is_available', true).order('sort_order'),
         ]).then(([catsRes, itemsRes]: any[]) => {
           const cats: Category[] = catsRes.data ?? []
-          setCategories(cats)
-          setItems(itemsRes.data ?? [])
-          if (cats.length > 0) setActiveCat(cats[0].id)
+          const its: MenuItem[]  = itemsRes.data ?? []
+          if (cats.length === 0 || its.length === 0) {
+            // Tables exist but empty — use fallback
+            setCategories(FALLBACK_CATEGORIES)
+            setItems(FALLBACK_ITEMS)
+            setActiveCat(FALLBACK_CATEGORIES[0].id)
+          } else {
+            setCategories(cats)
+            setItems(its)
+            if (cats.length > 0) setActiveCat(cats[0].id)
+          }
+          setLoading(false)
+        }).catch(() => {
+          setCategories(FALLBACK_CATEGORIES)
+          setItems(FALLBACK_ITEMS)
+          setActiveCat(FALLBACK_CATEGORIES[0].id)
           setLoading(false)
         })
+      })
+      .catch(() => {
+        setCategories(FALLBACK_CATEGORIES)
+        setItems(FALLBACK_ITEMS)
+        setActiveCat(FALLBACK_CATEGORIES[0].id)
+        setLoading(false)
       })
   }, [])
 
   const cartCount = cart.reduce((s, i) => s + i.qty, 0)
   const cartTotal = cart.reduce((s, i) => s + i.price * i.qty, 0)
+
+  function showToast(msg: string) {
+    setToast(msg)
+    if (toastTimer.current) clearTimeout(toastTimer.current)
+    toastTimer.current = setTimeout(() => setToast(null), 1500)
+  }
+
+  function triggerCartBounce() {
+    setCartBounce(true)
+    setTimeout(() => setCartBounce(false), 400)
+  }
 
   function addItem(item: MenuItem) {
     setCart(prev => {
@@ -60,6 +131,8 @@ export default function DemoFoodQRMenu() {
       if (ex) return prev.map(c => c.id === item.id ? { ...c, qty: c.qty + 1 } : c)
       return [...prev, { id: item.id, name: item.name, price: item.price, qty: 1 }]
     })
+    showToast(`✓ เพิ่ม ${item.name}`)
+    triggerCartBounce()
   }
 
   function removeItem(id: string) {
@@ -74,33 +147,36 @@ export default function DemoFoodQRMenu() {
   function getQty(id: string) { return cart.find(c => c.id === id)?.qty ?? 0 }
 
   async function submitOrder() {
-    if (!tableNo.trim() || !tenantId || cart.length === 0) return
+    if (!tableNo.trim() || cart.length === 0) return
     setSubmitting(true)
-    setOrderError(null)
     const orderRef = 'TBL-' + Math.random().toString(36).substring(2, 8).toUpperCase()
-    const sb = createClient() as any
-    const { error } = await sb.from('table_orders').insert({
-      tenant_id:     tenantId,
-      order_ref:     orderRef,
-      table_number:  tableNo.trim(),
-      customer_name: custName.trim() || null,
-      items:         cart,
-      total:         cartTotal,
-      note:          orderNote.trim() || null,
-    })
-    if (error) {
-      setOrderError(error.message)
-      setSubmitting(false)
-    } else {
-      setSuccess(orderRef)
-      setCart([])
-      setShowOrder(false)
-      setShowCart(false)
-      setTableNo('')
-      setCustName('')
-      setOrderNote('')
-      setSubmitting(false)
+
+    if (tenantId) {
+      try {
+        const sb = createClient() as any
+        await sb.from('table_orders').insert({
+          tenant_id:     tenantId,
+          order_ref:     orderRef,
+          table_number:  tableNo.trim(),
+          customer_name: custName.trim() || null,
+          items:         cart,
+          total:         cartTotal,
+          note:          orderNote.trim() || null,
+        })
+      } catch {
+        // swallow — show success anyway (demo)
+      }
     }
+
+    // Always show success in demo
+    setSuccess(orderRef)
+    setCart([])
+    setShowOrder(false)
+    setShowCart(false)
+    setTableNo('')
+    setCustName('')
+    setOrderNote('')
+    setSubmitting(false)
   }
 
   const displayItems = activeCat ? items.filter(i => i.category_id === activeCat) : items
@@ -131,6 +207,13 @@ export default function DemoFoodQRMenu() {
   /* ── MAIN PAGE ───────────────────────────────────────── */
   return (
     <div style={{ minHeight: '100vh', background: CREAM, fontFamily: 'Sarabun, sans-serif', paddingBottom: '80px' }}>
+
+      {/* TOAST */}
+      {toast && (
+        <div style={{ position: 'fixed', top: '16px', left: '50%', transform: 'translateX(-50%)', background: BROWN, color: 'white', padding: '8px 18px', borderRadius: '999px', fontSize: '13px', fontWeight: 600, zIndex: 200, whiteSpace: 'nowrap', boxShadow: '0 4px 16px rgba(111,78,55,0.35)', pointerEvents: 'none' }}>
+          {toast}
+        </div>
+      )}
 
       {/* DEMO BANNER */}
       <div style={{ background: BROWN, color: 'white', textAlign: 'center', padding: '6px', fontSize: '11px', fontWeight: 700, letterSpacing: '2px' }}>
@@ -215,7 +298,7 @@ export default function DemoFoodQRMenu() {
       {/* FLOATING CART */}
       {cartCount > 0 && !showCart && !showOrder && (
         <button onClick={() => setShowCart(true)}
-          style={{ position: 'fixed', bottom: '20px', left: '50%', transform: 'translateX(-50%)', background: BROWN, color: 'white', border: 'none', borderRadius: '999px', padding: '14px 28px', fontSize: '14px', fontWeight: 700, cursor: 'pointer', boxShadow: '0 8px 32px rgba(111,78,55,0.4)', zIndex: 50, display: 'flex', alignItems: 'center', gap: '10px', whiteSpace: 'nowrap' }}>
+          style={{ position: 'fixed', bottom: '20px', left: '50%', transform: `translateX(-50%) scale(${cartBounce ? 1.2 : 1})`, background: BROWN, color: 'white', border: 'none', borderRadius: '999px', padding: '14px 28px', fontSize: '14px', fontWeight: 700, cursor: 'pointer', boxShadow: '0 8px 32px rgba(111,78,55,0.4)', zIndex: 50, display: 'flex', alignItems: 'center', gap: '10px', whiteSpace: 'nowrap', transition: 'transform 0.2s cubic-bezier(0.34,1.56,0.64,1)' }}>
           <span style={{ background: GOLDEN, borderRadius: '999px', padding: '2px 8px', fontSize: '12px', fontWeight: 700 }}>{cartCount}</span>
           ดูรายการ · {cartTotal.toLocaleString()} ฿
         </button>
@@ -289,10 +372,8 @@ export default function DemoFoodQRMenu() {
               <span style={{ fontWeight: 700, fontSize: '16px', color: BROWN }}>{cartTotal.toLocaleString()} ฿</span>
             </div>
 
-            {orderError && <p style={{ color: '#EF4444', fontSize: '12px', marginBottom: '10px' }}>⚠️ {orderError}</p>}
-
             <button onClick={submitOrder} disabled={!tableNo.trim() || submitting || cart.length === 0}
-              style={{ width: '100%', padding: '14px', borderRadius: '14px', background: BROWN, color: 'white', border: 'none', fontSize: '15px', fontWeight: 700, cursor: !tableNo.trim() || submitting ? 'not-allowed' : 'pointer', opacity: !tableNo.trim() || submitting ? 0.5 : 1, marginBottom: '8px', transition: 'opacity 0.2s' }}>
+              style={{ width: '100%', padding: '14px', borderRadius: '14px', background: BROWN, color: 'white', border: 'none', fontSize: '15px', fontWeight: 700, cursor: !tableNo.trim() || submitting ? 'not-allowed' : 'pointer', opacity: !tableNo.trim() || submitting ? 0.7 : 1, marginBottom: '8px', transition: 'opacity 0.2s' }}>
               {submitting ? 'กำลังส่ง...' : 'ยืนยันสั่ง →'}
             </button>
             <button onClick={() => { setShowOrder(false); setShowCart(true) }}
