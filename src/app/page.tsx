@@ -169,9 +169,9 @@ export default function HomePage() {
             <div className={`${s.priceCard} reveal`}>
               <div className={s.planName}>Free</div>
               <div className={s.planPrice}><sup>฿</sup>0<sub>/เดือน</sub></div>
-              <div className={s.planDesc}>ทดลองฟรี 30 วัน ไม่ต้องใส่บัตร</div>
+              <div className={s.planDesc}>ทดลองฟรี 14 วัน ไม่ต้องใส่บัตร</div>
               <ul className={s.planFeatures}>
-                <li>ทุก feature ครบ 30 วัน</li>
+                <li>ทุก feature ครบ 14 วัน</li>
                 <li>หน้าร้าน + จองออนไลน์</li>
                 <li>Admin dashboard</li>
                 <li>Subdomain .krabbie.com</li>

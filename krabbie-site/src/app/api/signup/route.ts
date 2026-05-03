@@ -29,9 +29,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: `"${slug}" ถูกใช้แล้ว กรุณาเลือกชื่ออื่น` }, { status: 409 })
   }
 
-  // Create tenant (trial = 30 days)
+  // Create tenant (trial = 14 days)
   const trialEnds = new Date()
-  trialEnds.setDate(trialEnds.getDate() + 30)
+  trialEnds.setDate(trialEnds.getDate() + 14)
 
   const { data: tenant, error } = await supabase
     .from('tenants')
