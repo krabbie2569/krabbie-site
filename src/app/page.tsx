@@ -13,15 +13,15 @@ export default function HomePage() {
             Krabbie<span className="text-orange-500">.com</span>
           </span>
         </div>
-        <div className="flex items-center gap-6">
-          <Link href="/templates" className="text-gray-400 hover:text-white text-sm transition-colors">
-            Templates
-          </Link>
-          <Link href="#pricing" className="text-gray-400 hover:text-white text-sm transition-colors">
+        <div className="flex items-center gap-4">
+          <Link href="#pricing" className="text-gray-400 hover:text-white text-sm transition-colors hidden sm:block">
             ราคา
           </Link>
+          <Link href="/login" className="text-gray-400 hover:text-white text-sm transition-colors border border-gray-700 hover:border-gray-500 rounded-lg px-3 py-1.5">
+            เข้าสู่ระบบ
+          </Link>
           <Link href="/signup" className="btn-primary text-sm">
-            เริ่มใช้งาน ฟรี!
+            ทดลองฟรี!
           </Link>
         </div>
       </nav>
