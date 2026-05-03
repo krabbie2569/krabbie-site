@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase'
 
 type Step = 'calendar' | 'info' | 'summary'
@@ -168,7 +168,7 @@ export default function RentalBookingModal({ item, tenantId, lineUrl, onClose }:
     const first = new Date(year, month, 1).getDay()
     const total_days = new Date(year, month + 1, 0).getDate()
     const today = new Date().toISOString().slice(0, 10)
-    const cells: JSX.Element[] = []
+    const cells: React.ReactElement[] = []
 
     for (let i = 0; i < first; i++) cells.push(<div key={`e${i}`} />)
 
