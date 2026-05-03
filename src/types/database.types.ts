@@ -6,16 +6,17 @@ export interface Database {
       tenants: {
         Row: {
           id: string
-          slug: string                  // subdomain: shop.krabbie.com
+          slug: string
           name: string
           template_id: string
           owner_email: string
           owner_phone: string | null
           plan: 'trial' | 'active' | 'suspended' | 'cancelled'
+          plan_type: 'standard' | 'pro'
           trial_ends_at: string | null
           activated_at: string | null
           expires_at: string | null
-          settings: Json               // { primaryColor, logoUrl, lineId, ... }
+          settings: Json
           created_at: string
           updated_at: string
         }
@@ -113,9 +114,19 @@ export interface Database {
           amount: number
           method: 'promptpay' | 'bank_transfer'
           status: 'pending' | 'paid' | 'failed' | 'refunded'
+          plan_type: 'standard' | 'pro'
+          review_status: 'pending' | 'auto_approved' | 'admin_approved' | 'rejected'
           slip_url: string | null
           paid_at: string | null
-          months: number               // how many months this payment covers
+          months: number
+          transaction_ref: string | null
+          verified_amount: number | null
+          verify_method: string | null
+          verify_raw: Json | null
+          rejection_reason: string | null
+          reviewed_by: string | null
+          reviewed_at: string | null
+          verified_at: string | null
           created_at: string
         }
         Insert: Omit<Database['public']['Tables']['payments']['Row'], 'id' | 'created_at'>

@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
   // Fetch payment
   const { data: payment } = await supabase
     .from('payments')
-    .select('*, tenants(id, plan_type)')
+    .select('*')
     .eq('id', paymentId)
     .single()
 
