@@ -43,7 +43,7 @@ export default async function BillingPage({ params }: Props) {
           <div className="flex items-center justify-between">
             <div>
               <div className="font-syne font-bold text-lg capitalize">
-                {tenant.plan_type === 'pro' ? '⭐ Pro' : '🦀 Standard'}
+                🦀 Standard
               </div>
               <div className="text-sm text-gray-500 mt-0.5">
                 {tenant.plan === 'trial'
@@ -68,7 +68,7 @@ export default async function BillingPage({ params }: Props) {
           <div className="sec-label mb-4">ชำระเงิน / ต่ออายุ</div>
           <SlipUploader
             tenantSlug={tenantSlug}
-            currentPlan={(tenant.plan_type as 'standard' | 'pro') ?? 'standard'}
+            currentPlan="standard"
             onSuccess={() => {}}
           />
         </div>
