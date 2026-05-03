@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
     .from('tenants')
     .select('id, plan, plan_type')
     .eq('slug', tenantSlug)
-    .single()
+    .single() as { data: Record<string, any> | null; error: unknown }
 
   if (!tenant) {
     return NextResponse.json({ error: 'ไม่พบร้านค้า' }, { status: 404 })
@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
       review_status: 'pending',
     })
     .select()
-    .single()
+    .single() as { data: Record<string, any> | null; error: unknown }
 
   if (payErr || !payment) {
     return NextResponse.json({ error: 'บันทึก payment ไม่สำเร็จ' }, { status: 500 })
@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
       .select('id')
       .eq('transaction_ref', verifyResult.transactionRef)
       .neq('id', payment.id)
-      .single()
+      .single() as { data: Record<string, any> | null; error: unknown }
 
     if (existing) {
       await supabase.from('payments').update({

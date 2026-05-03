@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     .from('payments')
     .select('*')
     .eq('id', paymentId)
-    .single()
+    .single() as { data: Record<string, any> | null; error: unknown }
 
   if (!payment) {
     return NextResponse.json({ error: 'ไม่พบ payment' }, { status: 404 })
