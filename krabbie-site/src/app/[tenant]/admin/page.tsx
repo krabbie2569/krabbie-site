@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { getTenantBySlug } from '@/lib/tenant'
 import { createServerSupabaseClient } from '@/lib/supabase.server'
 import { notFound } from 'next/navigation'
@@ -37,16 +38,41 @@ export default async function TenantAdminPage({ params }: Props) {
   const pendingCount   = bookings?.filter(b => b.status === 'pending').length ?? 0
   const confirmedCount = bookings?.filter(b => b.status === 'confirmed').length ?? 0
 
+  const isRental = tenant.template_id === 'booking-rental'
+
   return (
     <div className="min-h-screen bg-gray-50 pb-16">
 
       {/* ADMIN HEADER */}
       <div className="bg-krabbie-dark px-4 py-3 flex items-center justify-between">
-        <div>
-          <span className="font-syne text-white font-bold">{tenant.name}</span>
-          <span className="font-mono text-gray-500 text-xs ml-2">Admin</span>
+        <div className="flex items-center gap-3">
+          <Link href={`/${tenantSlug}`} className="text-gray-400 hover:text-white transition-colors text-sm font-mono">
+            ← หน้าร้าน
+          </Link>
+          <span className="text-gray-600">|</span>
+          <div>
+            <span className="font-syne text-white font-bold">{tenant.name}</span>
+            <span className="font-mono text-gray-500 text-xs ml-2">Admin</span>
+          </div>
         </div>
         <span className="badge-trial">{tenant.plan === 'trial' ? 'ทดลองใช้' : 'Active'}</span>
+      </div>
+
+      {/* QUICK NAV */}
+      <div className="bg-white border-b border-krabbie-border px-4 py-2 flex gap-2 overflow-x-auto">
+        {[
+          { href: `/${tenantSlug}/admin`,          label: '📊 ภาพรวม',      active: true  },
+          { href: `/${tenantSlug}/admin/services`,  label: isRental ? '📦 สินค้า' : '🛠️ บริการ', active: false },
+          { href: `/${tenantSlug}/admin/settings`,  label: '⚙️ ตั้งค่า',    active: false },
+          { href: `/${tenantSlug}/admin/billing`,   label: '💳 ชำระเงิน',   active: false },
+        ].map(({ href, label, active }) => (
+          <Link key={href} href={href}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${
+              active ? 'bg-orange-100 text-orange-600' : 'text-gray-500 hover:bg-gray-100'
+            }`}>
+            {label}
+          </Link>
+        ))}
       </div>
 
       <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
@@ -61,7 +87,12 @@ export default async function TenantAdminPage({ params }: Props) {
 
         {/* SERVICES */}
         <div>
-          <div className="sec-label mb-3">บริการ</div>
+          <div className="flex items-center justify-between mb-3">
+            <div className="sec-label">{isRental ? 'สินค้าให้เช่า' : 'บริการ'}</div>
+            <Link href={`/${tenantSlug}/admin/services`} className="text-xs text-orange-500 font-semibold hover:underline">
+              จัดการ →
+            </Link>
+          </div>
           <div className="space-y-2">
             {(services as Service[] ?? []).map((s) => (
               <div key={s.id} className="card flex items-center gap-3 py-3">
@@ -76,7 +107,10 @@ export default async function TenantAdminPage({ params }: Props) {
               </div>
             ))}
             {(!services || services.length === 0) && (
-              <div className="card text-center py-8 text-gray-400 text-sm">ยังไม่มีบริการ</div>
+              <div className="card text-center py-8 text-gray-400 text-sm">
+                ยังไม่มี{isRental ? 'สินค้า' : 'บริการ'} —{' '}
+                <Link href={`/${tenantSlug}/admin/services`} className="text-orange-500 underline">เพิ่มเลย</Link>
+              </div>
             )}
           </div>
         </div>

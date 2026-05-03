@@ -6,22 +6,59 @@ import { sanitizeSlug, isValidSlug, shopUrl } from '@/lib/utils'
 import type { SignupForm } from '@/types'
 
 const TEMPLATES = [
-  { id: 'booking-service', name: 'ระบบจองบริการ', emoji: '📅', desc: 'นวด · ฝึกสอน · ช่างภาพ · ซ่อม', available: true },
-  { id: 'booking-spa',     name: 'สปา & นวดแผนไทย', emoji: '🌿', desc: 'สปา · อโรมา · นวดแผนไทย', available: true },
-  { id: 'shop',            name: 'ร้านขายสินค้า',   emoji: '🛍️', desc: 'เร็วๆ นี้', available: false },
-  { id: 'qr-menu',         name: 'QR เมนูร้านอาหาร', emoji: '🍜', desc: 'เร็วๆ นี้', available: false },
+  {
+    id: 'booking-service',
+    name: 'จองบริการ',
+    emoji: '📅',
+    desc: 'นวด · ฝึกสอน · ช่างภาพ · ซ่อม',
+    detail: 'รับจองคิวออนไลน์ เลือกบริการ เลือกเวลา ยืนยันอัตโนมัติ',
+    color: '#ff6b00',
+    bg: 'linear-gradient(135deg,#fff8f0,#ffe0c0)',
+    available: true,
+  },
+  {
+    id: 'booking-rental',
+    name: 'เช่าสินค้า',
+    emoji: '📷',
+    desc: 'กล้อง · เสื้อผ้า · อุปกรณ์',
+    detail: 'เช่ารายวัน รายชั่วโมง เลือกวันรับ-คืน ปฏิทินแสดง busy days',
+    color: '#E91E8C',
+    bg: 'linear-gradient(135deg,#fff0f8,#f8e0ff)',
+    available: true,
+  },
+  {
+    id: 'shop',
+    name: 'ร้านขายสินค้า',
+    emoji: '🛍️',
+    desc: 'เร็วๆ นี้',
+    detail: 'ระบบร้านค้าออนไลน์ สต็อก ออเดอร์',
+    color: '#6B7280',
+    bg: 'linear-gradient(135deg,#f9fafb,#f3f4f6)',
+    available: false,
+  },
+  {
+    id: 'qr-menu',
+    name: 'QR เมนูอาหาร',
+    emoji: '🍜',
+    desc: 'เร็วๆ นี้',
+    detail: 'เมนูดิจิทัล QR สั่งอาหาร ไม่ต้องพิมพ์',
+    color: '#6B7280',
+    bg: 'linear-gradient(135deg,#f9fafb,#f3f4f6)',
+    available: false,
+  },
 ]
 
 export default function SignupPage() {
-  const [step, setStep] = useState<1 | 2 | 3>(1)
-  const [form, setForm] = useState<SignupForm>({
+  const [step, setStep]         = useState<1 | 2 | 3>(1)
+  const [carIdx, setCarIdx]     = useState(0)
+  const [form, setForm]         = useState<SignupForm>({
     templateId: '',
     shopName:   '',
     slug:       '',
     ownerEmail: '',
     ownerPhone: '',
   })
-  const [loading, setLoading]   = useState(false)
+  const [loading, setLoading]     = useState(false)
   const [slugError, setSlugError] = useState('')
   const [apiError, setApiError]   = useState('')
 
@@ -40,11 +77,11 @@ export default function SignupPage() {
   }
 
   function autoSlug(name: string) {
-    if (!form.slug) {
-      const generated = sanitizeSlug(name)
-      setField('slug', generated)
-    }
+    if (!form.slug) setField('slug', sanitizeSlug(name))
   }
+
+  function prev() { setCarIdx(i => Math.max(0, i - 1)) }
+  function next() { setCarIdx(i => Math.min(TEMPLATES.length - 1, i + 1)) }
 
   async function handleSubmit() {
     setLoading(true)
@@ -64,11 +101,15 @@ export default function SignupPage() {
     setStep(3)
   }
 
+  const current = TEMPLATES[carIdx]
+
   return (
     <main className="min-h-screen bg-krabbie-bg flex flex-col">
 
       {/* NAV */}
       <nav className="bg-krabbie-dark px-6 py-4 flex items-center gap-3">
+        <Link href="/" className="text-gray-400 hover:text-white text-sm font-mono transition-colors">← กลับ</Link>
+        <span className="text-gray-700">|</span>
         <Link href="/" className="text-2xl">🦀</Link>
         <span className="font-syne text-white font-extrabold">
           Krabbie<span className="text-orange-500">.com</span>
@@ -95,35 +136,91 @@ export default function SignupPage() {
             </span>
           </div>
 
-          {/* STEP 1: CHOOSE TEMPLATE */}
+          {/* STEP 1: CAROUSEL TEMPLATE PICKER */}
           {step === 1 && (
             <div>
               <h1 className="font-syne text-2xl font-bold mb-1">เลือก Template ที่ใช่</h1>
-              <p className="text-gray-500 text-sm mb-6">เลือก template ที่เหมาะกับธุรกิจของคุณ</p>
-              <div className="grid grid-cols-2 gap-3 mb-6">
-                {TEMPLATES.map((t) => (
-                  <button
-                    key={t.id}
-                    disabled={!t.available}
-                    onClick={() => setField('templateId', t.id)}
-                    className={`p-4 rounded-krabbie border-2 text-left transition-all ${
-                      !t.available ? 'opacity-50 cursor-not-allowed border-krabbie-border' :
-                      form.templateId === t.id ? 'border-orange-500 bg-orange-50' :
-                      'border-krabbie-border hover:border-orange-300'
-                    }`}
-                  >
-                    <div className="text-2xl mb-2">{t.emoji}</div>
-                    <div className="font-bold text-sm mb-1">{t.name}</div>
-                    <div className="text-xs text-gray-400">{t.desc}</div>
-                    {!t.available && <div className="badge-soon mt-1 inline-block">เร็วๆ นี้</div>}
+              <p className="text-gray-500 text-sm mb-8">เลือก template ที่เหมาะกับธุรกิจของคุณ</p>
+
+              {/* CAROUSEL */}
+              <div className="relative flex items-center gap-3 mb-6">
+
+                {/* PREV */}
+                <button onClick={prev} disabled={carIdx === 0}
+                  className="flex-shrink-0 w-10 h-10 rounded-full border-2 border-krabbie-border bg-white flex items-center justify-center text-xl transition-all hover:border-orange-400 disabled:opacity-20 disabled:cursor-not-allowed">
+                  ‹
+                </button>
+
+                {/* CARD */}
+                <div key={current.id}
+                  style={{ background: current.bg, borderColor: form.templateId === current.id ? current.color : 'transparent' }}
+                  className={`flex-1 rounded-2xl border-4 p-8 text-center transition-all cursor-pointer select-none ${
+                    !current.available ? 'opacity-60' : 'hover:scale-[1.02]'
+                  }`}
+                  onClick={() => current.available && setField('templateId', current.id)}>
+
+                  <div className="text-7xl mb-5 leading-none">{current.emoji}</div>
+                  <div className="font-syne font-extrabold text-2xl mb-2" style={{ color: current.available ? current.color : '#9CA3AF' }}>
+                    {current.name}
+                  </div>
+                  <div className="text-sm font-semibold text-gray-600 mb-3">{current.desc}</div>
+                  <div className="text-xs text-gray-400 leading-relaxed mb-4">{current.detail}</div>
+
+                  {!current.available && (
+                    <div className="inline-block px-3 py-1 rounded-full bg-gray-200 text-gray-500 text-xs font-mono font-bold">
+                      เร็วๆ นี้
+                    </div>
+                  )}
+                  {current.available && form.templateId === current.id && (
+                    <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-white text-xs font-bold"
+                      style={{ background: current.color }}>
+                      ✓ เลือกแล้ว
+                    </div>
+                  )}
+                  {current.available && form.templateId !== current.id && (
+                    <div className="inline-block px-4 py-1.5 rounded-full border-2 text-xs font-bold transition-colors"
+                      style={{ borderColor: current.color, color: current.color }}>
+                      แตะเพื่อเลือก
+                    </div>
+                  )}
+                </div>
+
+                {/* NEXT */}
+                <button onClick={next} disabled={carIdx === TEMPLATES.length - 1}
+                  className="flex-shrink-0 w-10 h-10 rounded-full border-2 border-krabbie-border bg-white flex items-center justify-center text-xl transition-all hover:border-orange-400 disabled:opacity-20 disabled:cursor-not-allowed">
+                  ›
+                </button>
+              </div>
+
+              {/* DOTS */}
+              <div className="flex justify-center gap-2 mb-8">
+                {TEMPLATES.map((t, i) => (
+                  <button key={t.id} onClick={() => setCarIdx(i)}
+                    className="transition-all rounded-full"
+                    style={{
+                      width:   i === carIdx ? '20px' : '8px',
+                      height:  '8px',
+                      background: i === carIdx ? (current.available ? current.color : '#9CA3AF') : '#E5E7EB',
+                    }}/>
+                ))}
+              </div>
+
+              {/* THUMBNAIL STRIP */}
+              <div className="flex gap-2 justify-center mb-8">
+                {TEMPLATES.map((t, i) => (
+                  <button key={t.id} onClick={() => setCarIdx(i)}
+                    style={{ background: t.bg, borderColor: i === carIdx ? t.color : 'transparent' }}
+                    className="w-14 h-14 rounded-xl border-2 flex flex-col items-center justify-center gap-0.5 text-lg transition-all hover:scale-105">
+                    <span>{t.emoji}</span>
+                    <span className="text-[9px] font-mono text-gray-500 leading-none">{t.name.split(' ')[0]}</span>
                   </button>
                 ))}
               </div>
+
               <button
                 disabled={!form.templateId}
                 onClick={() => setStep(2)}
-                className="btn-primary w-full disabled:opacity-40 disabled:cursor-not-allowed"
-              >
+                className="btn-primary w-full disabled:opacity-40 disabled:cursor-not-allowed">
                 ถัดไป →
               </button>
             </div>
@@ -136,7 +233,7 @@ export default function SignupPage() {
               <p className="text-gray-500 text-sm mb-6">กรอกข้อมูลเพื่อสร้างเว็บร้านของคุณ</p>
 
               <div className="bg-orange-50 border border-orange-200 rounded-lg px-4 py-3 text-sm text-orange-700 mb-5">
-                🎉 ทดลองใช้ฟรี 1 เดือน — ไม่ต้องชำระจนกว่าจะพอใจ
+                🎉 ทดลองใช้ฟรี 14 วัน — ไม่ต้องชำระจนกว่าจะพอใจ
               </div>
 
               <div className="space-y-4">
@@ -216,7 +313,7 @@ export default function SignupPage() {
                 {form.slug ? shopUrl(form.slug) : 'yourshop.krabbie.com'}
               </div>
               <p className="text-xs text-gray-400 mb-6 font-mono">
-                ✓ ทดลองฟรี 1 เดือน · ชำระ 150 ฿ ต่อเมื่อพอใจ
+                ✓ ทดลองฟรี 14 วัน · ชำระ 150 ฿ ต่อเมื่อพอใจ
               </p>
               <a href={form.slug ? shopUrl(form.slug) : '#'} className="btn-primary block mb-3">
                 เข้าเว็บร้านของฉัน →
