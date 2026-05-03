@@ -50,8 +50,8 @@ export default function DemoBookingRental() {
       {/* HEADER */}
       <header style={{background:'rgba(255,255,255,0.85)',backdropFilter:'blur(12px)',borderBottom:'1px solid rgba(233,30,140,0.1)',padding:'14px 20px',display:'flex',justifyContent:'space-between',alignItems:'center',position:'sticky',top:0,zIndex:10}}>
         <div>
-          <div style={{fontFamily:'Georgia,serif',fontSize:'17px',fontWeight:600,background:PINK,WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>BoBBoB Camera</div>
-          <div style={{fontSize:'8px',letterSpacing:'3px',color:'#9CA3AF',textTransform:'uppercase'}}>Rental · Korat</div>
+          <div style={{fontFamily:'Georgia,serif',fontSize:'17px',fontWeight:600,background:PINK,WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>BoBBoB Camera Korat</div>
+          <div style={{fontSize:'8px',letterSpacing:'3px',color:'#9CA3AF',textTransform:'uppercase'}}>Stylist &amp; Camera Rental · Korat</div>
         </div>
         <div style={{display:'flex',gap:'6px'}}>
           {['📷','👕','🗓️','⭐'].map(e => (
@@ -74,8 +74,9 @@ export default function DemoBookingRental() {
             <span style={{color:'#E91E8C',fontSize:'9px'}}>✦</span>
             <span style={{fontSize:'9px',letterSpacing:'2px',color:'#E91E8C',textTransform:'uppercase'}}>บริการเช่าสินค้า</span>
           </div>
-          <h1 style={{fontFamily:'Georgia,serif',fontSize:'36px',fontWeight:600,lineHeight:1.1,marginBottom:'6px',background:PINK,WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>BoBBoB Camera</h1>
-          <h2 style={{fontFamily:'Georgia,serif',fontSize:'20px',fontWeight:400,color:'#1a1a2e',marginBottom:'16px'}}>Rental · Korat</h2>
+          <h1 style={{fontFamily:'Georgia,serif',fontSize:'36px',fontWeight:600,lineHeight:1.1,marginBottom:'6px',background:PINK,WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>BoBBoB Camera Korat</h1>
+          <h2 style={{fontFamily:'Georgia,serif',fontSize:'16px',fontWeight:400,color:'#1a1a2e',marginBottom:'8px'}}>Stylist &amp; Camera Rental · Korat</h2>
+          <p style={{fontSize:'11px',color:'#6B7280',maxWidth:'260px',margin:'0 auto 16px',lineHeight:1.6}}>สไตลิสต์และช่างภาพมืออาชีพ ให้เช่าเสื้อผ้าแฟชั่นและกล้องคอมแพคคุณภาพสูง</p>
           <div style={{display:'flex',gap:'8px',justifyContent:'center',flexWrap:'wrap'}}>
             {['📷 ดูกล้อง','✦ ดูเสื้อผ้า','🗓️ ปฏิทิน','⭐ รีวิว'].map(l => (
               <div key={l} style={{padding:'8px 16px',borderRadius:'999px',border:'1px solid rgba(233,30,140,0.2)',background:'white',color:'#6B7280',fontSize:'11px',cursor:'pointer'}}>{l}</div>
@@ -88,7 +89,7 @@ export default function DemoBookingRental() {
       <section style={{padding:'40px 20px'}}>
         <p style={{fontSize:'9px',letterSpacing:'4px',color:'#E91E8C',textTransform:'uppercase',marginBottom:'8px'}}>Equipment</p>
         <h2 style={{fontFamily:'Georgia,serif',fontSize:'22px',fontWeight:600,color:'#1a1a2e',marginBottom:'4px'}}>กล้องให้เช่า</h2>
-        <p style={{color:'#9CA3AF',fontSize:'12px',marginBottom:'20px'}}>กล้องคุณภาพสูง พกพาสะดวก</p>
+        <p style={{color:'#9CA3AF',fontSize:'12px',marginBottom:'20px'}}>กล้องคอมแพคคุณภาพสูง พกพาสะดวก</p>
         <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px'}}>
           {CAMERAS.map(c => <ItemCard key={c.id} item={c} onBook={() => { setBookItem(c); setShowBooking(true) }} />)}
         </div>
@@ -98,7 +99,7 @@ export default function DemoBookingRental() {
       <section style={{padding:'40px 20px',background:'linear-gradient(180deg,#FDFBFF,#FFF0F8)'}}>
         <p style={{fontSize:'9px',letterSpacing:'4px',color:'#E91E8C',textTransform:'uppercase',marginBottom:'8px'}}>Collection</p>
         <h2 style={{fontFamily:'Georgia,serif',fontSize:'22px',fontWeight:600,color:'#1a1a2e',marginBottom:'4px'}}>เสื้อผ้าให้เช่า</h2>
-        <p style={{color:'#9CA3AF',fontSize:'12px',marginBottom:'20px'}}>เลือกสไตล์ที่ใช่</p>
+        <p style={{color:'#9CA3AF',fontSize:'12px',marginBottom:'20px'}}>เลือกสไตล์ที่ใช่สำหรับทุกโอกาส</p>
         <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px'}}>
           {CLOTHES.map(c => <ItemCard key={c.id} item={c} onBook={() => { setBookItem(c); setShowBooking(true) }} />)}
         </div>

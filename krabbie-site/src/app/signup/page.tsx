@@ -175,17 +175,35 @@ function SignupContent() {
                 {/* CARD */}
                 <div key={current.id}
                   style={{ background: current.bg, borderColor: form.templateId === current.id ? current.color : 'transparent' }}
-                  className={`flex-1 rounded-2xl border-4 p-8 text-center transition-all cursor-pointer select-none ${
+                  className={`flex-1 rounded-2xl border-4 p-5 text-center transition-all cursor-pointer select-none ${
                     !current.available ? 'opacity-60' : 'hover:scale-[1.02]'
                   }`}
                   onClick={() => current.available && setField('templateId', current.id)}>
 
-                  <div className="text-7xl mb-5 leading-none">{current.emoji}</div>
+                  {current.available ? (
+                    <div className="flex justify-center mb-4">
+                      <div style={{
+                        width: '150px', height: '300px',
+                        border: '6px solid #1a1a2e', borderRadius: '22px',
+                        overflow: 'hidden', position: 'relative',
+                        boxShadow: '0 12px 32px rgba(0,0,0,0.25)',
+                        background: '#f3f4f6', flexShrink: 0,
+                      }}>
+                        <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: '32px', height: '7px', background: '#1a1a2e', borderRadius: '0 0 7px 7px', zIndex: 10 }} />
+                        <div style={{ width: '390px', height: '844px', transformOrigin: 'top left', transform: 'scale(0.385)', pointerEvents: 'none' }}>
+                          <iframe src={`/demo/${current.id}`} style={{ width: '390px', height: '844px', border: 'none' }} title={`Preview ${current.name}`} loading="lazy" />
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-7xl mb-5 leading-none">{current.emoji}</div>
+                  )}
+
                   <div className="font-syne font-extrabold text-2xl mb-2" style={{ color: current.available ? current.color : '#9CA3AF' }}>
                     {current.name}
                   </div>
                   <div className="text-sm font-semibold text-gray-600 mb-3">{current.desc}</div>
-                  <div className="text-xs text-gray-400 leading-relaxed mb-4">{current.detail}</div>
+                  {!current.available && <div className="text-xs text-gray-400 leading-relaxed mb-4">{current.detail}</div>}
 
                   {!current.available && (
                     <div className="inline-block px-3 py-1 rounded-full bg-gray-200 text-gray-500 text-xs font-mono font-bold">
