@@ -12,18 +12,15 @@ type Payment = {
   status:           string
   review_status:    string
   slip_url:         string | null
-  verified_amount:  number | null
-  verify_method:    string | null
   rejection_reason: string | null
   created_at:       string
   tenants:          { slug: string; name: string } | null
 }
 
 const REVIEW_TABS = [
-  { key: 'pending',        label: 'รอตรวจ',     cls: 'bg-yellow-100 text-yellow-700' },
-  { key: 'auto_approved',  label: '✓ Auto',      cls: 'bg-teal-light text-teal-dark' },
-  { key: 'admin_approved', label: '✓ Admin',     cls: 'bg-teal-light text-teal-dark' },
-  { key: 'rejected',       label: '✗ ปฏิเสธ',  cls: 'bg-red-100 text-red-600' },
+  { key: 'pending',        label: 'รอตรวจ',    cls: 'bg-yellow-100 text-yellow-700' },
+  { key: 'admin_approved', label: '✓ Approved', cls: 'bg-teal-light text-teal-dark' },
+  { key: 'rejected',       label: '✗ ปฏิเสธ', cls: 'bg-red-100 text-red-600' },
 ]
 
 export default function AdminPaymentsPage() {
@@ -145,25 +142,14 @@ export default function AdminPaymentsPage() {
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-syne font-bold">{p.tenants?.name ?? 'Unknown'}</span>
                       <span className="font-mono text-xs text-orange-500">{p.tenants?.slug}.krabbie.com</span>
-                      <span className={`text-[0.6rem] font-mono px-2 py-0.5 rounded capitalize ${
-                        p.plan_type === 'pro' ? 'bg-teal-light text-teal-dark' : 'badge-free'
-                      }`}>{p.plan_type}</span>
                     </div>
 
                     <div className="flex gap-4 mt-1 text-sm flex-wrap">
                       <span className="font-syne font-bold text-orange-500">{Number(p.amount).toLocaleString()} ฿</span>
                       <span className="text-gray-400">{p.months} เดือน</span>
-                      {p.verified_amount != null && (
-                        <span className={`font-mono text-xs ${
-                          Math.abs(p.verified_amount - p.amount) < 0.01 ? 'text-teal-dark' : 'text-red-500 font-bold'
-                        }`}>
-                          อ่านได้: {p.verified_amount} ฿
-                          {Math.abs(p.verified_amount - p.amount) >= 0.01 && ' ⚠️ ไม่ตรง'}
-                        </span>
-                      )}
-                      {p.verify_method && (
-                        <span className="font-mono text-xs text-gray-400">via {p.verify_method}</span>
-                      )}
+                      <span className={`text-[0.6rem] font-mono px-2 py-0.5 rounded capitalize ${
+                        p.plan_type === 'pro' ? 'bg-teal-light text-teal-dark' : 'badge-free'
+                      }`}>{p.plan_type}</span>
                     </div>
 
                     <div className="font-mono text-xs text-gray-400 mt-0.5">
