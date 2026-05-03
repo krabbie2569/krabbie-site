@@ -3,7 +3,8 @@ import { createServiceClient } from '@/lib/supabase.server'
 
 // Super admin: approve หรือ reject payment ด้วยตัวเอง
 export async function POST(req: NextRequest) {
-  const supabase = createServiceClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const supabase = createServiceClient() as any
 
   const { paymentId, action, reason, adminEmail } = await req.json() as {
     paymentId:  string

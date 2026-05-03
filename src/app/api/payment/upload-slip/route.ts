@@ -8,7 +8,8 @@ const PLAN_PRICE: Record<string, number> = {
 }
 
 export async function POST(req: NextRequest) {
-  const supabase = createServiceClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const supabase = createServiceClient() as any
 
   const form       = await req.formData()
   const slipFile   = form.get('slip') as File | null
