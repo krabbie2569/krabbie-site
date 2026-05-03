@@ -13,6 +13,8 @@ const TEMPLATES = [
   { id: 'qr-menu',         name: 'QR เมนู',    emoji: '🍜', desc: 'เมนูอาหาร · QR · ร้านอาหาร', color: '#F59E0B' },
 ]
 
+const IFRAME_H = 2800
+
 export default function NewShopPage() {
   const router = useRouter()
   const [selected, setSelected]   = useState<string | null>(null)
@@ -84,50 +86,50 @@ export default function NewShopPage() {
       {/* STAGE */}
       <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
 
-        {/* 4 BANNER COLUMNS — always full size, iframes fully interactive */}
+        {/* 4 BANNER COLUMNS — always full size */}
         <div ref={railRef} style={{ position: 'absolute', inset: 0, display: 'flex' }}>
           {TEMPLATES.map(t => (
             <div
               key={t.id}
               style={{
-                flex: 1,
-                position: 'relative',
-                overflow: 'hidden',
+                flex: 1, position: 'relative', overflow: 'hidden',
                 borderRight: '1px solid rgba(255,255,255,0.04)',
                 transition: 'filter 0.35s ease',
                 filter: selected && selected !== t.id ? 'brightness(0.28)' : 'brightness(1)',
               }}
             >
-              {/* IFRAME — zoom (not transform) so scroll layout is correct */}
+              {/* Scrollable area — right edge pushed 20px out so scrollbar is hidden */}
               {colWidth > 0 && (
-                <div style={{ zoom: bgScale, width: '390px', height: '2600px' } as React.CSSProperties}>
-                  <iframe
-                    src={`/demo/${t.id}`}
-                    style={{ width: '390px', height: '2600px', border: 'none', display: 'block' }}
-                    title={t.name}
-                    loading="lazy"
-                  />
+                <div style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: '-20px', overflowY: 'scroll' }}>
+                  {/* zoom wrapper: scales 390px → colWidth, layout height scales too so scroll works */}
+                  <div style={{ zoom: bgScale, width: '390px', height: `${IFRAME_H}px` } as React.CSSProperties}>
+                    <iframe
+                      src={`/demo/${t.id}`}
+                      style={{ width: '390px', height: `${IFRAME_H}px`, border: 'none', display: 'block' }}
+                      title={t.name}
+                      loading="lazy"
+                    />
+                  </div>
                 </div>
               )}
 
-              {/* TOP LABEL — always visible */}
+              {/* TOP LABEL */}
               <div style={{
-                position: 'absolute', top: 0, left: 0, right: 0,
+                position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10,
                 padding: '10px 10px 32px',
                 background: 'linear-gradient(180deg, rgba(0,0,0,0.75) 0%, transparent 100%)',
-                pointerEvents: 'none', zIndex: 10,
+                pointerEvents: 'none',
               }}>
                 <span style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(8px)', color: 'white', padding: '3px 10px', borderRadius: '100px', fontSize: '0.72rem', fontWeight: 700 }}>
                   {t.name}
                 </span>
               </div>
 
-              {/* SELECT BUTTON — pinned at bottom, always clickable */}
+              {/* SELECT BUTTON — pinned at bottom, always visible */}
               <div style={{
-                position: 'absolute', bottom: 0, left: 0, right: 0,
+                position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 10,
                 padding: '60px 12px 18px',
-                background: 'linear-gradient(0deg, rgba(0,0,0,0.9) 0%, transparent 100%)',
-                zIndex: 10,
+                background: 'linear-gradient(0deg, rgba(0,0,0,0.92) 0%, transparent 100%)',
                 display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px',
               }}>
                 <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.62rem', textAlign: 'center' }}>{t.desc}</div>
@@ -135,28 +137,26 @@ export default function NewShopPage() {
                   type="button"
                   onClick={() => selected === t.id ? dismiss() : setSelected(t.id)}
                   style={{
-                    background: selected === t.id ? 'rgba(255,255,255,0.15)' : t.color,
+                    background: selected === t.id ? 'rgba(255,255,255,0.1)' : t.color,
                     color: 'white',
                     border: selected === t.id ? `2px solid ${t.color}` : 'none',
                     borderRadius: '100px',
                     padding: '9px 22px',
-                    fontWeight: 700,
-                    fontSize: '0.82rem',
-                    cursor: 'pointer',
+                    fontWeight: 700, fontSize: '0.82rem',
+                    cursor: 'pointer', whiteSpace: 'nowrap',
                     fontFamily: 'Sarabun, sans-serif',
                     boxShadow: selected === t.id ? 'none' : `0 4px 20px ${t.color}66`,
-                    whiteSpace: 'nowrap',
                     transition: 'all 0.2s',
                   }}
                 >
-                  {selected === t.id ? '✕ ยกเลิก' : `เลือกเทมเพลตนี้ →`}
+                  {selected === t.id ? '✕ ยกเลิก' : 'เลือกเทมเพลตนี้ →'}
                 </button>
               </div>
             </div>
           ))}
         </div>
 
-        {/* CENTER OVERLAY — Switcher + Form only (banners stay behind) */}
+        {/* CENTER OVERLAY: Switcher | Selected Banner Preview | Form */}
         {selected && template && (
           <div style={{
             position: 'absolute', top: 0, bottom: 0,
@@ -170,7 +170,7 @@ export default function NewShopPage() {
           }}>
 
             {/* SWITCHER */}
-            <div style={{ width: '80px', background: '#111', borderRight: '1px solid rgba(255,255,255,0.1)', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px 8px', gap: '10px' }}>
+            <div style={{ width: '76px', background: '#111', borderRight: '1px solid rgba(255,255,255,0.1)', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px 8px', gap: '10px', flexShrink: 0 }}>
               <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.58rem', fontFamily: 'monospace', letterSpacing: '2px', marginBottom: '4px', textAlign: 'center' }}>สลับ</div>
               {TEMPLATES.filter(t => t.id !== selected).map(t => (
                 <button
@@ -178,7 +178,7 @@ export default function NewShopPage() {
                   type="button"
                   onClick={() => setSelected(t.id)}
                   style={{
-                    width: '62px', padding: '10px 4px 8px',
+                    width: '60px', padding: '10px 4px 8px',
                     borderRadius: '12px',
                     border: `2px solid ${t.color}`,
                     background: `${t.color}22`,
@@ -196,8 +196,24 @@ export default function NewShopPage() {
               ))}
             </div>
 
+            {/* SELECTED BANNER — scrollable preview */}
+            <div style={{ width: '280px', position: 'relative', overflow: 'hidden', borderLeft: `3px solid ${template.color}`, flexShrink: 0 }}>
+              {/* top accent */}
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: template.color, boxShadow: `0 0 20px 4px ${template.color}`, zIndex: 5, pointerEvents: 'none' }} />
+              {/* scrollable inner, scrollbar hidden behind right edge */}
+              <div style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: '-20px', overflowY: 'scroll' }}>
+                <div style={{ zoom: 280 / 390, width: '390px', height: `${IFRAME_H}px` } as React.CSSProperties}>
+                  <iframe
+                    src={`/demo/${selected}`}
+                    style={{ width: '390px', height: `${IFRAME_H}px`, border: 'none', display: 'block' }}
+                    title={template.name}
+                  />
+                </div>
+              </div>
+            </div>
+
             {/* FORM PANEL */}
-            <div style={{ width: '320px', background: 'white', display: 'flex', flexDirection: 'column', overflow: 'hidden', borderLeft: `3px solid ${template.color}` }}>
+            <div style={{ width: '310px', background: 'white', display: 'flex', flexDirection: 'column', overflow: 'hidden', borderLeft: `2px solid ${template.color}33`, flexShrink: 0 }}>
               <form onSubmit={handleSubmit} style={{ flex: 1, overflowY: 'auto', padding: '26px 22px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
                 <div>
