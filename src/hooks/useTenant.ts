@@ -19,7 +19,7 @@ export function useTenant(slug: string): UseTenantResult {
 
   useEffect(() => {
     if (!slug) return
-    const supabase = createClient()
+    const supabase = createClient() as any
     supabase
       .from('tenants')
       .select('*')

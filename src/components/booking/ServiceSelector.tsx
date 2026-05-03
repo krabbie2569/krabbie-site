@@ -16,7 +16,7 @@ export default function ServiceSelector({ tenantId, selectedId, onSelect }: Prop
   const [loading, setLoading]   = useState(true)
 
   useEffect(() => {
-    const supabase = createClient()
+    const supabase = createClient() as any
     supabase
       .from('services')
       .select('*')

@@ -5,7 +5,7 @@ import StatsCard from '@/components/admin/StatsCard'
 import type { AdminStats, Tenant } from '@/types'
 
 export default async function SuperAdminPage() {
-  const supabase = createServiceClient()
+  const supabase = createServiceClient() as any
 
   const { data: tenants } = await supabase
     .from('tenants')

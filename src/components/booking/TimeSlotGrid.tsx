@@ -20,7 +20,7 @@ export default function TimeSlotGrid({ tenantId, serviceId, date, selectedSlotId
 
   useEffect(() => {
     setLoading(true)
-    const supabase = createClient()
+    const supabase = createClient() as any
     supabase
       .from('time_slots')
       .select('*')

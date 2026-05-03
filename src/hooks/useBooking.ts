@@ -27,7 +27,7 @@ export function useBooking(tenantSlug: string): UseBookingResult {
     setError(null)
 
     try {
-      const supabase = createClient()
+      const supabase = createClient() as any
 
       // 1. Fetch tenant id from slug
       const { data: tenant } = await supabase

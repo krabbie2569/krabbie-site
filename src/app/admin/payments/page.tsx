@@ -34,7 +34,7 @@ export default function AdminPaymentsPage() {
 
   async function load() {
     setLoading(true)
-    const supabase = createClient()
+    const supabase = createClient() as any
     const { data } = await supabase
       .from('payments')
       .select('*, tenants(slug, name)')
