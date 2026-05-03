@@ -51,6 +51,7 @@ const TEMPLATES = [
 export default function SignupPage() {
   const [step, setStep]         = useState<1 | 2 | 3>(1)
   const [carIdx, setCarIdx]     = useState(0)
+  const [preview, setPreview]   = useState<string | null>(null)
   const [form, setForm]         = useState<SignupForm>({
     templateId: '',
     shopName:   '',
@@ -182,6 +183,15 @@ export default function SignupPage() {
                       style={{ borderColor: current.color, color: current.color }}>
                       แตะเพื่อเลือก
                     </div>
+                  )}
+
+                  {/* PREVIEW BUTTON */}
+                  {current.available && (
+                    <button
+                      onClick={e => { e.stopPropagation(); setPreview(`/demo/${current.id}`) }}
+                      className="block w-full mt-3 text-xs text-gray-400 hover:text-gray-600 transition-colors underline underline-offset-2">
+                      👁 ดูตัวอย่างก่อน
+                    </button>
                   )}
                 </div>
 
@@ -326,6 +336,56 @@ export default function SignupPage() {
 
         </div>
       </div>
+
+      {/* TEMPLATE PREVIEW MODAL */}
+      {preview && (
+        <div
+          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={() => setPreview(null)}>
+          <div className="flex flex-col items-center gap-4" onClick={e => e.stopPropagation()}>
+
+            {/* CLOSE + LABEL */}
+            <div className="flex items-center justify-between w-full max-w-sm">
+              <span className="text-white text-sm font-semibold opacity-80">ตัวอย่าง template</span>
+              <button
+                onClick={() => setPreview(null)}
+                className="w-9 h-9 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center text-lg transition-colors">
+                ✕
+              </button>
+            </div>
+
+            {/* PHONE FRAME */}
+            <div className="relative" style={{ width: '320px' }}>
+              {/* notch */}
+              <div className="absolute top-3 left-1/2 -translate-x-1/2 w-24 h-5 bg-black rounded-full z-10" />
+              {/* frame */}
+              <div className="rounded-[42px] overflow-hidden shadow-2xl"
+                style={{ border: '8px solid #1a1a2e', background: '#1a1a2e', height: '620px', position: 'relative' }}>
+                <iframe
+                  src={preview}
+                  className="w-full h-full rounded-[36px]"
+                  style={{ border: 'none', display: 'block' }}
+                  title="Template preview"
+                />
+              </div>
+              {/* home bar */}
+              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 w-24 h-1 bg-white/40 rounded-full" />
+            </div>
+
+            {/* SELECT BUTTON */}
+            <button
+              onClick={() => {
+                const tId = preview.replace('/demo/', '')
+                const t   = TEMPLATES.find(t => t.id === tId)
+                if (t?.available) { setField('templateId', tId); setPreview(null) }
+              }}
+              className="px-8 py-3 rounded-full text-white font-bold text-sm shadow-lg transition-all hover:scale-105"
+              style={{ background: TEMPLATES.find(t => t.id === preview.replace('/demo/',''))?.color || '#ff6b00' }}>
+              ✓ เลือก template นี้
+            </button>
+          </div>
+        </div>
+      )}
     </main>
   )
 }
