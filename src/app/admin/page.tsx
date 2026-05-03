@@ -8,14 +8,20 @@ import StatsCard from '@/components/admin/StatsCard'
 import type { AdminStats, Tenant } from '@/types'
 
 export default async function SuperAdminPage() {
-  const supabase = createServiceClient() as any
+  let list: Tenant[] = []
+  let dbError: string | null = null
 
-  const { data: tenants } = await supabase
-    .from('tenants')
-    .select('*')
-    .order('created_at', { ascending: false })
-
-  const list = (tenants as Tenant[]) ?? []
+  try {
+    const supabase = createServiceClient() as any
+    const { data: tenants, error } = await supabase
+      .from('tenants')
+      .select('*')
+      .order('created_at', { ascending: false })
+    if (error) dbError = error.message
+    else list = (tenants as Tenant[]) ?? []
+  } catch (e: any) {
+    dbError = e?.message ?? 'Unknown error'
+  }
 
   const stats: AdminStats = {
     totalTenants:  list.length,
@@ -36,6 +42,11 @@ export default async function SuperAdminPage() {
       </div>
 
       <div className="max-w-5xl mx-auto px-6 py-8 space-y-8">
+        {dbError && (
+          <div className="bg-red-50 border border-red-200 rounded-krabbie px-4 py-3 text-sm text-red-700">
+            <strong>DB error:</strong> {dbError}
+          </div>
+        )}
         <div>
           <div className="sec-label mb-4">Overview</div>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3">

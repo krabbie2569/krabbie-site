@@ -4,6 +4,7 @@ import { createServerSupabaseClient } from '@/lib/supabase.server'
 import { formatPrice, formatDuration } from '@/lib/utils'
 import { notFound } from 'next/navigation'
 import type { Service } from '@/types'
+import RentalShopPage from '@/components/rental/RentalShopPage'
 
 interface Props {
   params: Promise<{ tenant: string }>
@@ -14,6 +15,21 @@ export default async function TenantHomePage({ params }: Props) {
   const tenant = await getTenantBySlug(tenantSlug)
   if (!tenant) notFound()
 
+  const settings = parseTenantSettings(tenant.settings)
+
+  // ── Rental template ─────────────────────────────────────────────────────
+  if (tenant.template_id === 'booking-rental') {
+    return (
+      <RentalShopPage
+        tenantId={tenant.id}
+        tenantName={tenant.name}
+        tenantSubtitle={(settings as any).subtitle ?? undefined}
+        lineUrl={(settings as any).lineUrl ?? undefined}
+      />
+    )
+  }
+
+  // ── Default booking-service template ────────────────────────────────────
   const supabase = await createServerSupabaseClient()
   const { data: services } = await supabase
     .from('services')
@@ -21,8 +37,6 @@ export default async function TenantHomePage({ params }: Props) {
     .eq('tenant_id', tenant.id)
     .eq('is_active', true)
     .order('sort_order')
-
-  const settings = parseTenantSettings(tenant.settings)
 
   return (
     <div className="min-h-screen bg-krabbie-bg pb-16">
