@@ -6,10 +6,10 @@ import { sanitizeSlug, isValidSlug, shopUrl } from '@/lib/utils'
 import type { SignupForm } from '@/types'
 
 const TEMPLATES = [
-  { id: 'booking-service', name: 'ระบบจองบริการ', emoji: '📅', desc: 'นวด · ฝึกสอน · ช่างภาพ · ซ่อม', available: true },
-  { id: 'booking-rental',  name: 'เช่าสินค้า',    emoji: '📷', desc: 'กล้อง · ชุด · อุปกรณ์ · ของตกแต่ง', available: true },
-  { id: 'shop',            name: 'ร้านขายสินค้า',  emoji: '🛍️', desc: 'เร็วๆ นี้', available: false },
-  { id: 'qr-menu',         name: 'QR เมนูอาหาร',   emoji: '🍜', desc: 'เร็วๆ นี้', available: false },
+  { id: 'booking-service', name: 'ระบบจองบริการ', emoji: '📅', desc: 'ช่างภาพ · เสริมสวย · สนามกีฬา · สปา · ที่พัก · และอีกมาก', pills: ['เลือกวันเวลา', 'อัพสลิป', 'admin ยืนยัน'], available: true },
+  { id: 'booking-rental',  name: 'เว็บเช่าสินค้า', emoji: '📷', desc: 'กล้อง · เสื้อผ้า · ชุดแต่งงาน · อุปกรณ์ · ของตกแต่งงาน', pills: ['ปฏิทิน busy days', 'เช่ารายวัน/ชั่วโมง', 'admin ยืนยัน'], available: true },
+  { id: 'shop',            name: 'ร้านขายสินค้า',  emoji: '🛍️', desc: 'เสื้อผ้า · handmade · เบเกอรี่ pre-order · ของมือสอง', pills: ['ตะกร้าสินค้า', 'จัดการสต็อก', 'อัพสลิป'], available: false },
+  { id: 'qr-menu',         name: 'QR เมนูอาหาร',   emoji: '🍜', desc: 'สแกน QR ต่อโต๊ะ · สั่งอาหาร · แจ้งครัว real-time', pills: ['QR รายโต๊ะ', 'real-time', 'ใบเสร็จ'], available: false },
 ]
 
 export default function SignupPage() {
@@ -108,22 +108,36 @@ export default function SignupPage() {
             <div>
               <h1 className="font-syne text-2xl font-bold mb-1">เลือก Template ที่ใช่</h1>
               <p className="text-gray-500 text-sm mb-6">เลือก template ที่เหมาะกับธุรกิจของคุณ</p>
-              <div className="grid grid-cols-2 gap-3 mb-6">
+              <div className="space-y-3 mb-6">
                 {TEMPLATES.map((t) => (
                   <button
                     key={t.id}
                     disabled={!t.available}
                     onClick={() => setField('templateId', t.id)}
-                    className={`p-4 rounded-krabbie border-2 text-left transition-all ${
-                      !t.available ? 'opacity-50 cursor-not-allowed border-krabbie-border' :
-                      form.templateId === t.id ? 'border-orange-500 bg-orange-50' :
-                      'border-krabbie-border hover:border-orange-300'
+                    className={`w-full text-left rounded-krabbie border-2 transition-all p-4 ${
+                      !t.available ? 'opacity-50 cursor-not-allowed border-krabbie-border bg-gray-50' :
+                      form.templateId === t.id ? 'border-orange-500 bg-orange-50 shadow-md' :
+                      'border-krabbie-border hover:border-orange-300 hover:shadow-sm bg-white'
                     }`}
                   >
-                    <div className="text-2xl mb-2">{t.emoji}</div>
-                    <div className="font-bold text-sm mb-1">{t.name}</div>
-                    <div className="text-xs text-gray-400">{t.desc}</div>
-                    {!t.available && <div className="badge-soon mt-1 inline-block">เร็วๆ นี้</div>}
+                    <div className="flex items-center gap-4">
+                      <div className="text-4xl w-12 text-center flex-shrink-0">{t.emoji}</div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-bold text-base">{t.name}</span>
+                          {!t.available && <span className="badge-soon text-[0.6rem]">เร็วๆ นี้</span>}
+                          {form.templateId === t.id && <span className="text-xs text-orange-500 font-semibold ml-auto">✓ เลือกแล้ว</span>}
+                        </div>
+                        <div className="text-xs text-gray-500">{t.desc}</div>
+                        {t.pills && (
+                          <div className="flex gap-1 mt-2 flex-wrap">
+                            {t.pills.map(p => (
+                              <span key={p} className="text-[0.65rem] bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">{p}</span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </button>
                 ))}
               </div>
