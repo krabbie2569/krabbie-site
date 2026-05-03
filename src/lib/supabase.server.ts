@@ -1,4 +1,4 @@
-import { createBrowserClient, createServerClient } from '@supabase/ssr'
+import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import type { Database } from '@/types/database.types'
 
@@ -29,7 +29,7 @@ export async function createServerSupabaseClient() {
 // Service-role client — use only in Route Handlers / trusted server-side code
 export function createServiceClient() {
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
-  return createBrowserClient<Database>(supabaseUrl, serviceKey, {
-    auth: { persistSession: false },
+  return createServerClient<Database>(supabaseUrl, serviceKey, {
+    cookies: { getAll: () => [], setAll: () => {} },
   })
 }

@@ -64,56 +64,6 @@ export default function HomePage() {
         <div className={s.foamLine} />
         <div className={s.beach} />
 
-        {/* Sunbathing crab */}
-        <div className={s.crabScene}>
-          <div className={s.towel} />
-          <svg width="260" height="200" viewBox="0 0 260 200" style={{ display: 'block', margin: '0 auto' }}>
-            <ellipse cx="130" cy="185" rx="95" ry="10" fill="rgba(0,0,0,0.12)"/>
-            <path d="M55 105 Q20 95 8 85" stroke="#FF6B35" strokeWidth="14" fill="none" strokeLinecap="round"/>
-            <ellipse cx="8" cy="82" rx="16" ry="12" fill="#FF6B35"/>
-            <ellipse cx="7" cy="78" rx="12" ry="8" fill="#FF8C5A"/>
-            <path d="M-2 73 Q-8 66 -3 70" stroke="#FF6B35" strokeWidth="4" fill="none" strokeLinecap="round"/>
-            <path d="M1 80 Q-5 86 -1 83" stroke="#FF6B35" strokeWidth="4" fill="none" strokeLinecap="round"/>
-            <path d="M205 105 Q235 92 248 80" stroke="#FF6B35" strokeWidth="14" fill="none" strokeLinecap="round"/>
-            <rect x="238" y="58" width="22" height="28" rx="4" fill="white" stroke="#ddd" strokeWidth="1"/>
-            <rect x="238" y="58" width="22" height="10" rx="4" fill="#33BBDD" fillOpacity="0.7"/>
-            <line x1="252" y1="58" x2="260" y2="42" stroke="#FF5500" strokeWidth="2.5" strokeLinecap="round"/>
-            <path d="M256 42 Q264 35 272 42 Q264 39 256 42" fill="#FFD600" stroke="#FF5500" strokeWidth="1"/>
-            <ellipse cx="248" cy="78" rx="14" ry="10" fill="#FF6B35"/>
-            <ellipse cx="248" cy="74" rx="10" ry="7" fill="#FF8C5A"/>
-            <ellipse cx="130" cy="130" rx="80" ry="52" fill="#FF6B35" transform="rotate(-4 130 130)"/>
-            <ellipse cx="130" cy="122" rx="72" ry="44" fill="#FF8C5A" transform="rotate(-4 130 130)"/>
-            <ellipse cx="130" cy="118" rx="42" ry="28" fill="#FF6B35" fillOpacity="0.35" transform="rotate(-4 130 130)"/>
-            <ellipse cx="112" cy="110" rx="22" ry="12" fill="white" fillOpacity="0.15" transform="rotate(-20 112 110)"/>
-            <path d="M75 140 Q60 120 50 108" stroke="#FF6B35" strokeWidth="9" fill="none" strokeLinecap="round"/>
-            <path d="M85 150 Q65 135 52 126" stroke="#FF6B35" strokeWidth="9" fill="none" strokeLinecap="round"/>
-            <path d="M72 158 Q55 148 46 140" stroke="#FF6B35" strokeWidth="8" fill="none" strokeLinecap="round"/>
-            <path d="M185 140 Q200 120 210 108" stroke="#FF6B35" strokeWidth="9" fill="none" strokeLinecap="round"/>
-            <path d="M175 150 Q195 135 208 126" stroke="#FF6B35" strokeWidth="9" fill="none" strokeLinecap="round"/>
-            <path d="M188 158 Q205 148 214 140" stroke="#FF6B35" strokeWidth="8" fill="none" strokeLinecap="round"/>
-            <rect x="99" y="86" width="11" height="22" rx="5" fill="#FF6B35" transform="rotate(15 104 97)"/>
-            <rect x="150" y="86" width="11" height="22" rx="5" fill="#FF6B35" transform="rotate(-15 156 97)"/>
-            <ellipse cx="104" cy="82" rx="16" ry="12" fill="#0D1B2A"/>
-            <ellipse cx="104" cy="82" rx="13" ry="9" fill="#006994" fillOpacity="0.9"/>
-            <ellipse cx="100" cy="79" rx="4" ry="3" fill="white" fillOpacity="0.4"/>
-            <ellipse cx="156" cy="82" rx="16" ry="12" fill="#0D1B2A"/>
-            <ellipse cx="156" cy="82" rx="13" ry="9" fill="#006994" fillOpacity="0.9"/>
-            <ellipse cx="152" cy="79" rx="4" ry="3" fill="white" fillOpacity="0.4"/>
-            <line x1="120" y1="82" x2="140" y2="82" stroke="#0D1B2A" strokeWidth="3"/>
-            <line x1="88" y1="82" x2="80" y2="80" stroke="#0D1B2A" strokeWidth="2.5" strokeLinecap="round"/>
-            <line x1="172" y1="82" x2="180" y2="80" stroke="#0D1B2A" strokeWidth="2.5" strokeLinecap="round"/>
-            <ellipse cx="86" cy="102" rx="14" ry="9" fill="#FF3D3D" fillOpacity="0.25"/>
-            <ellipse cx="174" cy="102" rx="14" ry="9" fill="#FF3D3D" fillOpacity="0.25"/>
-            <path d="M112 116 Q130 128 148 116" stroke="#0D1B2A" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
-            <rect x="148" y="38" width="110" height="46" rx="14" fill="white" stroke="#FFD166" strokeWidth="2"/>
-            <polygon points="160,84 172,84 166,96" fill="white"/>
-            <polygon points="159,85 173,85 166,97" fill="#FFD166"/>
-            <text x="158" y="57" fontFamily="Sarabun,sans-serif" fontSize="12" fontWeight="700" fill="#0D1B2A">สบายดีจัง ☀️</text>
-            <text x="158" y="74" fontFamily="Sarabun,sans-serif" fontSize="11" fill="#666">ให้แครบบี้ช่วย</text>
-            <text x="158" y="89" fontFamily="Sarabun,sans-serif" fontSize="11" fill="#666">สร้างเว็บนะ!</text>
-          </svg>
-        </div>
-
         {/* Hero text */}
         <div className={s.heroContent}>
           <div className={s.heroEyebrow}>🦀 เปิดตัวใหม่ · สร้างเว็บได้วันนี้เลย</div>
@@ -129,21 +79,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* ── STATS BAR ── */}
-      <div className={s.statsBar}>
-        {[
-          { n: '150฿', l: 'ต่อเดือน' },
-          { n: '3',    l: 'template หลัก' },
-          { n: '<1 นาที', l: 'ได้เว็บทันที' },
-          { n: '0',    l: 'ความรู้โค้ด' },
-        ].map(({ n, l }) => (
-          <div key={l} className={s.stat}>
-            <span className={s.statN}>{n}</span>
-            <span className={s.statL}>{l}</span>
-          </div>
-        ))}
-      </div>
 
       {/* ── HOW IT WORKS ── */}
       <section className={s.how} id="how">
@@ -230,11 +165,25 @@ export default function HomePage() {
           <p className={`${s.secP} ${s.pricingP} reveal`}>ทุก feature ในราคาเดียว ไม่มีค่าแรกเข้า ยกเลิกได้ทุกเดือน</p>
           <div className={s.priceCards}>
 
+            {/* Free */}
+            <div className={`${s.priceCard} reveal`}>
+              <div className={s.planName}>Free</div>
+              <div className={s.planPrice}><sup>฿</sup>0<sub>/เดือน</sub></div>
+              <div className={s.planDesc}>ทดลองฟรี 30 วัน ไม่ต้องใส่บัตร</div>
+              <ul className={s.planFeatures}>
+                <li>ทุก feature ครบ 30 วัน</li>
+                <li>หน้าร้าน + จองออนไลน์</li>
+                <li>Admin dashboard</li>
+                <li>Subdomain .krabbie.com</li>
+              </ul>
+              <Link href="/signup" className={`${s.planBtn} ${s.btnOutlineW}`}>เริ่มฟรีเลย</Link>
+            </div>
+
             {/* Basic */}
             <div className={`${s.priceCard} reveal`}>
               <div className={s.planName}>Basic</div>
               <div className={s.planPrice}><sup>฿</sup>150<sub>/เดือน</sub></div>
-              <div className={s.planDesc}>เริ่มต้น — ครบทุกอย่างที่ต้องการ</div>
+              <div className={s.planDesc}>เปิดร้านจริง — ครบทุกอย่าง</div>
               <ul className={s.planFeatures}>
                 <li>หน้าจอง/ขายของ 1 หน้า</li>
                 <li>Admin dashboard</li>
@@ -250,7 +199,7 @@ export default function HomePage() {
               <div className={s.hotLabel}>⭐ ยอดนิยม</div>
               <div className={s.planName} style={{ marginTop: '1rem' }}>Pro</div>
               <div className={s.planPrice}><sup>฿</sup>299<sub>/เดือน</sub></div>
-              <div className={s.planDesc}>ธุรกิจที่ต้องการชำระเงินอัตโนมัติ</div>
+              <div className={s.planDesc}>ชำระเงินอัตโนมัติ + LINE notify</div>
               <ul className={s.planFeatures}>
                 <li>ทุกอย่างใน Basic</li>
                 <li>QR PromptPay อัตโนมัติ</li>
