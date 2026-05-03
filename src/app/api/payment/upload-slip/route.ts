@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase.server'
+import { uploadSlip } from '@/lib/cloudinary'
 
 const PLAN_PRICE: Record<string, number> = {
   standard: 150,
@@ -29,25 +30,18 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'ไม่พบร้านค้า' }, { status: 404 })
   }
 
-  // Upload slip to Supabase Storage
+  // Upload to Cloudinary
   const bytes    = await slipFile.arrayBuffer()
   const buffer   = Buffer.from(bytes)
-  const ext      = slipFile.type.split('/')[1] ?? 'jpg'
-  const filename = `${tenant.id}/${Date.now()}.${ext}`
+  let slipUrl: string
 
-  const { error: uploadErr } = await supabase.storage
-    .from('payment-slips')
-    .upload(filename, buffer, { contentType: slipFile.type, upsert: false })
-
-  if (uploadErr) {
-    return NextResponse.json({ error: 'อัพโหลดรูปไม่สำเร็จ: ' + uploadErr.message }, { status: 500 })
+  try {
+    slipUrl = await uploadSlip(buffer, slipFile.type, `krabbie/slips/${tenant.id}`)
+  } catch {
+    return NextResponse.json({ error: 'อัพโหลดรูปไม่สำเร็จ' }, { status: 500 })
   }
 
-  const { data: { publicUrl } } = supabase.storage
-    .from('payment-slips')
-    .getPublicUrl(filename)
-
-  // Create payment record — pending manual review
+  // Save payment record — pending manual review
   const amount = PLAN_PRICE[planType] * months
   const { error: payErr } = await supabase
     .from('payments')
@@ -56,7 +50,7 @@ export async function POST(req: NextRequest) {
       amount,
       method:        'promptpay',
       status:        'pending',
-      slip_url:      publicUrl,
+      slip_url:      slipUrl,
       months,
       plan_type:     planType,
       review_status: 'pending',
