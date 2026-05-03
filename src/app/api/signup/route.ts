@@ -15,7 +15,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Subdomain ไม่ถูกต้อง' }, { status: 400 })
   }
 
-  const supabase = createServiceClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const supabase = createServiceClient() as any
 
   // Check slug not taken
   const { data: existing } = await supabase
