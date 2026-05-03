@@ -125,12 +125,17 @@ export default function LoginPage() {
           )}
         </div>
 
-        <p className="text-center font-mono text-xs text-gray-400 mt-4">
-          ยังไม่มีบัญชี?{' '}
-          <Link href="/signup" className="text-orange-500 hover:underline">
-            ทดลองฟรี 14 วัน
+        <div className="mt-4 space-y-2">
+          <Link
+            href="/signup"
+            className="btn-outline block text-center w-full"
+          >
+            สมัครใช้งาน — ทดลองฟรี 14 วัน →
           </Link>
-        </p>
+          <p className="text-center font-mono text-xs text-gray-400">
+            ยังไม่มีบัญชี? สมัครได้เลย ไม่ต้องใช้บัตรเครดิต
+          </p>
+        </div>
 
       </div>
     </main>
