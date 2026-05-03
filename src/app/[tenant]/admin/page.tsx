@@ -17,7 +17,7 @@ export default async function TenantAdminPage({ params }: Props) {
 
   const supabase = await createServerSupabaseClient()
 
-  const [{ data: bookings }, { data: services }] = await Promise.all([
+  const [{ data: bookingsRaw }, { data: services }] = await Promise.all([
     supabase
       .from('bookings')
       .select('*, services(name), time_slots(date, start_time, end_time)')
@@ -31,8 +31,9 @@ export default async function TenantAdminPage({ params }: Props) {
       .order('sort_order'),
   ])
 
+  const bookings = bookingsRaw as any[] | null
   const today = new Date().toISOString().slice(0, 10)
-  const todayBookings  = bookings?.filter(b => (b.time_slots as any)?.date === today) ?? []
+  const todayBookings  = bookings?.filter(b => b.time_slots?.date === today) ?? []
   const pendingCount   = bookings?.filter(b => b.status === 'pending').length ?? 0
   const confirmedCount = bookings?.filter(b => b.status === 'confirmed').length ?? 0
 
