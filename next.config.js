@@ -2,7 +2,7 @@
 const nextConfig = {
   // Required for Cloudflare Pages via @cloudflare/next-on-pages
   experimental: {
-    serverComponentsExternalPackages: [],
+    serverExternalPackages: [],
   },
   images: {
     remotePatterns: [
