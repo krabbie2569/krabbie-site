@@ -16,8 +16,10 @@ export default function DemoBookingService() {
   return (
     <div className="min-h-screen bg-krabbie-bg pb-16 text-sm">
 
-      <div className="bg-orange-500 text-white text-center py-1.5 text-xs font-bold font-mono tracking-wider">
-        ✦ ตัวอย่าง Template — ระบบจองบริการ ✦
+      <div className="bg-orange-500 text-white py-2 px-4 text-xs font-bold font-mono flex items-center justify-between">
+        <a href="/" style={{ color:'white', textDecoration:'none', opacity:0.85 }}>← หน้าแรก</a>
+        <span className="tracking-wider">✦ ตัวอย่าง Template — ระบบจองบริการ</span>
+        <a href="/dashboard/new?template=booking-service" style={{ color:'rgba(255,255,255,0.85)', textDecoration:'underline' }}>ใช้ template →</a>
       </div>
 
       <section className="bg-krabbie-dark text-center py-10 px-6">

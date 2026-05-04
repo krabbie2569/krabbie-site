@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import styles from '../app/page.module.css'
+import { createClient } from '@/lib/supabase'
 
 const TEMPLATES = [
   {
@@ -55,6 +56,18 @@ export default function TemplatesSection() {
   const [preview, setPreview] = useState<string | null>(null)
   const [previewTitle, setPreviewTitle] = useState('')
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop')
+  const [loggedIn, setLoggedIn] = useState(false)
+
+  useEffect(() => {
+    const supabase = createClient() as any
+    supabase.auth.getSession().then(({ data: { session } }: any) => {
+      setLoggedIn(!!session)
+    })
+  }, [])
+
+  function templateHref(id: string) {
+    return loggedIn ? `/dashboard/new?template=${id}` : `/signup?template=${id}`
+  }
 
   function openPreview(path: string, title: string) {
     setPreview(path)
@@ -94,7 +107,7 @@ export default function TemplatesSection() {
                       👁 ดูตัวอย่าง
                     </button>
                     <Link
-                      href={`/signup?template=${t.id}`}
+                      href={templateHref(t.id)}
                       style={{flex:1,padding:'8px 0',borderRadius:'8px',border:'none',background:'#FF5500',color:'white',fontSize:'0.82rem',fontWeight:700,cursor:'pointer',textAlign:'center',textDecoration:'none',display:'block'}}
                     >
                       ใช้ template นี้ →
@@ -186,7 +199,7 @@ export default function TemplatesSection() {
           {/* CTA */}
           <div onClick={e => e.stopPropagation()}>
             <Link
-              href={`/signup?template=${TEMPLATES.find(t => t.demoPath === preview)?.id ?? ''}`}
+              href={templateHref(TEMPLATES.find(t => t.demoPath === preview)?.id ?? '')}
               style={{padding:'12px 32px',borderRadius:'100px',background:'#FF5500',color:'white',fontWeight:700,fontSize:'0.9rem',textDecoration:'none',boxShadow:'0 4px 24px rgba(255,85,0,0.5)',display:'inline-block'}}
               onClick={() => setPreview(null)}
             >

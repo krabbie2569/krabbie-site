@@ -27,8 +27,10 @@ export default function DemoQRMenu() {
     <div style={{ minHeight:'100vh', background:'#FFFBEB', fontFamily:'Sarabun,sans-serif', color:'#1a1a2e' }}>
 
       {/* DEMO BADGE */}
-      <div style={{ background:GRAD, color:'white', textAlign:'center', padding:'8px', fontSize:'0.72rem', fontWeight:700, letterSpacing:'2px' }}>
-        ✦ ตัวอย่าง Template · QR เมนูอาหาร · <a href="/dashboard/new?template=qr-menu" style={{ color:'rgba(255,255,255,0.85)', textDecoration:'underline' }}>ใช้ template นี้ →</a>
+      <div style={{ background:GRAD, color:'white', padding:'8px 16px', fontSize:'0.72rem', fontWeight:700, letterSpacing:'1px', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+        <a href="/" style={{ color:'rgba(255,255,255,0.85)', textDecoration:'none' }}>← หน้าแรก</a>
+        <span style={{ letterSpacing:'2px' }}>✦ ตัวอย่าง Template · QR เมนูอาหาร</span>
+        <a href="/dashboard/new?template=qr-menu" style={{ color:'rgba(255,255,255,0.85)', textDecoration:'underline' }}>ใช้ template →</a>
       </div>
 
       {/* HEADER */}
