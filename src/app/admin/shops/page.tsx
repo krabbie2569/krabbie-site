@@ -21,16 +21,17 @@ export default async function AdminShopsPage({ searchParams }: Props) {
   let query = supabase.from('tenants').select('*').order('created_at', { ascending: false })
   if (status !== 'all') query = query.eq('plan', status)
 
-  const { data: tenants = [] }: { data: Tenant[] } = await query
+  const { data: tenantsRaw } = await query
+  const tenants: Tenant[] = tenantsRaw ?? []   // null-safe: Supabase returns null on error, not undefined
 
-  const counts = await supabase.from('tenants').select('plan')
-  const all: Tenant[] = counts.data ?? []
-  const countMap = {
+  const { data: allRaw } = await supabase.from('tenants').select('plan')
+  const all: { plan: string }[] = allRaw ?? []
+  const countMap: Record<string, number> = {
     all:       all.length,
-    trial:     all.filter((t: Tenant) => t.plan === 'trial').length,
-    active:    all.filter((t: Tenant) => t.plan === 'active').length,
-    suspended: all.filter((t: Tenant) => t.plan === 'suspended').length,
-  } as Record<string, number>
+    trial:     all.filter(t => t.plan === 'trial').length,
+    active:    all.filter(t => t.plan === 'active').length,
+    suspended: all.filter(t => t.plan === 'suspended').length,
+  }
 
   return (
     <div className="px-8 py-8 space-y-6 max-w-6xl">
