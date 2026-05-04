@@ -29,7 +29,7 @@ export default async function SlotsPage({ params }: Props) {
     .order('date').order('start_time')
 
   // Get unique dates that have slots
-  const allDates = [...new Set((slots ?? []).map((s: any) => s.date as string))].sort()
+  const allDates: string[] = [...new Set<string>((slots ?? []).map((s: any) => s.date as string))].sort()
 
   return (
     <div className="flex min-h-screen">
