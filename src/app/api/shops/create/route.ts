@@ -36,34 +36,41 @@ export async function POST(req: NextRequest) {
   const trialEnds = new Date()
   trialEnds.setDate(trialEnds.getDate() + 14)
 
+  const insertData: Record<string, unknown> = {
+    slug,
+    name:          shopName,
+    template_id:   templateId || 'booking-service',
+    owner_email:   user.email,
+    owner_phone:   ownerPhone || '',
+    plan:          'trial',
+    plan_type:     'standard',
+    trial_ends_at: trialEnds.toISOString(),
+    settings: {
+      primaryColor:   '#ff6b00',
+      logoUrl:        null,
+      lineId:         null,
+      lineNotify:     false,
+      pushEnabled:    false,
+      maxAdvanceDays: 30,
+      autoConfirm:    true,
+      businessHours:  defaultHours(),
+    },
+  }
+
+  // auth_user_id may not exist yet (migration 009) — add only if column is present
+  try {
+    const probe = await supabase.from('tenants').select('auth_user_id').limit(0)
+    if (!probe.error) insertData.auth_user_id = user.id
+  } catch { /* column doesn't exist yet — skip */ }
+
   const { data: tenant, error } = await supabase
     .from('tenants')
-    .insert({
-      slug,
-      name:          shopName,
-      template_id:   templateId || 'booking-service',
-      owner_email:   user.email,
-      owner_phone:   ownerPhone || '',
-      plan:          'trial',
-      plan_type:     'standard',
-      auth_user_id:  user.id,
-      trial_ends_at: trialEnds.toISOString(),
-      settings: {
-        primaryColor:   '#ff6b00',
-        logoUrl:        null,
-        lineId:         null,
-        lineNotify:     false,
-        pushEnabled:    false,
-        maxAdvanceDays: 30,
-        autoConfirm:    true,
-        businessHours:  defaultHours(),
-      },
-    })
+    .insert(insertData)
     .select('slug')
     .single()
 
   if (error || !tenant) {
-    return NextResponse.json({ error: 'สร้างร้านไม่สำเร็จ กรุณาลองใหม่' }, { status: 500 })
+    return NextResponse.json({ error: error?.message ?? 'สร้างร้านไม่สำเร็จ กรุณาลองใหม่' }, { status: 500 })
   }
 
   return NextResponse.json({ data: { slug: tenant.slug } })

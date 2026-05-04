@@ -10,7 +10,8 @@ export default async function DashboardPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login?next=/dashboard')
 
-  const [{ data: shopsRaw }, { data: profile }] = await Promise.all([
+  const [shopsRes, profileRes] = await Promise.all([
+    // try auth_user_id first (migration 009), fall back to owner_email
     supabase
       .from('tenants')
       .select('id, slug, name, plan, plan_type, trial_ends_at, expires_at, template_id, created_at')
@@ -22,6 +23,18 @@ export default async function DashboardPage() {
       .eq('id', user.id)
       .maybeSingle(),
   ])
+
+  // if auth_user_id column missing, fall back to owner_email
+  let shopsRaw = shopsRes.data
+  if (shopsRes.error || !shopsRaw?.length) {
+    const fallback = await supabase
+      .from('tenants')
+      .select('id, slug, name, plan, plan_type, trial_ends_at, expires_at, template_id, created_at')
+      .eq('owner_email', user.email)
+      .order('created_at', { ascending: false })
+    if (!fallback.error) shopsRaw = fallback.data
+  }
+  const { data: profile } = profileRes
 
   const shops  = shopsRaw ?? []
   const seeds  = profile?.seeds ?? 0
