@@ -83,6 +83,37 @@ export default async function SuperAdminPage() {
           </p>
         </div>
 
+        {/* TEMPLATES */}
+        <div>
+          <div className="sec-label mb-4">Templates</div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {[
+              { id: 'booking-service', name: 'จองบริการ',     emoji: '📅', color: '#ff6b00', bg: '#fff8f0' },
+              { id: 'booking-rental',  name: 'เช่าสินค้า',    emoji: '📷', color: '#E91E8C', bg: '#fff0f8' },
+              { id: 'shop-general',    name: 'ร้านขายสินค้า', emoji: '🛍️', color: '#1E293B', bg: '#f1f5f9' },
+              { id: 'food-qr-menu',    name: 'QR เมนูอาหาร', emoji: '🍜', color: '#6F4E37', bg: '#fff8f0' },
+            ].map((t) => (
+              <div key={t.id} className="rounded-xl border border-krabbie-border overflow-hidden" style={{ background: t.bg }}>
+                <div className="px-4 pt-5 pb-3 text-center">
+                  <div className="text-3xl mb-2">{t.emoji}</div>
+                  <div className="font-syne font-bold text-sm mb-0.5" style={{ color: t.color }}>{t.name}</div>
+                  <div className="font-mono text-[9px] text-gray-400 uppercase tracking-wider">{t.id}</div>
+                </div>
+                <div className="px-3 pb-4 flex flex-col gap-1.5">
+                  <Link
+                    href={`/demo/${t.id}`}
+                    target="_blank"
+                    className="block w-full py-2 rounded-lg text-center text-xs font-bold text-white transition-all hover:opacity-80"
+                    style={{ background: t.color }}
+                  >
+                    ดู Demo →
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* TENANT TABLE */}
         <div>
           <div className="flex items-center justify-between mb-4">
