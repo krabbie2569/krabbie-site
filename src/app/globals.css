@@ -1,4 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Sarabun:wght@300;400;600;700&family=Syne:wght@700;800&family=Space+Mono:wght@400;700&display=swap');
+/* Bricolage Grotesque — used in page.module.css by name (display headings on landing page only) */
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&display=swap');
+/* Syne · Sarabun · Space Mono are loaded via next/font in layout.tsx */
 
 @tailwind base;
 @tailwind components;

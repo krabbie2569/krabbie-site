@@ -82,14 +82,13 @@ export default function AdminPaymentsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-krabbie-dark px-6 py-4 flex items-center gap-3">
-        <span className="text-2xl">🦀</span>
-        <span className="font-syne text-white font-bold">Krabbie</span>
-        <span className="font-mono text-orange-500 text-xs ml-1">/ payments</span>
+    <div className="px-8 py-8 max-w-5xl">
+      <div className="mb-6">
+        <h1 className="font-syne font-extrabold text-2xl text-krabbie-dark">Payments</h1>
+        <p className="font-mono text-xs text-gray-400 mt-0.5">รายการชำระเงินจากลูกค้า (ระบบเก่า — ใช้ Seeds แทน)</p>
       </div>
 
-      <div className="max-w-5xl mx-auto px-6 py-6">
+      <div>
 
         {/* TABS */}
         <div className="flex gap-2 mb-6 flex-wrap">

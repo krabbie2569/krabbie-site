@@ -37,9 +37,11 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans:  ['Sarabun', 'sans-serif'],
-        syne:  ['Syne', 'sans-serif'],
-        mono:  ['Space Mono', 'monospace'],
+        // CSS vars set by next/font in layout.tsx; hardcoded names are fallbacks for CSS modules
+        sans:    ['var(--font-sarabun)', 'Sarabun', 'sans-serif'],
+        syne:    ['var(--font-syne)', 'Syne', 'Sarabun', 'sans-serif'], // Sarabun fallback = Thai chars in headings look right
+        mono:    ['var(--font-mono)', 'Space Mono', 'monospace'],
+        display: ['Bricolage Grotesque', 'sans-serif'],
       },
       borderRadius: {
         krabbie: '12px',
