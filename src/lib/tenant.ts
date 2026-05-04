@@ -1,5 +1,5 @@
 import type { Tenant, TenantSettings } from '@/types'
-import { createServerSupabaseClient } from './supabase.server'
+import { createServiceClient } from './supabase.server'
 
 const APP_DOMAIN = process.env.NEXT_PUBLIC_APP_DOMAIN ?? 'krabbie.com'
 
@@ -18,12 +18,12 @@ export function extractSlugFromHost(host: string): string | null {
 
 // Fetch tenant row from DB by slug (used in server components/middleware)
 export async function getTenantBySlug(slug: string): Promise<Tenant | null> {
-  const supabase = await createServerSupabaseClient() as any
+  const supabase = createServiceClient() as any
   const { data } = await supabase
     .from('tenants')
     .select('*')
     .eq('slug', slug)
-    .single()
+    .maybeSingle()
   return data ?? null
 }
 

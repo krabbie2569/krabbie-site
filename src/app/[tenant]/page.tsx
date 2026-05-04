@@ -2,7 +2,7 @@ export const runtime = 'edge'
 
 import Link from 'next/link'
 import { getTenantBySlug, parseTenantSettings } from '@/lib/tenant'
-import { createServerSupabaseClient } from '@/lib/supabase.server'
+import { createServiceClient } from '@/lib/supabase.server'
 import { formatPrice, formatDuration } from '@/lib/utils'
 import { notFound } from 'next/navigation'
 import type { Service } from '@/types'
@@ -16,7 +16,7 @@ export default async function TenantHomePage({ params }: Props) {
   const tenant = await getTenantBySlug(tenantSlug)
   if (!tenant) notFound()
 
-  const supabase = await createServerSupabaseClient()
+  const supabase = createServiceClient() as any
   const { data: services } = await supabase
     .from('services')
     .select('*')

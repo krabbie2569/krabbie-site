@@ -1,7 +1,7 @@
 export const runtime = 'edge'
 
 import { getTenantBySlug, parseTenantSettings } from '@/lib/tenant'
-import { createServerSupabaseClient } from '@/lib/supabase.server'
+import { createServiceClient } from '@/lib/supabase.server'
 import { notFound } from 'next/navigation'
 import { formatDateTH, formatTime, formatPrice } from '@/lib/utils'
 import { BOOKING_STATUS_LABEL, BOOKING_STATUS_COLOR } from '@/types'
@@ -19,7 +19,7 @@ export default async function TenantAdminPage({ params }: Props) {
   const tenant = await getTenantBySlug(tenantSlug)
   if (!tenant) notFound()
 
-  const supabase = await createServerSupabaseClient() as any
+  const supabase = createServiceClient() as any
 
   const [{ data: bookings }, { data: services }] = await Promise.all([
     supabase

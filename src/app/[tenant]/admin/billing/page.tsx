@@ -1,7 +1,7 @@
 export const runtime = 'edge'
 
 import { getTenantBySlug } from '@/lib/tenant'
-import { createServerSupabaseClient } from '@/lib/supabase.server'
+import { createServiceClient } from '@/lib/supabase.server'
 import { notFound } from 'next/navigation'
 import SlipUploader from '@/components/payment/SlipUploader'
 import TenantAdminSidebar from '@/components/tenant/TenantAdminSidebar'
@@ -13,7 +13,7 @@ export default async function BillingPage({ params }: Props) {
   const tenant = await getTenantBySlug(tenantSlug)
   if (!tenant) notFound()
 
-  const supabase = await createServerSupabaseClient()
+  const supabase = createServiceClient() as any
   const { data: payments } = await supabase
     .from('payments')
     .select('*')
