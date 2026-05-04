@@ -4,6 +4,7 @@ import { createServerSupabaseClient } from '@/lib/supabase.server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import DashboardSidebar from '@/components/account/DashboardSidebar'
+import { shopDisplayUrl } from '@/lib/utils'
 
 export default async function DashboardPage() {
   const supabase = await createServerSupabaseClient() as any
@@ -97,7 +98,7 @@ export default async function DashboardPage() {
                           <span className={badge.cls}>{badge.label}</span>
                           {expired && <span className="font-mono text-[0.55rem] text-red-400">หมดอายุ</span>}
                         </div>
-                        <div className="font-mono text-xs text-gray-400">{shop.slug}.krabbie.com</div>
+                        <div className="font-mono text-xs text-gray-400">{shopDisplayUrl(shop.slug)}</div>
                         {shop.plan === 'trial' && trialEnd && (
                           <div className={`font-mono text-[0.6rem] mt-0.5 ${trialExpired ? 'text-red-400' : 'text-teal-500'}`}>
                             ทดลองฟรี · หมด {trialEnd.toLocaleDateString('th-TH')}

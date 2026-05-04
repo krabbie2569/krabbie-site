@@ -56,9 +56,15 @@ export function shopUrl(slug: string): string {
   if (typeof window !== 'undefined') {
     return `${window.location.origin}/${slug}`
   }
-  // SSR fallback
-  const domain = process.env.NEXT_PUBLIC_APP_DOMAIN ?? 'krabbie.com'
-  return `https://${domain}/${slug}`
+  // SSR fallback — uses NEXT_PUBLIC_BASE_URL if set, otherwise Cloudflare Pages domain
+  const base = process.env.NEXT_PUBLIC_BASE_URL
+    ?? `https://${process.env.NEXT_PUBLIC_APP_DOMAIN ?? 'krabbie-site.pages.dev'}`
+  return `${base}/${slug}`
+}
+
+// Display-friendly shop URL (no https://)
+export function shopDisplayUrl(slug: string): string {
+  return shopUrl(slug).replace(/^https?:\/\//, '')
 }
 
 // Duration in human-readable Thai: 90 → "1 ชั่วโมง 30 นาที"

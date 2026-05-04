@@ -21,6 +21,18 @@ export default function ShopStatusActions({ tenantId, currentPlan }: Props) {
     window.location.reload()
   }
 
+  async function deletShop() {
+    if (!confirm('ลบร้านนี้ถาวรเลยใช่มั้ย? ไม่สามารถกู้คืนได้')) return
+    setLoading('delete')
+    await fetch('/api/admin/shops/delete', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ tenantId }),
+    })
+    setLoading(null)
+    window.location.reload()
+  }
+
   return (
     <div className="flex gap-1.5 flex-wrap">
       {currentPlan !== 'active' && (
@@ -50,6 +62,13 @@ export default function ShopStatusActions({ tenantId, currentPlan }: Props) {
           {loading === 'suspend' ? '...' : 'Suspend'}
         </button>
       )}
+      <button
+        disabled={!!loading}
+        onClick={deletShop}
+        className="px-2.5 py-1 bg-gray-900 text-white text-[0.65rem] font-bold rounded-md hover:bg-red-700 transition disabled:opacity-40"
+      >
+        {loading === 'delete' ? '...' : 'ลบ'}
+      </button>
     </div>
   )
 }

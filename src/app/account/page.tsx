@@ -4,6 +4,7 @@ import { createServerSupabaseClient } from '@/lib/supabase.server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import DashboardSidebar from '@/components/account/DashboardSidebar'
+import { shopDisplayUrl } from '@/lib/utils'
 import ChangePasswordForm from '@/components/account/ChangePasswordForm'
 
 export default async function AccountPage() {
@@ -73,7 +74,7 @@ export default async function AccountPage() {
               <div className="flex justify-between items-center">
                 <span className="text-gray-500">ที่อยู่เว็บ</span>
                 <a href={`/${tenant.slug}`} target="_blank" rel="noopener noreferrer" className="font-mono text-xs text-orange-500 hover:underline">
-                  {tenant.slug}.krabbie.com →
+                  {shopDisplayUrl(tenant.slug)} →
                 </a>
               </div>
               <div className="flex justify-between items-center">

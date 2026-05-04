@@ -23,6 +23,7 @@ export async function POST(req: NextRequest) {
 
   const supabase = createServiceClient() as any
 
+  // Check slug availability
   const { data: existing } = await supabase
     .from('tenants')
     .select('id')
@@ -33,18 +34,35 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: `"${slug}" ถูกใช้แล้ว กรุณาเลือกชื่ออื่น` }, { status: 409 })
   }
 
-  const trialEnds = new Date()
-  trialEnds.setDate(trialEnds.getDate() + 14)
+  // Check seed balance
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('seeds')
+    .eq('id', user.id)
+    .maybeSingle()
+
+  const seeds = profile?.seeds ?? 0
+  if (seeds < 1) {
+    return NextResponse.json(
+      { error: 'ไม่มี Seed — ติดต่อ LINE: @krabbie เพื่อซื้อ Seed ก่อนสร้างร้าน' },
+      { status: 402 }
+    )
+  }
+
+  // Compute 30-day expiry
+  const expiresAt = new Date()
+  expiresAt.setDate(expiresAt.getDate() + 30)
 
   const insertData: Record<string, unknown> = {
     slug,
-    name:          shopName,
-    template_id:   templateId || 'booking-service',
-    owner_email:   user.email,
-    owner_phone:   ownerPhone || '',
-    plan:          'trial',
-    plan_type:     'standard',
-    trial_ends_at: trialEnds.toISOString(),
+    name:        shopName,
+    template_id: templateId || 'booking-service',
+    owner_email: user.email,
+    owner_phone: ownerPhone || '',
+    plan:        'active',
+    plan_type:   'standard',
+    expires_at:  expiresAt.toISOString(),
+    activated_at: new Date().toISOString(),
     settings: {
       primaryColor:   '#ff6b00',
       logoUrl:        null,
@@ -72,6 +90,17 @@ export async function POST(req: NextRequest) {
   if (error || !tenant) {
     return NextResponse.json({ error: error?.message ?? 'สร้างร้านไม่สำเร็จ กรุณาลองใหม่' }, { status: 500 })
   }
+
+  // Deduct 1 seed and record transaction
+  await Promise.all([
+    supabase
+      .from('profiles')
+      .update({ seeds: seeds - 1 })
+      .eq('id', user.id),
+    supabase
+      .from('seed_transactions')
+      .insert({ user_id: user.id, delta: -1, note: `สร้างร้าน ${slug}` }),
+  ])
 
   return NextResponse.json({ data: { slug: tenant.slug } })
 }

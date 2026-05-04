@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic'
 
 import { createServiceClient } from '@/lib/supabase.server'
 import ShopStatusActions from '@/components/admin/ShopStatusActions'
+import { shopDisplayUrl } from '@/lib/utils'
 import type { Tenant } from '@/types'
 
 const TABS = [
@@ -81,11 +82,11 @@ export default async function AdminShopsPage({ searchParams }: Props) {
                   <td className="px-5 py-3.5">
                     <div className="font-semibold leading-tight">{t.name}</div>
                     <a
-                      href={`https://${t.slug}.krabbie.com`}
+                      href={`/${t.slug}`}
                       target="_blank"
                       className="font-mono text-xs text-orange-500 hover:underline"
                     >
-                      {t.slug}.krabbie.com ↗
+                      {shopDisplayUrl(t.slug)} ↗
                     </a>
                     <div className="font-mono text-[0.6rem] text-gray-400 mt-0.5">{t.owner_email}</div>
                   </td>
