@@ -3,10 +3,8 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase'
 
-const CUSTOMER_EMAIL = process.env.NEXT_PUBLIC_DEV_CUSTOMER_EMAIL ?? ''
-const CUSTOMER_PASS  = process.env.NEXT_PUBLIC_DEV_CUSTOMER_PASS  ?? ''
-const ADMIN_EMAIL    = process.env.NEXT_PUBLIC_DEV_ADMIN_EMAIL    ?? process.env.NEXT_PUBLIC_ADMIN_EMAIL ?? ''
-const ADMIN_PASS     = process.env.NEXT_PUBLIC_DEV_ADMIN_PASS     ?? ''
+const CUSTOMER_EMAIL = 'testcustomer@krabbie.dev'
+const CUSTOMER_PASS  = 'KrabbieTest123!'
 const ENABLED        = process.env.NEXT_PUBLIC_DEV_SWITCHER === '1'
 
 export default function DevSwitcher() {
@@ -28,20 +26,26 @@ export default function DevSwitcher() {
 
   if (!ENABLED) return null
 
-  async function switchTo(email: string, pass: string) {
-    if (!email || !pass) return
+  async function switchToCustomer() {
     setLoading(true)
+    document.cookie = 'krabbie_bypass=; path=/; max-age=0'
     const supabase = createClient() as any
     await supabase.auth.signOut()
-    await supabase.auth.signInWithPassword({ email, password: pass })
-    window.location.reload()
+    await supabase.auth.signInWithPassword({ email: CUSTOMER_EMAIL, password: CUSTOMER_PASS })
+    window.location.href = '/dashboard'
+  }
+
+  function switchToAdmin() {
+    document.cookie = 'krabbie_bypass=adminkrab_ok; path=/; max-age=86400; SameSite=Lax'
+    window.location.href = '/admin'
   }
 
   async function logout() {
     setLoading(true)
+    document.cookie = 'krabbie_bypass=; path=/; max-age=0'
     const supabase = createClient() as any
     await supabase.auth.signOut()
-    window.location.reload()
+    window.location.href = '/'
   }
 
   return (
@@ -68,26 +72,24 @@ export default function DevSwitcher() {
           )}
 
           <button
-            onClick={() => switchTo(CUSTOMER_EMAIL, CUSTOMER_PASS)}
-            disabled={loading || !CUSTOMER_EMAIL}
+            onClick={switchToCustomer}
+            disabled={loading}
             style={{
               padding: '9px 14px', borderRadius: '10px', border: 'none',
               background: '#0099CC', color: 'white', fontFamily: 'monospace',
               fontSize: '0.82rem', fontWeight: 700, cursor: 'pointer', textAlign: 'left',
-              opacity: CUSTOMER_EMAIL ? 1 : 0.4,
             }}
           >
             👤 มุมมองลูกค้า
           </button>
 
           <button
-            onClick={() => switchTo(ADMIN_EMAIL, ADMIN_PASS)}
-            disabled={loading || !ADMIN_EMAIL}
+            onClick={switchToAdmin}
+            disabled={loading}
             style={{
               padding: '9px 14px', borderRadius: '10px', border: 'none',
               background: '#FF5500', color: 'white', fontFamily: 'monospace',
               fontSize: '0.82rem', fontWeight: 700, cursor: 'pointer', textAlign: 'left',
-              opacity: ADMIN_EMAIL ? 1 : 0.4,
             }}
           >
             🔑 มุมมองแอดมิน
