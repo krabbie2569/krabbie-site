@@ -12,11 +12,26 @@ export default async function AccountPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login?next=/account')
 
-  const { data: tenant } = await supabase
-    .from('tenants')
-    .select('slug, name, plan, plan_type, trial_ends_at, expires_at, created_at')
-    .eq('owner_email', user.email)
-    .maybeSingle()
+  const [{ data: tenant }, { data: profile }, { data: seedTx }] = await Promise.all([
+    supabase
+      .from('tenants')
+      .select('slug, name, plan, plan_type, trial_ends_at, expires_at, created_at')
+      .eq('owner_email', user.email)
+      .maybeSingle(),
+    supabase
+      .from('profiles')
+      .select('seeds, display_name')
+      .eq('id', user.id)
+      .maybeSingle(),
+    supabase
+      .from('seed_transactions')
+      .select('delta, note, created_at')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(10),
+  ])
+
+  const seeds = profile?.seeds ?? 0
 
   const planLabel: Record<string, string> = {
     trial: `ทดลองฟรี · หมด ${tenant?.trial_ends_at ? new Date(tenant.trial_ends_at).toLocaleDateString('th-TH') : '?'}`,
@@ -86,6 +101,62 @@ export default async function AccountPage() {
             </div>
           </div>
         )}
+
+        {/* Seeds */}
+        <div className="card border-orange-100 bg-gradient-to-br from-orange-50 to-amber-50">
+          <div className="flex items-center justify-between mb-3">
+            <div className="sec-label">🌱 Seed ของฉัน</div>
+            <div className="font-syne font-extrabold text-3xl text-orange-500">{seeds}</div>
+          </div>
+
+          {/* what is seed */}
+          <div className="bg-white/70 rounded-xl p-3 mb-3 space-y-1.5 text-xs text-gray-600 leading-relaxed">
+            <div className="flex items-start gap-2">
+              <span className="text-orange-400 mt-0.5">◆</span>
+              <span><strong>1 Seed</strong> = เปิดใช้งานเว็บร้าน 1 ร้าน นาน <strong>30 วัน</strong></span>
+            </div>
+            <div className="flex items-start gap-2">
+              <span className="text-orange-400 mt-0.5">◆</span>
+              <span>ซื้อ seed แล้วกด <strong>Activate</strong> ในหน้าจัดการร้านได้เลย</span>
+            </div>
+            <div className="flex items-start gap-2">
+              <span className="text-orange-400 mt-0.5">◆</span>
+              <span>โอนเงิน <strong>150 ฿/เดือน</strong> → แจ้ง LINE: @krabbie → แอดมินเพิ่ม seed ให้</span>
+            </div>
+          </div>
+
+          {seeds === 0 ? (
+            <div className="bg-orange-100 text-orange-700 text-xs rounded-lg px-3 py-2 font-mono text-center">
+              ยังไม่มี seed — ติดต่อ LINE: @krabbie เพื่อซื้อ
+            </div>
+          ) : (
+            <div className="bg-teal-50 text-teal-700 text-xs rounded-lg px-3 py-2 font-mono text-center">
+              ✓ มี {seeds} seed · ใช้ได้อีก {seeds} เดือน
+            </div>
+          )}
+
+          {/* transaction history */}
+          {seedTx && seedTx.length > 0 && (
+            <div className="mt-3">
+              <div className="text-[0.6rem] font-mono text-gray-400 uppercase tracking-wider mb-1.5">ประวัติ Seed</div>
+              <div className="space-y-1">
+                {(seedTx as any[]).map((tx: any, i: number) => (
+                  <div key={i} className="flex items-center justify-between text-xs py-1 border-b border-orange-100 last:border-0">
+                    <div className="text-gray-500">{tx.note || 'เพิ่ม seed'}</div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-[0.6rem] text-gray-300">
+                        {new Date(tx.created_at).toLocaleDateString('th-TH')}
+                      </span>
+                      <span className={`font-mono font-bold ${tx.delta > 0 ? 'text-teal-600' : 'text-red-500'}`}>
+                        {tx.delta > 0 ? `+${tx.delta}` : tx.delta} 🌱
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* Change Password */}
         <ChangePasswordForm />
