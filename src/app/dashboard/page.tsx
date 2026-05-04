@@ -3,7 +3,7 @@ export const runtime = 'edge'
 import { createServerSupabaseClient } from '@/lib/supabase.server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import LogoutButton from '@/components/account/LogoutButton'
+import DashboardSidebar from '@/components/account/DashboardSidebar'
 
 export default async function DashboardPage() {
   const supabase = await createServerSupabaseClient() as any
@@ -35,23 +35,10 @@ export default async function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-
-      {/* HEADER */}
-      <div className="bg-krabbie-dark px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Link href="/" className="text-xl">🦀</Link>
-          <span className="font-syne text-white font-bold">Dashboard</span>
-        </div>
-        <div className="flex items-center gap-4">
-          <Link href="/account" className="font-mono text-xs text-gray-400 hover:text-white transition-colors">
-            {user.user_metadata?.display_name || user.email}
-          </Link>
-          <LogoutButton />
-        </div>
-      </div>
-
-      <div className="max-w-5xl mx-auto px-4 py-8">
+    <div className="flex min-h-screen">
+      <DashboardSidebar email={user.email ?? ''} />
+      <main className="flex-1 min-w-0 overflow-auto bg-gray-50">
+      <div className="max-w-5xl mx-auto px-6 py-8">
 
         {/* WELCOME */}
         <div className="mb-6">
@@ -178,6 +165,7 @@ export default async function DashboardPage() {
           </div>
         </div>
       </div>
+      </main>
     </div>
   )
 }

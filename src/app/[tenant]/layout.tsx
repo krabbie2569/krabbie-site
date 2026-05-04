@@ -1,6 +1,7 @@
 export const runtime = 'edge'
 
 import { headers } from 'next/headers'
+
 import { notFound } from 'next/navigation'
 import { getTenantBySlug, parseTenantSettings, isTenantActive } from '@/lib/tenant'
 import TenantHeader from '@/components/tenant/TenantHeader'
@@ -29,7 +30,12 @@ export default async function TenantLayout({ children, params }: Props) {
   const tenant = await getTenantBySlug(tenantSlug)
 
   if (!tenant) notFound()
-  if (!isTenantActive(tenant)) {
+
+  const headersList = await headers()
+  const pathname = headersList.get('x-pathname') ?? ''
+  const isAdmin = /\/admin(\/|$)/.test(pathname)
+
+  if (!isAdmin && !isTenantActive(tenant)) {
     return (
       <main className="min-h-screen bg-krabbie-bg flex items-center justify-center p-6">
         <div className="text-center max-w-sm">
@@ -42,6 +48,14 @@ export default async function TenantLayout({ children, params }: Props) {
   }
 
   const settings = parseTenantSettings(tenant.settings)
+
+  if (isAdmin) {
+    return (
+      <div style={{ '--primary': settings.primaryColor } as React.CSSProperties}>
+        {children}
+      </div>
+    )
+  }
 
   return (
     <div style={{ '--primary': settings.primaryColor } as React.CSSProperties}>

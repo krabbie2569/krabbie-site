@@ -6,6 +6,7 @@ import { BOOKING_STATUS_LABEL, BOOKING_STATUS_COLOR } from '@/types'
 import type { Booking, Service } from '@/types'
 import StatsCard from '@/components/admin/StatsCard'
 import BookingActions from '@/components/admin/BookingActions'
+import TenantAdminSidebar from '@/components/tenant/TenantAdminSidebar'
 
 interface Props {
   params: Promise<{ tenant: string }>
@@ -39,18 +40,10 @@ export default async function TenantAdminPage({ params }: Props) {
   const confirmedCount = bookingsRaw?.filter((b: any) => b.status === 'confirmed').length ?? 0
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-16">
-
-      {/* ADMIN HEADER */}
-      <div className="bg-krabbie-dark px-4 py-3 flex items-center justify-between">
-        <div>
-          <span className="font-syne text-white font-bold">{tenant.name}</span>
-          <span className="font-mono text-gray-500 text-xs ml-2">Admin</span>
-        </div>
-        <span className="badge-trial">{tenant.plan === 'trial' ? 'ทดลองใช้' : 'Active'}</span>
-      </div>
-
-      <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
+    <div className="flex min-h-screen">
+      <TenantAdminSidebar slug={tenantSlug} shopName={tenant.name} plan={tenant.plan} />
+      <main className="flex-1 min-w-0 overflow-auto bg-gray-50 pb-16">
+      <div className="max-w-3xl mx-auto px-6 py-8 space-y-6">
 
         {/* STATS */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -112,6 +105,7 @@ export default async function TenantAdminPage({ params }: Props) {
         </div>
 
       </div>
+      </main>
     </div>
   )
 }

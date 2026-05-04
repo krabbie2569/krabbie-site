@@ -2,6 +2,7 @@ import { getTenantBySlug } from '@/lib/tenant'
 import { createServerSupabaseClient } from '@/lib/supabase.server'
 import { notFound } from 'next/navigation'
 import SlipUploader from '@/components/payment/SlipUploader'
+import TenantAdminSidebar from '@/components/tenant/TenantAdminSidebar'
 
 interface Props { params: Promise<{ tenant: string }> }
 
@@ -30,12 +31,10 @@ export default async function BillingPage({ params }: Props) {
     : null
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-16">
-      <div className="bg-krabbie-dark px-4 py-3">
-        <span className="font-syne text-white font-bold">การชำระเงิน</span>
-      </div>
-
-      <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
+    <div className="flex min-h-screen">
+      <TenantAdminSidebar slug={tenantSlug} shopName={tenant.name} plan={tenant.plan} />
+      <main className="flex-1 min-w-0 overflow-auto bg-gray-50 pb-16">
+      <div className="max-w-2xl mx-auto px-6 py-8 space-y-6">
 
         {/* CURRENT STATUS */}
         <div className="card">
@@ -104,6 +103,7 @@ export default async function BillingPage({ params }: Props) {
         )}
 
       </div>
+      </main>
     </div>
   )
 }

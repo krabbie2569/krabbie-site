@@ -267,14 +267,6 @@ export default function NewShopPage() {
           </div>
         )}
 
-        {/* HINT */}
-        {!selected && (
-          <div style={{ position: 'absolute', top: '14px', left: 0, right: 0, textAlign: 'center', pointerEvents: 'none', zIndex: 15 }}>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(12px)', color: 'rgba(255,255,255,0.5)', padding: '7px 18px', borderRadius: '100px', fontSize: '0.7rem', fontFamily: 'monospace', letterSpacing: '1px', border: '1px solid rgba(255,255,255,0.08)' }}>
-              เลื่อนดูและเลือก template ที่ต้องการ ↓
-            </div>
-          </div>
-        )}
       </div>
     </div>
   )

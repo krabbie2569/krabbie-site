@@ -25,27 +25,37 @@ export async function middleware(request: NextRequest) {
     if (tenantParam) {
       url.pathname = `/${tenantParam}${url.pathname === '/' ? '' : url.pathname}`
       url.searchParams.delete('tenant')
-      const res = NextResponse.rewrite(url)
+      const rh = withPathname(request.headers, url.pathname)
+      const res = NextResponse.rewrite(url, { request: { headers: rh } })
       res.headers.set('x-tenant-slug', tenantParam)
       return guardAdmin(request, res, url.pathname)
     }
-    return guardAdmin(request, NextResponse.next(), url.pathname)
+    const rh = withPathname(request.headers, url.pathname)
+    return guardAdmin(request, NextResponse.next({ request: { headers: rh } }), url.pathname)
   }
 
   const isMainDomain = hostname === APP_DOMAIN || hostname === `www.${APP_DOMAIN}`
   if (isMainDomain) {
-    return guardAdmin(request, NextResponse.next(), url.pathname)
+    const rh = withPathname(request.headers, url.pathname)
+    return guardAdmin(request, NextResponse.next({ request: { headers: rh } }), url.pathname)
   }
 
   if (hostname.endsWith(`.${APP_DOMAIN}`)) {
     const slug = hostname.replace(`.${APP_DOMAIN}`, '')
     url.pathname = `/${slug}${url.pathname === '/' ? '' : url.pathname}`
-    const res = NextResponse.rewrite(url)
+    const rh = withPathname(request.headers, url.pathname)
+    const res = NextResponse.rewrite(url, { request: { headers: rh } })
     res.headers.set('x-tenant-slug', slug)
     return guardAdmin(request, res, url.pathname)
   }
 
   return NextResponse.next()
+}
+
+function withPathname(existing: Headers, pathname: string): Headers {
+  const h = new Headers(existing)
+  h.set('x-pathname', pathname)
+  return h
 }
 
 async function guardAdmin(req: NextRequest, res: NextResponse, pathname: string) {

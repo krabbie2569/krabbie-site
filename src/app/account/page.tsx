@@ -3,7 +3,7 @@ export const runtime = 'edge'
 import { createServerSupabaseClient } from '@/lib/supabase.server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import LogoutButton from '@/components/account/LogoutButton'
+import DashboardSidebar from '@/components/account/DashboardSidebar'
 import ChangePasswordForm from '@/components/account/ChangePasswordForm'
 
 export default async function AccountPage() {
@@ -26,16 +26,10 @@ export default async function AccountPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-16">
-      <div className="bg-krabbie-dark px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Link href="/" className="text-xl">🦀</Link>
-          <span className="font-syne text-white font-bold">บัญชีของฉัน</span>
-        </div>
-        <LogoutButton />
-      </div>
-
-      <div className="max-w-lg mx-auto px-4 py-6 space-y-4">
+    <div className="flex min-h-screen">
+      <DashboardSidebar email={user.email ?? ''} />
+      <main className="flex-1 min-w-0 overflow-auto bg-gray-50 pb-16">
+      <div className="max-w-lg mx-auto px-6 py-8 space-y-4">
 
         {/* Profile */}
         <div className="card">
@@ -97,6 +91,7 @@ export default async function AccountPage() {
         <ChangePasswordForm />
 
       </div>
+      </main>
     </div>
   )
 }
