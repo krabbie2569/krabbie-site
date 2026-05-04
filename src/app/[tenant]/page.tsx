@@ -1,10 +1,11 @@
 export const runtime = 'edge'
 
 import Link from 'next/link'
-import { getTenantBySlug, parseTenantSettings } from '@/lib/tenant'
+import { getTenantBySlug, parseTenantSettings, isTenantActive } from '@/lib/tenant'
 import { createServiceClient } from '@/lib/supabase.server'
 import { formatPrice, formatDuration } from '@/lib/utils'
 import { notFound } from 'next/navigation'
+import TenantHeader from '@/components/tenant/TenantHeader'
 import type { Service } from '@/types'
 
 interface Props {
@@ -15,6 +16,18 @@ export default async function TenantHomePage({ params }: Props) {
   const { tenant: tenantSlug } = await params
   const tenant = await getTenantBySlug(tenantSlug)
   if (!tenant) notFound()
+
+  if (!isTenantActive(tenant)) {
+    return (
+      <main className="min-h-screen bg-krabbie-bg flex items-center justify-center p-6">
+        <div className="text-center max-w-sm">
+          <div className="text-5xl mb-4">🦀</div>
+          <h1 className="font-syne text-xl font-bold mb-2">ร้านนี้ระงับการใช้งานชั่วคราว</h1>
+          <p className="text-gray-500 text-sm">กรุณาติดต่อเจ้าของร้าน หรือกลับมาใหม่ภายหลัง</p>
+        </div>
+      </main>
+    )
+  }
 
   const supabase = createServiceClient() as any
   const { data: services } = await supabase
@@ -28,6 +41,8 @@ export default async function TenantHomePage({ params }: Props) {
 
   return (
     <div className="min-h-screen bg-krabbie-bg pb-16">
+      <TenantHeader tenant={tenant} settings={settings} />
+
       <section className="bg-krabbie-dark text-center py-12 px-6">
         {settings.logoUrl && (
           <img src={settings.logoUrl} alt={tenant.name} className="w-16 h-16 rounded-full mx-auto mb-4 object-cover" />
