@@ -25,6 +25,12 @@ export default function TenantHeader({ tenant, settings }: Props) {
 
       <div className="flex items-center gap-3">
         <Link
+          href={`/${tenant.slug}/admin`}
+          className="text-white/60 text-xs hover:text-white transition-colors"
+        >
+          Admin
+        </Link>
+        <Link
           href={`/${tenant.slug}/book`}
           className="bg-white text-krabbie-dark font-bold text-xs px-3 py-1.5 rounded-lg hover:bg-orange-50 transition-colors"
         >
