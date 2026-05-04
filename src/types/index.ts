@@ -1,13 +1,15 @@
 import type { Database } from './database.types'
 
 // ── Row shortcuts ──────────────────────────────────────────────────────────
-export type Tenant    = Database['public']['Tables']['tenants']['Row']
-export type Service   = Database['public']['Tables']['services']['Row']
-export type Staff     = Database['public']['Tables']['staff']['Row']
-export type TimeSlot  = Database['public']['Tables']['time_slots']['Row']
-export type Booking   = Database['public']['Tables']['bookings']['Row']
-export type Template  = Database['public']['Tables']['templates']['Row']
-export type Payment   = Database['public']['Tables']['payments']['Row']
+export type Tenant          = Database['public']['Tables']['tenants']['Row']
+export type Service         = Database['public']['Tables']['services']['Row']
+export type Staff           = Database['public']['Tables']['staff']['Row']
+export type TimeSlot        = Database['public']['Tables']['time_slots']['Row']
+export type Booking         = Database['public']['Tables']['bookings']['Row']
+export type Template        = Database['public']['Tables']['templates']['Row']
+export type Payment         = Database['public']['Tables']['payments']['Row']
+export type UserProfile     = Database['public']['Tables']['profiles']['Row']
+export type SeedTransaction = Database['public']['Tables']['seed_transactions']['Row']
 
 // ── Insert shortcuts ───────────────────────────────────────────────────────
 export type NewTenant   = Database['public']['Tables']['tenants']['Insert']
@@ -107,9 +109,22 @@ export interface SignupForm {
 
 // ── Super admin stats ──────────────────────────────────────────────────────
 export interface AdminStats {
-  totalTenants:  number
-  activeTenants: number
-  trialTenants:  number
-  mrr:           number    // monthly recurring revenue (THB)
-  totalBookings: number
+  totalUsers:       number
+  totalTenants:     number
+  activeTenants:    number
+  trialTenants:     number
+  suspendedTenants: number
+  seedsIssued:      number
+  seedsBalance:     number
+  mrr:              number
+}
+
+// ── Admin user row (merged auth + profiles + tenants) ───────────────────────
+export interface AdminUser {
+  id:          string
+  email:       string
+  displayName: string | null
+  seeds:       number
+  shopCount:   number
+  joinedAt:    string
 }

@@ -128,6 +128,32 @@ export interface Database {
         Insert: Omit<Database['public']['Tables']['payments']['Row'], 'id' | 'created_at'>
         Update: Partial<Database['public']['Tables']['payments']['Insert']>
       }
+
+      profiles: {
+        Row: {
+          id: string
+          display_name: string | null
+          email: string | null
+          seeds: number
+          created_at: string
+        }
+        Insert: { id: string; display_name?: string | null; email?: string | null; seeds?: number }
+        Update: Partial<Database['public']['Tables']['profiles']['Insert']>
+      }
+
+      seed_transactions: {
+        Row: {
+          id: string
+          user_id: string
+          delta: number
+          note: string | null
+          admin_email: string | null
+          tenant_id: string | null
+          created_at: string
+        }
+        Insert: Omit<Database['public']['Tables']['seed_transactions']['Row'], 'id' | 'created_at'>
+        Update: Partial<Database['public']['Tables']['seed_transactions']['Insert']>
+      }
     }
 
     Views: {

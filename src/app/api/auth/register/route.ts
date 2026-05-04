@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
 
   const supabase = createServiceClient() as any
 
-  const { error } = await supabase.auth.admin.createUser({
+  const { data: created, error } = await supabase.auth.admin.createUser({
     email: email.toLowerCase().trim(),
     password,
     email_confirm: true,
@@ -27,6 +27,15 @@ export async function POST(req: NextRequest) {
       ? 'อีเมลนี้มีบัญชีอยู่แล้ว กรุณาเข้าสู่ระบบ'
       : 'สร้างบัญชีไม่สำเร็จ กรุณาลองใหม่'
     return NextResponse.json({ error: msg }, { status: 400 })
+  }
+
+  if (created?.user?.id) {
+    await supabase.from('profiles').insert({
+      id:           created.user.id,
+      display_name: name,
+      email:        email.toLowerCase().trim(),
+      seeds:        0,
+    })
   }
 
   return NextResponse.json({ success: true })

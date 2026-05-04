@@ -51,9 +51,6 @@ export async function middleware(request: NextRequest) {
 async function guardAdmin(req: NextRequest, res: NextResponse, pathname: string) {
   if (!isProtected(pathname)) return res
 
-  // AUTH DISABLED TEMPORARILY — re-enable by removing the next line
-  return res
-
   // Dev bypass via adminkrab cookie
   if (req.cookies.get('krabbie_bypass')?.value === 'adminkrab_ok') return res
 
