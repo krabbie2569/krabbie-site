@@ -39,27 +39,63 @@ const BOOKED_MAP: Record<string, string[]> = {
   '05-06': ['10:00','13:00'], '05-07': ['11:00','14:00'], '05-08': ['09:00'],
 }
 
-/* รายได้รายวัน (สัปดาห์นี้ จ–ส) */
-const WEEKLY_REVENUE = [
-  { day: 'จ',  date: '05-05', amount: 2890 },
-  { day: 'อ',  date: '05-06', amount: 1240 },
-  { day: 'พ',  date: '05-07', amount: 3750 },
-  { day: 'พฤ', date: '05-08', amount: 2560 },
-  { day: 'ศ',  date: '05-09', amount: 4100 },
-  { day: 'ส',  date: '05-10', amount: 4610 },
-]
-const WEEKLY_MAX = Math.max(...WEEKLY_REVENUE.map(d => d.amount))
-const WEEKLY_TOTAL = WEEKLY_REVENUE.reduce((s, d) => s + d.amount, 0)
+type RevPeriod = 'today' | 'week' | 'month' | 'year'
+const REVENUE: Record<RevPeriod, {
+  label: string; total: number; prev: number
+  bookings: number; avgValue: number; newCustomers: number
+  bars: { label: string; value: number; isCurrent?: boolean }[]
+}> = {
+  today: {
+    label: 'วันนี้', total: 4720, prev: 4200, bookings: 7, avgValue: 674, newCustomers: 3,
+    bars: [
+      { label: '09', value: 350 }, { label: '10', value: 890, isCurrent: true },
+      { label: '11', value: 490 }, { label: '13', value: 550 },
+      { label: '14', value: 1200 }, { label: '15', value: 350 }, { label: '16', value: 890 },
+    ],
+  },
+  week: {
+    label: 'สัปดาห์นี้', total: 19150, prev: 17720, bookings: 32, avgValue: 598, newCustomers: 9,
+    bars: [
+      { label: 'จ', value: 2890 }, { label: 'อ', value: 1240 },
+      { label: 'พ', value: 3750 }, { label: 'พฤ', value: 2560 },
+      { label: 'ศ', value: 4100 }, { label: 'ส', value: 4610, isCurrent: true },
+    ],
+  },
+  month: {
+    label: 'เดือนนี้', total: 74820, prev: 60840, bookings: 128, avgValue: 584, newCustomers: 34,
+    bars: [
+      { label: 'สป.1', value: 15200 }, { label: 'สป.2', value: 18450 },
+      { label: 'สป.3', value: 21300 }, { label: 'สป.4', value: 19870, isCurrent: true },
+    ],
+  },
+  year: {
+    label: 'ปีนี้', total: 305820, prev: 233420, bookings: 524, avgValue: 583, newCustomers: 187,
+    bars: [
+      { label: 'ม.ค.', value: 52400 }, { label: 'ก.พ.', value: 48900 },
+      { label: 'มี.ค.', value: 61200 }, { label: 'เม.ย.', value: 68500 },
+      { label: 'พ.ค.',  value: 74820, isCurrent: true },
+      { label: 'มิ.ย.', value: 0 }, { label: 'ก.ค.', value: 0 },
+      { label: 'ส.ค.',  value: 0 }, { label: 'ก.ย.', value: 0 },
+      { label: 'ต.ค.',  value: 0 }, { label: 'พ.ย.', value: 0 }, { label: 'ธ.ค.', value: 0 },
+    ],
+  },
+}
 
-/* บริการยอดนิยมตามรายได้ */
 const TOP_SERVICES = [
-  { name: 'ทำสีผม (Balayage)',    revenue: 7200, count: 6 },
-  { name: 'สปาตัวทั้งตัว',        revenue: 5340, count: 6 },
-  { name: 'ทำเล็บเจล',            revenue: 4400, count: 8 },
-  { name: 'คลีนิกหน้า + บีบสิว',  revenue: 2940, count: 6 },
-  { name: 'นวดแผนไทย',            revenue: 2800, count: 8 },
+  { name: 'ทำสีผม (Balayage)',   revenue: 7200,  count: 6  },
+  { name: 'สปาตัวทั้งตัว',       revenue: 5340,  count: 6  },
+  { name: 'ทำเล็บเจล',           revenue: 4400,  count: 8  },
+  { name: 'คลีนิกหน้า + บีบสิว', revenue: 2940,  count: 6  },
+  { name: 'นวดแผนไทย',           revenue: 2800,  count: 8  },
 ]
 const TOP_MAX = TOP_SERVICES[0].revenue
+
+function shortNum(n: number) {
+  if (n === 0) return '–'
+  if (n >= 10000) return `${(n / 1000).toFixed(0)}K`
+  if (n >= 1000)  return `${(n / 1000).toFixed(1)}K`
+  return String(n)
+}
 
 type NavKey = 'overview' | 'bookings' | 'services' | 'staff' | 'revenue' | 'slots' | 'settings'
 const NAV: { key: NavKey; label: string; icon: string }[] = [
@@ -102,7 +138,7 @@ export default function DemoAdminSection() {
     shopName: 'Sabai Beauty Studio', phone: '081-234-5678', line: '@sabaibeauty',
     autoConfirm: false, advanceDays: 14, color: '#f97316',
   })
-  const [revPeriod, setRevPeriod] = useState<'week'|'month'>('week')
+  const [revPeriod, setRevPeriod] = useState<RevPeriod>('month')
 
   function showToast(msg: string) {
     setToast(msg); setTimeout(() => setToast(''), 2500)
@@ -142,9 +178,7 @@ export default function DemoAdminSection() {
   const todayCount     = bookings.filter(b => b.date === '2025-05-06').length
   const filteredBooks  = bookFilter === 'all' ? bookings : bookings.filter(b => b.status === bookFilter)
 
-  /* รายได้จาก confirmed เท่านั้น */
   const confirmedRevenue = bookings.filter(b => b.status === 'confirmed').reduce((s, b) => s + b.price, 0)
-  const monthRevenue     = revPeriod === 'week' ? WEEKLY_TOTAL : WEEKLY_TOTAL * 4 + 3240
 
   return (
     <div className="relative">
@@ -376,97 +410,120 @@ export default function DemoAdminSection() {
         )}
 
         {/* ── รายได้ ── */}
-        {nav === 'revenue' && (
-          <div className="space-y-4">
-            {/* Period toggle */}
-            <div className="flex gap-2">
-              {(['week', 'month'] as const).map(p => (
-                <button key={p} onClick={() => setRevPeriod(p)}
-                  className={`text-xs font-mono px-4 py-1.5 rounded-full border transition-all ${
-                    revPeriod === p ? 'bg-orange-500 text-white border-orange-500' : 'bg-white border-krabbie-border hover:border-orange-300'
-                  }`}>
-                  {p === 'week' ? 'สัปดาห์นี้' : 'เดือนนี้'}
-                </button>
-              ))}
-            </div>
+        {nav === 'revenue' && (() => {
+          const d    = REVENUE[revPeriod]
+          const pct  = Math.round(((d.total - d.prev) / d.prev) * 100)
+          const up   = pct >= 0
+          const barMax = Math.max(...d.bars.map(b => b.value))
+          return (
+            <div className="space-y-4">
 
-            {/* Summary stats */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-white rounded-xl border border-krabbie-border p-4 col-span-2">
-                <div className="text-xs text-gray-400 mb-1 font-mono">รายได้รวม</div>
-                <div className="font-syne font-bold text-3xl text-green-600">{formatPrice(monthRevenue)}</div>
-                <div className="text-xs text-green-500 mt-1 font-mono">↑ +12% จากสัปดาห์ก่อน</div>
+              {/* Period tabs */}
+              <div className="flex gap-1.5 bg-white border border-krabbie-border rounded-xl p-1">
+                {(['today','week','month','year'] as RevPeriod[]).map(p => (
+                  <button key={p} onClick={() => setRevPeriod(p)}
+                    className={`flex-1 text-xs font-semibold py-1.5 rounded-lg transition-all ${
+                      revPeriod === p ? 'bg-orange-500 text-white shadow-sm' : 'text-gray-500 hover:text-gray-800'
+                    }`}>
+                    {p === 'today' ? 'วันนี้' : p === 'week' ? 'สัปดาห์' : p === 'month' ? 'เดือน' : 'ปี'}
+                  </button>
+                ))}
               </div>
-              <div className="bg-white rounded-xl border border-krabbie-border p-3 text-center">
-                <div className="font-syne font-bold text-xl text-orange-500">{bookings.filter(b => b.status === 'confirmed').length}</div>
-                <div className="text-xs text-gray-400">การจองที่สำเร็จ</div>
-              </div>
-              <div className="bg-white rounded-xl border border-krabbie-border p-3 text-center">
-                <div className="font-syne font-bold text-xl text-orange-500">{formatPrice(Math.round(confirmedRevenue / Math.max(confirmedCount, 1)))}</div>
-                <div className="text-xs text-gray-400">เฉลี่ย/การจอง</div>
-              </div>
-            </div>
 
-            {/* Bar chart */}
-            <div className="bg-white rounded-xl border border-krabbie-border p-4">
-              <div className="sec-label mb-3">รายได้รายวัน (สัปดาห์นี้)</div>
-              <div className="flex items-end gap-2 h-24">
-                {WEEKLY_REVENUE.map(d => (
-                  <div key={d.day} className="flex-1 flex flex-col items-center gap-1">
-                    <div className="text-[0.55rem] text-gray-400 font-mono">{formatPrice(d.amount).replace('฿','')}</div>
-                    <div className="w-full bg-orange-500 rounded-t transition-all"
-                      style={{ height: `${Math.round((d.amount / WEEKLY_MAX) * 52)}px` }} />
-                    <span className="text-[0.6rem] text-gray-500 font-mono">{d.day}</span>
+              {/* Hero metric */}
+              <div className="bg-white rounded-2xl border border-krabbie-border p-5">
+                <div className="text-xs text-gray-400 font-mono mb-1">รายได้รวม · {d.label}</div>
+                <div className="flex items-end gap-3 mb-3">
+                  <div className="font-syne font-black text-4xl text-gray-900">{formatPrice(d.total)}</div>
+                  <div className={`flex items-center gap-1 mb-1 text-sm font-semibold ${up ? 'text-green-500' : 'text-red-500'}`}>
+                    <span>{up ? '↑' : '↓'}</span>
+                    <span>{Math.abs(pct)}%</span>
+                  </div>
+                </div>
+                <div className="text-xs text-gray-400">เทียบกับ{revPeriod === 'today' ? 'เมื่อวาน' : revPeriod === 'week' ? 'สัปดาห์ที่แล้ว' : revPeriod === 'month' ? 'เดือนที่แล้ว' : 'ปีที่แล้ว'} ({formatPrice(d.prev)})</div>
+
+                {/* Bar chart */}
+                <div className="mt-5 flex items-end gap-1" style={{ height: '80px' }}>
+                  {d.bars.map((b, i) => (
+                    <div key={i} className="flex-1 flex flex-col items-center justify-end gap-0.5 h-full">
+                      {b.value > 0 && (
+                        <div className="text-[0.5rem] text-gray-400 font-mono leading-none mb-0.5">{shortNum(b.value)}</div>
+                      )}
+                      <div
+                        className={`w-full rounded-t-md transition-all ${b.value === 0 ? 'bg-gray-100' : b.isCurrent ? 'bg-orange-500' : 'bg-orange-200'}`}
+                        style={{ height: b.value === 0 ? '4px' : `${Math.max(4, Math.round((b.value / barMax) * 60))}px` }}
+                      />
+                      <div className="text-[0.55rem] text-gray-400 font-mono leading-none mt-0.5">{b.label}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* 4 KPI cards */}
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { label: 'การจองทั้งหมด', value: String(d.bookings), sub: 'ครั้ง',       color: 'text-orange-500' },
+                  { label: 'ค่าเฉลี่ย/ครั้ง', value: formatPrice(d.avgValue), sub: 'บาท', color: 'text-blue-500'   },
+                  { label: 'ลูกค้าใหม่',     value: String(d.newCustomers), sub: 'คน',     color: 'text-purple-500' },
+                  { label: 'คะแนนรีวิว',     value: '4.9',              sub: '/ 5.0',      color: 'text-yellow-500' },
+                ].map(c => (
+                  <div key={c.label} className="bg-white rounded-xl border border-krabbie-border p-3">
+                    <div className="text-[0.65rem] text-gray-400 mb-1">{c.label}</div>
+                    <div className={`font-syne font-bold text-xl ${c.color}`}>{c.value}</div>
+                    <div className="text-[0.6rem] text-gray-400 font-mono">{c.sub}</div>
                   </div>
                 ))}
               </div>
-            </div>
 
-            {/* Top services */}
-            <div className="bg-white rounded-xl border border-krabbie-border p-4">
-              <div className="sec-label mb-3">บริการยอดนิยม (ตามรายได้)</div>
-              <div className="space-y-3">
-                {TOP_SERVICES.map((s, i) => (
-                  <div key={s.name}>
-                    <div className="flex items-center justify-between text-xs mb-1">
-                      <span className="font-semibold flex items-center gap-1.5">
-                        <span className={`w-4 h-4 rounded-full flex items-center justify-center text-[0.55rem] font-bold text-white ${
-                          i === 0 ? 'bg-orange-500' : i === 1 ? 'bg-orange-400' : 'bg-gray-300'
-                        }`}>{i + 1}</span>
-                        {s.name}
-                      </span>
-                      <span className="font-mono text-gray-500">{s.count} ครั้ง · <span className="text-green-600 font-bold">{formatPrice(s.revenue)}</span></span>
+              {/* Top services */}
+              <div className="bg-white rounded-xl border border-krabbie-border p-4">
+                <div className="sec-label mb-4">บริการที่ทำรายได้สูงสุด</div>
+                <div className="space-y-3">
+                  {TOP_SERVICES.map((s, i) => (
+                    <div key={s.name} className="flex items-center gap-3">
+                      <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[0.6rem] font-black text-white flex-shrink-0 ${
+                        i === 0 ? 'bg-orange-500' : i === 1 ? 'bg-orange-400' : i === 2 ? 'bg-orange-300' : 'bg-gray-200 text-gray-600'
+                      }`}>{i + 1}</div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between text-xs mb-1">
+                          <span className="font-semibold truncate">{s.name}</span>
+                          <span className="font-mono text-green-600 font-bold ml-2 flex-shrink-0">{formatPrice(s.revenue)}</span>
+                        </div>
+                        <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                          <div className={`h-full rounded-full ${i === 0 ? 'bg-orange-500' : i === 1 ? 'bg-orange-400' : 'bg-orange-300'}`}
+                            style={{ width: `${Math.round((s.revenue / TOP_MAX) * 100)}%` }} />
+                        </div>
+                        <div className="text-[0.6rem] text-gray-400 font-mono mt-0.5">{s.count} การจอง</div>
+                      </div>
                     </div>
-                    <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                      <div className="h-full bg-orange-400 rounded-full transition-all"
-                        style={{ width: `${Math.round((s.revenue / TOP_MAX) * 100)}%` }} />
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
 
-            {/* Transactions */}
-            <div className="bg-white rounded-xl border border-krabbie-border p-4">
-              <div className="sec-label mb-3">รายการที่สำเร็จล่าสุด</div>
-              <div className="space-y-2">
-                {bookings.filter(b => b.status === 'confirmed').map(b => (
-                  <div key={b.id} className="flex items-center justify-between text-sm">
+              {/* Recent confirmed */}
+              <div className="bg-white rounded-xl border border-krabbie-border overflow-hidden">
+                <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+                  <div className="sec-label">รายการล่าสุด</div>
+                  <span className="text-xs text-gray-400 font-mono">เฉพาะที่ยืนยันแล้ว</span>
+                </div>
+                {bookings.filter(b => b.status === 'confirmed').map((b, i, arr) => (
+                  <div key={b.id} className={`flex items-center justify-between px-4 py-2.5 ${i < arr.length - 1 ? 'border-b border-gray-50' : ''}`}>
                     <div>
                       <div className="font-semibold text-sm">{b.name}</div>
-                      <div className="text-xs text-gray-400">{b.service} · {b.date}</div>
+                      <div className="text-xs text-gray-400">{b.service} · {b.date} {b.time}</div>
                     </div>
-                    <div className="font-mono font-bold text-green-600">{formatPrice(b.price)}</div>
+                    <div className="font-mono font-bold text-sm text-green-600">+{formatPrice(b.price)}</div>
                   </div>
                 ))}
+                <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-t border-gray-100">
+                  <span className="text-sm font-bold">รวมทั้งหมด</span>
+                  <span className="font-syne font-bold text-green-600">{formatPrice(bookings.filter(b => b.status === 'confirmed').reduce((s, b) => s + b.price, 0))}</span>
+                </div>
               </div>
-              <div className="mt-3 pt-3 border-t border-gray-100 flex justify-between font-semibold text-sm">
-                <span>รวมที่แสดง</span>
-                <span className="font-mono text-green-600">{formatPrice(confirmedRevenue)}</span>
-              </div>
+
             </div>
-          </div>
-        )}
+          )
+        })()}
 
         {/* ── ตารางเวลา ── */}
         {nav === 'slots' && (
