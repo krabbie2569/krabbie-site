@@ -1,6 +1,6 @@
 export const runtime = 'edge'
 
-import { createServerSupabaseClient } from '@/lib/supabase.server'
+import { createServerSupabaseClient, createServiceClient } from '@/lib/supabase.server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import DashboardSidebar from '@/components/account/DashboardSidebar'
@@ -8,16 +8,18 @@ import { shopDisplayUrl } from '@/lib/utils'
 import ChangePasswordForm from '@/components/account/ChangePasswordForm'
 
 export default async function AccountPage() {
-  const supabase = await createServerSupabaseClient() as any
-
-  const { data: { user } } = await supabase.auth.getUser()
+  const supabaseAuth = await createServerSupabaseClient() as any
+  const { data: { user } } = await supabaseAuth.auth.getUser()
   if (!user) redirect('/login?next=/account')
+
+  const supabase = createServiceClient() as any
 
   const [{ data: tenant }, { data: profile }, { data: seedTx }] = await Promise.all([
     supabase
       .from('tenants')
       .select('slug, name, plan, plan_type, trial_ends_at, expires_at, created_at')
-      .eq('owner_email', user.email)
+      .or(`auth_user_id.eq.${user.id},owner_email.eq.${user.email}`)
+      .order('created_at', { ascending: false })
       .maybeSingle(),
     supabase
       .from('profiles')

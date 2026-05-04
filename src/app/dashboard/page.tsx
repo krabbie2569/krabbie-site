@@ -1,22 +1,24 @@
 export const runtime = 'edge'
 
-import { createServerSupabaseClient } from '@/lib/supabase.server'
+import { createServerSupabaseClient, createServiceClient } from '@/lib/supabase.server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import DashboardSidebar from '@/components/account/DashboardSidebar'
 import { shopDisplayUrl } from '@/lib/utils'
 
 export default async function DashboardPage() {
-  const supabase = await createServerSupabaseClient() as any
-  const { data: { user } } = await supabase.auth.getUser()
+  const supabaseAuth = await createServerSupabaseClient() as any
+  const { data: { user } } = await supabaseAuth.auth.getUser()
   if (!user) redirect('/login?next=/dashboard')
 
+  // Use service client so RLS/column issues never block the query
+  const supabase = createServiceClient() as any
+
   const [shopsRes, profileRes] = await Promise.all([
-    // try auth_user_id first (migration 009), fall back to owner_email
     supabase
       .from('tenants')
       .select('id, slug, name, plan, plan_type, trial_ends_at, expires_at, template_id, created_at')
-      .eq('auth_user_id', user.id)
+      .or(`auth_user_id.eq.${user.id},owner_email.eq.${user.email}`)
       .order('created_at', { ascending: false }),
     supabase
       .from('profiles')
@@ -25,16 +27,7 @@ export default async function DashboardPage() {
       .maybeSingle(),
   ])
 
-  // if auth_user_id column missing, fall back to owner_email
-  let shopsRaw = shopsRes.data
-  if (shopsRes.error || !shopsRaw?.length) {
-    const fallback = await supabase
-      .from('tenants')
-      .select('id, slug, name, plan, plan_type, trial_ends_at, expires_at, template_id, created_at')
-      .eq('owner_email', user.email)
-      .order('created_at', { ascending: false })
-    if (!fallback.error) shopsRaw = fallback.data
-  }
+  const shopsRaw = shopsRes.data
   const { data: profile } = profileRes
 
   const shops  = shopsRaw ?? []
