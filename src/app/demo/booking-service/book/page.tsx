@@ -3,72 +3,91 @@
 import { useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { format, addDays, startOfDay, getDay } from 'date-fns'
+import {
+  format, addMonths, subMonths, startOfMonth, endOfMonth,
+  eachDayOfInterval, isSameDay, isBefore, startOfDay, getDay, addDays
+} from 'date-fns'
 import { th } from 'date-fns/locale'
 import { formatPrice, formatDuration } from '@/lib/utils'
 
 const SERVICES = [
-  { id: '1', name: 'นวดแผนไทย',             description: 'ผ่อนคลายกล้ามเนื้อ',   duration_minutes: 60,  price: 350 },
-  { id: '2', name: 'ทำเล็บเจล (มือ + เท้า)', description: 'เล็บสวย ทนนาน 3–4 สัปดาห์', duration_minutes: 90,  price: 550 },
-  { id: '3', name: 'คลีนิกหน้า + บีบสิว',    description: 'ดูแลผิวหน้า ลดสิว',   duration_minutes: 75,  price: 490 },
-  { id: '4', name: 'สปาตัวทั้งตัว',           description: 'สครับ + มาร์ค + นวด', duration_minutes: 120, price: 890 },
-  { id: '5', name: 'ทำสีผม (Balayage)',       description: 'ระบายสีธรรมชาติ',     duration_minutes: 150, price: 1200 },
+  { id: '1', name: 'นวดแผนไทย',             description: 'ผ่อนคลายกล้ามเนื้อด้วยศาสตร์ดั้งเดิม บำรุงร่างกาย', duration_minutes: 60,  price: 350 },
+  { id: '2', name: 'ทำเล็บเจล (มือ + เท้า)', description: 'เล็บสวย สีไม่ลอก ทนนาน 3–4 สัปดาห์',                duration_minutes: 90,  price: 550 },
+  { id: '3', name: 'คลีนิกหน้า + บีบสิว',    description: 'ดูแลผิวหน้า ลดสิว ล้างพอร์ บำรุงผิวลึก',            duration_minutes: 75,  price: 490 },
+  { id: '4', name: 'สปาตัวทั้งตัว',           description: 'สครับ + มาร์ค + นวดผ่อนคลาย ผิวนุ่มเนียน',           duration_minutes: 120, price: 890 },
+  { id: '5', name: 'ทำสีผม (Balayage)',       description: 'ระบายสีธรรมชาติ ดูแพง ไม่ต้องรีทัชบ่อย',             duration_minutes: 150, price: 1200 },
 ]
 
-const SLOT_TIMES = ['09:00','10:00','11:00','13:00','14:00','15:00','16:00']
+const ALL_SLOTS = ['09:00','10:00','11:00','13:00','14:00','15:00','16:00']
+const DAY_LABELS = ['อา','จ','อ','พ','พฤ','ศ','ส']
 
-// Generate next 10 weekdays
-function getAvailableDates() {
-  const dates: { value: string; label: string }[] = []
-  let d = startOfDay(new Date())
-  d = addDays(d, 1)
-  while (dates.length < 10) {
-    if (getDay(d) !== 0) {
-      dates.push({ value: format(d, 'yyyy-MM-dd'), label: format(d, 'd MMM', { locale: th }) })
-    }
-    d = addDays(d, 1)
-  }
-  return dates
+// Deterministic fake booked slots per date (so the demo looks realistic)
+function getBookedSlots(dateStr: string): string[] {
+  const day = new Date(dateStr).getDate()
+  if (day % 4 === 0) return ['09:00','11:00','15:00']
+  if (day % 4 === 1) return ['10:00','14:00']
+  if (day % 4 === 2) return ['13:00','16:00','09:00']
+  return ['11:00','15:00']
 }
 
-const STEP_LABELS = ['เลือกบริการ', 'เลือกวันเวลา', 'ข้อมูลของคุณ', 'ยืนยัน']
+// Days where ALL slots are booked (for calendar dot indicator)
+function isDayFull(dateStr: string): boolean {
+  return getBookedSlots(dateStr).length >= ALL_SLOTS.length - 1
+}
+function isDayPartial(dateStr: string): boolean {
+  const b = getBookedSlots(dateStr).length
+  return b >= 2 && b < ALL_SLOTS.length - 1
+}
 
 function BookContent() {
-  const searchParams    = useSearchParams()
-  const preselected     = searchParams.get('service')
-  const DATES           = getAvailableDates()
+  const searchParams = useSearchParams()
+  const preselected  = searchParams.get('service')
 
-  const [step, setStep]         = useState<1|2|3|4>(preselected ? 2 : 1)
   const [serviceId, setService] = useState<string|null>(preselected)
+  const [viewMonth, setView]    = useState(new Date())
   const [date, setDate]         = useState<string|null>(null)
   const [slot, setSlot]         = useState<string|null>(null)
+  const [showForm, setShowForm] = useState(false)
+  const [done, setDone]         = useState(false)
   const [name, setName]         = useState('')
   const [phone, setPhone]       = useState('')
   const [email, setEmail]       = useState('')
   const [note, setNote]         = useState('')
 
-  const service = SERVICES.find(s => s.id === serviceId)
+  const service    = SERVICES.find(s => s.id === serviceId)
+  const today      = startOfDay(new Date())
+  const monthStart = startOfMonth(viewMonth)
+  const monthEnd   = endOfMonth(viewMonth)
+  const days       = eachDayOfInterval({ start: monthStart, end: monthEnd })
+  const startPad   = getDay(monthStart)
+  const bookedSlots = date ? getBookedSlots(date) : []
 
-  if (step === 4) {
+  function selectDate(d: Date) {
+    const ds = format(d, 'yyyy-MM-dd')
+    setDate(ds); setSlot(null); setShowForm(false)
+  }
+
+  function selectSlot(t: string) {
+    setSlot(t); setShowForm(true)
+  }
+
+  if (done) {
     return (
       <div className="min-h-screen bg-krabbie-bg flex items-center justify-center p-6">
         <div className="card max-w-sm w-full text-center">
           <div className="text-5xl mb-4">✅</div>
-          <h2 className="font-syne text-xl font-bold mb-2">จองสำเร็จแล้ว! (ตัวอย่าง)</h2>
-          <p className="text-gray-500 text-sm mb-2">นี่คือหน้าต่างยืนยันที่ลูกค้าของคุณจะเห็น</p>
-          <div className="bg-orange-50 border border-orange-200 rounded-lg px-4 py-3 font-mono text-orange-600 text-sm mb-4">
+          <h2 className="font-syne text-xl font-bold mb-2">จองสำเร็จแล้ว!</h2>
+          <p className="text-gray-500 text-sm mb-1">นี่คือหน้ายืนยันที่ลูกค้าของคุณจะเห็น</p>
+          <div className="bg-orange-50 border border-orange-200 rounded-lg px-4 py-3 font-mono text-orange-600 text-sm my-4">
             KRB-DEMO-2025
           </div>
-          <div className="text-xs text-gray-400 mb-4">
-            {service?.name} · {date} · {slot}
+          <div className="text-xs text-gray-500 space-y-0.5 mb-6">
+            <div>{service?.name}</div>
+            <div className="font-mono">{date} · {slot}</div>
+            <div>{name} · {phone}</div>
           </div>
-          <Link href="/demo/booking-service" className="btn-outline w-full block text-center">
-            ← กลับหน้าร้าน
-          </Link>
-          <Link href="/dashboard/new?template=booking-service"
-            className="btn-primary w-full block text-center mt-2">
-            เปิดร้านแบบนี้เลย →
-          </Link>
+          <Link href="/demo/booking-service" className="btn-outline w-full block text-center mb-2">← กลับหน้าร้าน</Link>
+          <Link href="/dashboard/new?template=booking-service" className="btn-primary w-full block text-center">เปิดร้านแบบนี้ →</Link>
         </div>
       </div>
     )
@@ -80,131 +99,189 @@ function BookContent() {
       {/* Demo banner */}
       <div className="px-4 py-1.5 text-center text-xs font-mono bg-orange-500 text-white sticky top-0 z-50">
         ✦ ตัวอย่างระบบจอง —{' '}
-        <Link href="/dashboard/new?template=booking-service" className="underline text-white/80 hover:text-white">
-          เปิดร้านแบบนี้
+        <Link href="/dashboard/new?template=booking-service" className="underline text-white/80">เปิดร้านแบบนี้</Link>
+      </div>
+
+      {/* Back link */}
+      <div className="max-w-xl mx-auto px-4 pt-4">
+        <Link href="/demo/booking-service" className="text-xs text-gray-400 hover:text-orange-500 transition-colors">
+          ← กลับหน้าร้าน
         </Link>
       </div>
 
-      {/* Step indicator */}
-      <div className="bg-white border-b border-krabbie-border px-4 py-3">
-        <div className="max-w-xl mx-auto flex items-center gap-1">
-          {STEP_LABELS.map((label, i) => {
-            const s = (i + 1) as 1|2|3|4
-            return (
-              <div key={s} className="flex items-center gap-1 flex-1">
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[0.6rem] font-bold font-mono flex-shrink-0 ${
-                  s < step ? 'bg-teal-DEFAULT text-white' :
-                  s === step ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-400'
-                }`}>{s < step ? '✓' : s}</div>
-                <span className={`text-[0.65rem] hidden sm:block ${s === step ? 'text-orange-500 font-semibold' : 'text-gray-400'}`}>{label}</span>
-                {i < 3 && <div className={`flex-1 h-0.5 mx-1 ${s < step ? 'bg-teal-DEFAULT' : 'bg-gray-200'}`} />}
-              </div>
-            )
-          })}
-        </div>
-      </div>
+      <div className="max-w-xl mx-auto px-4 py-4 space-y-5">
 
-      <div className="max-w-xl mx-auto px-4 py-6">
-
-        {/* STEP 1 — เลือกบริการ */}
-        {step === 1 && (
+        {/* ── เลือกบริการ ── */}
+        {!service ? (
           <div>
             <div className="sec-label mb-4">เลือกบริการ</div>
             <div className="space-y-3">
               {SERVICES.map(s => (
-                <button key={s.id} onClick={() => { setService(s.id); setStep(2) }}
-                  className={`w-full card text-left flex items-center gap-4 transition-all ${
-                    serviceId === s.id ? 'border-orange-500 bg-orange-50' : 'hover:border-orange-300'
-                  }`}>
+                <button key={s.id} onClick={() => setService(s.id)}
+                  className="w-full card text-left flex items-center gap-4 hover:border-orange-300 transition-all group">
                   <div className="flex-1">
-                    <div className="font-semibold text-sm mb-0.5">{s.name}</div>
+                    <div className="font-semibold text-sm group-hover:text-orange-500">{s.name}</div>
                     <div className="text-xs text-gray-400">{s.description}</div>
                     <div className="font-mono text-xs text-gray-400 mt-0.5">⏱ {formatDuration(s.duration_minutes)}</div>
                   </div>
-                  <div className="text-right flex-shrink-0">
-                    <div className="font-syne font-bold text-orange-500 text-lg">{formatPrice(s.price)}</div>
-                  </div>
+                  <div className="font-syne font-bold text-orange-500 text-lg flex-shrink-0">{formatPrice(s.price)}</div>
                 </button>
               ))}
             </div>
           </div>
-        )}
+        ) : (
+          <>
+            {/* ── บริการที่เลือก ── */}
+            <div className="card flex items-center gap-4 bg-orange-50 border-orange-300">
+              <div className="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center text-white text-lg flex-shrink-0">✂️</div>
+              <div className="flex-1 min-w-0">
+                <div className="font-bold text-sm">{service.name}</div>
+                <div className="text-xs text-gray-500">⏱ {formatDuration(service.duration_minutes)}</div>
+              </div>
+              <div className="text-right flex-shrink-0">
+                <div className="font-syne font-bold text-orange-500 text-lg">{formatPrice(service.price)}</div>
+              </div>
+              <button onClick={() => { setService(null); setDate(null); setSlot(null); setShowForm(false) }}
+                className="text-xs text-gray-400 hover:text-red-400 flex-shrink-0">เปลี่ยน</button>
+            </div>
 
-        {/* STEP 2 — เลือกวันเวลา */}
-        {step === 2 && (
-          <div className="space-y-4">
-            <div>
+            {/* ── ปฏิทิน ── */}
+            <div className="card p-4">
               <div className="sec-label mb-3">เลือกวันที่</div>
-              <div className="flex gap-2 overflow-x-auto pb-1">
-                {DATES.map(d => (
-                  <button key={d.value} onClick={() => { setDate(d.value); setSlot(null) }}
-                    className={`flex-shrink-0 px-3 py-2 rounded-lg border text-xs font-mono font-semibold transition-colors ${
-                      date === d.value ? 'bg-orange-500 text-white border-orange-500' : 'bg-white border-krabbie-border hover:border-orange-300'
-                    }`}>{d.label}</button>
+
+              {/* Month nav */}
+              <div className="flex items-center justify-between mb-3">
+                <button onClick={() => setView(prev => subMonths(prev, 1))}
+                  className="w-8 h-8 rounded-full hover:bg-orange-50 flex items-center justify-center text-gray-400 hover:text-orange-500">‹</button>
+                <span className="font-syne font-bold text-sm">
+                  {format(viewMonth, 'LLLL yyyy', { locale: th })}
+                </span>
+                <button onClick={() => setView(prev => addMonths(prev, 1))}
+                  className="w-8 h-8 rounded-full hover:bg-orange-50 flex items-center justify-center text-gray-400 hover:text-orange-500">›</button>
+              </div>
+
+              {/* Day headers */}
+              <div className="grid grid-cols-7 mb-1">
+                {DAY_LABELS.map(d => (
+                  <div key={d} className="text-center font-mono text-[0.6rem] text-gray-400 py-1">{d}</div>
                 ))}
+              </div>
+
+              {/* Days */}
+              <div className="grid grid-cols-7 gap-0.5">
+                {Array.from({ length: startPad }).map((_, i) => <div key={`p${i}`} />)}
+                {days.map(day => {
+                  const ds       = format(day, 'yyyy-MM-dd')
+                  const past     = isBefore(day, today)
+                  const isSun    = getDay(day) === 0
+                  const disabled = past || isSun
+                  const selected = date === ds
+                  const full     = !disabled && isDayFull(ds)
+                  const partial  = !disabled && !full && isDayPartial(ds)
+
+                  return (
+                    <button key={ds} disabled={disabled} onClick={() => selectDate(day)}
+                      className={`relative h-9 rounded-lg text-xs font-mono transition-all flex flex-col items-center justify-center gap-0 ${
+                        disabled  ? 'text-gray-200 cursor-not-allowed' :
+                        selected  ? 'bg-orange-500 text-white font-bold' :
+                        isSameDay(day, today) ? 'border-2 border-orange-300 text-orange-500 hover:bg-orange-50' :
+                        'text-gray-700 hover:bg-orange-50 hover:text-orange-500'
+                      }`}
+                    >
+                      {format(day, 'd')}
+                      {/* Availability dot */}
+                      {!disabled && !selected && (
+                        <span className={`w-1 h-1 rounded-full ${
+                          full ? 'bg-red-400' : partial ? 'bg-yellow-400' : 'bg-teal-DEFAULT'
+                        }`} />
+                      )}
+                    </button>
+                  )
+                })}
+              </div>
+
+              {/* Legend */}
+              <div className="flex gap-4 mt-3 text-[0.6rem] text-gray-400 font-mono justify-end">
+                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-teal-DEFAULT inline-block"/>ว่าง</span>
+                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-yellow-400 inline-block"/>เกือบเต็ม</span>
+                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-400 inline-block"/>เต็มแล้ว</span>
               </div>
             </div>
 
+            {/* ── เลือกเวลา ── */}
             {date && (
               <div>
-                <div className="sec-label mb-3">เลือกเวลา</div>
+                <div className="sec-label mb-3">เลือกเวลา — {format(new Date(date), 'd MMMM yyyy', { locale: th })}</div>
                 <div className="grid grid-cols-3 gap-2">
-                  {SLOT_TIMES.map(t => (
-                    <button key={t} onClick={() => setSlot(t)}
-                      className={`h-10 rounded-lg text-xs font-mono font-bold border-2 transition-all ${
-                        slot === t ? 'bg-orange-500 text-white border-orange-500' : 'bg-white text-gray-700 border-krabbie-border hover:border-orange-300'
-                      }`}>{t}</button>
-                  ))}
+                  {ALL_SLOTS.map(t => {
+                    const booked   = bookedSlots.includes(t)
+                    const selected = slot === t
+                    return (
+                      <button key={t} disabled={booked} onClick={() => selectSlot(t)}
+                        className={`relative h-12 rounded-xl text-sm font-mono font-bold border-2 transition-all overflow-hidden ${
+                          booked   ? 'bg-gray-50 border-gray-100 text-gray-300 cursor-not-allowed' :
+                          selected ? 'bg-orange-500 text-white border-orange-500 shadow-md' :
+                          'bg-white border-krabbie-border hover:border-orange-400 hover:text-orange-500'
+                        }`}
+                      >
+                        {t}
+                        {/* Stamp overlay for booked */}
+                        {booked && (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <span className="text-red-500 border-2 border-red-400 text-[0.55rem] font-black px-1.5 py-0.5 rounded rotate-[-12deg] bg-white/90">
+                              จองแล้ว
+                            </span>
+                          </div>
+                        )}
+                      </button>
+                    )
+                  })}
                 </div>
               </div>
             )}
 
-            <div className="flex gap-3 mt-2">
-              <button onClick={() => setStep(1)} className="btn-outline flex-1">← ย้อนกลับ</button>
-              <button onClick={() => setStep(3)} disabled={!slot}
-                className="btn-primary flex-1 disabled:opacity-40">ถัดไป →</button>
-            </div>
-          </div>
-        )}
+            {/* ── กรอกข้อมูล (โชว์เมื่อเลือกเวลาแล้ว) ── */}
+            {showForm && slot && (
+              <div>
+                <div className="sec-label mb-4">ข้อมูลของคุณ</div>
 
-        {/* STEP 3 — ข้อมูลลูกค้า */}
-        {step === 3 && (
-          <div>
-            <div className="sec-label mb-4">ข้อมูลของคุณ</div>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-semibold mb-1">ชื่อ-นามสกุล *</label>
-                <input className="input" placeholder="ชื่อ นามสกุล" value={name} onChange={e => setName(e.target.value)} />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold mb-1">เบอร์โทร *</label>
-                <input className="input" type="tel" placeholder="0812345678" value={phone} onChange={e => setPhone(e.target.value)} />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold mb-1">อีเมล <span className="text-gray-400 font-normal">(ไม่บังคับ)</span></label>
-                <input className="input" type="email" placeholder="email@example.com" value={email} onChange={e => setEmail(e.target.value)} />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold mb-1">หมายเหตุ <span className="text-gray-400 font-normal">(ไม่บังคับ)</span></label>
-                <textarea className="input resize-none" rows={2} value={note} onChange={e => setNote(e.target.value)} />
-              </div>
+                {/* Selected summary */}
+                <div className="bg-orange-50 border border-orange-200 rounded-lg px-4 py-3 mb-4 text-sm">
+                  <div className="font-semibold text-orange-700 mb-1">สรุปการจอง</div>
+                  <div className="space-y-0.5 text-gray-600 text-xs">
+                    <div className="flex justify-between"><span>บริการ</span><span className="font-semibold">{service.name}</span></div>
+                    <div className="flex justify-between"><span>วันที่</span><span className="font-mono">{format(new Date(date!), 'd MMMM yyyy', { locale: th })}</span></div>
+                    <div className="flex justify-between"><span>เวลา</span><span className="font-mono font-bold text-orange-600">{slot}</span></div>
+                    <div className="flex justify-between"><span>ราคา</span><span className="font-syne font-bold text-orange-500">{formatPrice(service.price)}</span></div>
+                  </div>
+                </div>
 
-              {/* Summary */}
-              <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 text-sm space-y-1">
-                <div className="font-semibold text-orange-700 mb-2">สรุปการจอง</div>
-                <div className="flex justify-between text-gray-600"><span>บริการ</span><span className="font-semibold">{service?.name}</span></div>
-                <div className="flex justify-between text-gray-600"><span>วันที่</span><span className="font-mono">{date}</span></div>
-                <div className="flex justify-between text-gray-600"><span>เวลา</span><span className="font-mono">{slot}</span></div>
-                <div className="flex justify-between text-gray-600"><span>ราคา</span><span className="font-syne font-bold text-orange-500">{formatPrice(service?.price ?? 0)}</span></div>
-              </div>
-            </div>
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-sm font-semibold mb-1">ชื่อ-นามสกุล *</label>
+                    <input className="input" placeholder="ชื่อ นามสกุล" value={name} onChange={e => setName(e.target.value)} />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold mb-1">เบอร์โทร *</label>
+                    <input className="input" type="tel" placeholder="0812345678" value={phone} onChange={e => setPhone(e.target.value)} />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold mb-1">อีเมล <span className="text-gray-400 font-normal">(ไม่บังคับ)</span></label>
+                    <input className="input" type="email" placeholder="email@example.com" value={email} onChange={e => setEmail(e.target.value)} />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold mb-1">หมายเหตุ <span className="text-gray-400 font-normal">(ไม่บังคับ)</span></label>
+                    <textarea className="input resize-none" rows={2} placeholder="แพ้อะไรไหม? มีข้อความพิเศษ?" value={note} onChange={e => setNote(e.target.value)} />
+                  </div>
+                </div>
 
-            <div className="flex gap-3 mt-6">
-              <button onClick={() => setStep(2)} className="btn-outline flex-1">← ย้อนกลับ</button>
-              <button onClick={() => setStep(4)} disabled={!name.trim() || !phone.trim()}
-                className="btn-primary flex-1 disabled:opacity-40">ยืนยันการจอง →</button>
-            </div>
-          </div>
+                <button onClick={() => setDone(true)} disabled={!name.trim() || !phone.trim()}
+                  className="btn-primary w-full mt-5 py-3 disabled:opacity-40 text-base">
+                  ยืนยันการจอง →
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

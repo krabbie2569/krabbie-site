@@ -11,6 +11,15 @@ const SERVICES = [
   { id: '5', name: 'ทำสีผม (Balayage)',       description: 'ระบายสีธรรมชาติ ดูแพง ไม่ต้องรีทัชบ่อย',              duration_minutes: 150, price: 1200 },
 ]
 
+const REVIEWS = [
+  { name: 'คุณมินตรา ส.', stars: 5, date: '28 เม.ย. 2568', service: 'นวดแผนไทย',
+    body: 'ประทับใจมากเลยค่ะ หมอนวดฝีมือดี กดจุดได้ถูกต้อง ร่างกายผ่อนคลายมากหลังนวด จองออนไลน์ง่ายมาก ไม่ต้องโทรหา แนะนำเลยนะคะ' },
+  { name: 'คุณปิยะ น.', stars: 5, date: '20 เม.ย. 2568', service: 'สปาตัวทั้งตัว',
+    body: 'บริการดีมากครับ สครับผิวแล้วรู้สึกผิวเนียนขึ้นเห็นได้ชัด ทีมงานเป็นมิตร บรรยากาศร้านสะอาด ราคาคุ้มค่ามาก ใช้บริการซ้ำแน่นอน' },
+  { name: 'คุณนภา ว.', stars: 4, date: '15 เม.ย. 2568', service: 'ทำเล็บเจล (มือ + เท้า)',
+    body: 'เล็บสวยมากค่ะ ช่างทำเล็บฝีมือดี สีไม่ลอกมาสองสัปดาห์แล้ว ระบบจองดีมาก เลือกเวลาได้เองเลย สะดวกมากค่ะ' },
+]
+
 const CALENDAR_DAYS = ['อา','จ','อ','พ','พฤ','ศ','ส']
 const DEMO_DATES    = [null,null,null,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
 const DEMO_SLOTS    = ['10:00','11:00','13:00','14:00','16:00']
@@ -111,7 +120,35 @@ export default function DemoBookingService() {
         </div>
       </section>
 
-      <div className="text-center font-mono text-xs text-gray-300 mt-4">
+      {/* Reviews */}
+      <section className="max-w-xl mx-auto px-4 pb-8">
+        <div className="sec-label mb-4">รีวิวจากลูกค้า</div>
+        <div className="space-y-3">
+          {REVIEWS.map((r, i) => (
+            <div key={i} className="card">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-9 h-9 rounded-full bg-orange-100 flex items-center justify-center text-orange-500 font-bold text-sm flex-shrink-0">
+                  {r.name.charAt(0)}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="font-semibold text-sm">{r.name}</div>
+                  <div className="text-[0.65rem] text-gray-400 font-mono">{r.date} · {r.service}</div>
+                </div>
+                <div className="text-orange-400 text-sm flex-shrink-0">{'★'.repeat(r.stars)}{'☆'.repeat(5 - r.stars)}</div>
+              </div>
+              <p className="text-sm text-gray-600 leading-relaxed">{r.body}</p>
+            </div>
+          ))}
+        </div>
+        <div className="mt-4 text-center">
+          <Link href="/demo/booking-service/book"
+            className="btn-primary text-sm px-6">
+            จองบริการเลย →
+          </Link>
+        </div>
+      </section>
+
+      <div className="text-center font-mono text-xs text-gray-300 mt-4 pb-8">
         Powered by <span className="text-orange-400">🦀 Krabbie.com</span>
       </div>
     </div>
