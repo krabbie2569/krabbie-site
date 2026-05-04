@@ -11,11 +11,11 @@ import { th } from 'date-fns/locale'
 import { formatPrice, formatDuration } from '@/lib/utils'
 
 const SERVICES = [
-  { id: '1', name: 'นวดแผนไทย',             description: 'ผ่อนคลายกล้ามเนื้อด้วยศาสตร์ดั้งเดิม บำรุงร่างกาย', duration_minutes: 60,  price: 350 },
-  { id: '2', name: 'ทำเล็บเจล (มือ + เท้า)', description: 'เล็บสวย สีไม่ลอก ทนนาน 3–4 สัปดาห์',                duration_minutes: 90,  price: 550 },
-  { id: '3', name: 'คลีนิกหน้า + บีบสิว',    description: 'ดูแลผิวหน้า ลดสิว ล้างพอร์ บำรุงผิวลึก',            duration_minutes: 75,  price: 490 },
-  { id: '4', name: 'สปาตัวทั้งตัว',           description: 'สครับ + มาร์ค + นวดผ่อนคลาย ผิวนุ่มเนียน',           duration_minutes: 120, price: 890 },
-  { id: '5', name: 'ทำสีผม (Balayage)',       description: 'ระบายสีธรรมชาติ ดูแพง ไม่ต้องรีทัชบ่อย',             duration_minutes: 150, price: 1200 },
+  { id: '1', name: 'นวดแผนไทย',             description: 'ผ่อนคลายกล้ามเนื้อด้วยศาสตร์ดั้งเดิม บำรุงร่างกาย', duration_minutes: 60,  price: 350,  image: 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=120&h=120&q=80&fit=crop&auto=format' },
+  { id: '2', name: 'ทำเล็บเจล (มือ + เท้า)', description: 'เล็บสวย สีไม่ลอก ทนนาน 3–4 สัปดาห์',                duration_minutes: 90,  price: 550,  image: 'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=120&h=120&q=80&fit=crop&auto=format' },
+  { id: '3', name: 'คลีนิกหน้า + บีบสิว',    description: 'ดูแลผิวหน้า ลดสิว ล้างพอร์ บำรุงผิวลึก',            duration_minutes: 75,  price: 490,  image: 'https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=120&h=120&q=80&fit=crop&auto=format' },
+  { id: '4', name: 'สปาตัวทั้งตัว',           description: 'สครับ + มาร์ค + นวดผ่อนคลาย ผิวนุ่มเนียน',           duration_minutes: 120, price: 890,  image: 'https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=120&h=120&q=80&fit=crop&auto=format' },
+  { id: '5', name: 'ทำสีผม (Balayage)',       description: 'ระบายสีธรรมชาติ ดูแพง ไม่ต้องรีทัชบ่อย',             duration_minutes: 150, price: 1200, image: 'https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?w=120&h=120&q=80&fit=crop&auto=format' },
 ]
 
 const ALL_SLOTS = ['09:00','10:00','11:00','13:00','14:00','15:00','16:00']
@@ -115,16 +115,17 @@ function BookContent() {
         {!service ? (
           <div>
             <div className="sec-label mb-4">เลือกบริการ</div>
-            <div className="space-y-3">
-              {SERVICES.map(s => (
+            <div className="rounded-2xl overflow-hidden border border-krabbie-border">
+              {SERVICES.map((s, i) => (
                 <button key={s.id} onClick={() => setService(s.id)}
-                  className="w-full card text-left flex items-center gap-4 hover:border-orange-300 transition-all group">
-                  <div className="flex-1">
-                    <div className="font-semibold text-sm group-hover:text-orange-500">{s.name}</div>
-                    <div className="text-xs text-gray-400">{s.description}</div>
+                  className={`w-full flex items-center gap-0 hover:bg-orange-50 transition-all group text-left ${i < SERVICES.length - 1 ? 'border-b border-krabbie-border' : ''}`}>
+                  <img src={s.image} alt={s.name} className="w-20 h-16 object-cover flex-shrink-0" />
+                  <div className="flex-1 px-3 py-2 min-w-0">
+                    <div className="font-semibold text-sm group-hover:text-orange-500 transition-colors">{s.name}</div>
+                    <div className="text-xs text-gray-400 leading-snug">{s.description}</div>
                     <div className="font-mono text-xs text-gray-400 mt-0.5">⏱ {formatDuration(s.duration_minutes)}</div>
                   </div>
-                  <div className="font-syne font-bold text-orange-500 text-lg flex-shrink-0">{formatPrice(s.price)}</div>
+                  <div className="font-syne font-bold text-orange-500 text-base flex-shrink-0 pr-4">{formatPrice(s.price)}</div>
                 </button>
               ))}
             </div>
@@ -132,17 +133,17 @@ function BookContent() {
         ) : (
           <>
             {/* ── บริการที่เลือก ── */}
-            <div className="card flex items-center gap-4 bg-orange-50 border-orange-300">
-              <div className="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center text-white text-lg flex-shrink-0">✂️</div>
-              <div className="flex-1 min-w-0">
+            <div className="rounded-xl overflow-hidden border border-orange-300 bg-orange-50 flex items-center">
+              <img src={service.image} alt={service.name} className="w-20 h-16 object-cover flex-shrink-0" />
+              <div className="flex-1 px-3 min-w-0">
                 <div className="font-bold text-sm">{service.name}</div>
                 <div className="text-xs text-gray-500">⏱ {formatDuration(service.duration_minutes)}</div>
               </div>
-              <div className="text-right flex-shrink-0">
-                <div className="font-syne font-bold text-orange-500 text-lg">{formatPrice(service.price)}</div>
+              <div className="text-right flex-shrink-0 px-3">
+                <div className="font-syne font-bold text-orange-500 text-base">{formatPrice(service.price)}</div>
+                <button onClick={() => { setService(null); setDate(null); setSlot(null); setShowForm(false) }}
+                  className="text-[0.65rem] text-gray-400 hover:text-red-400 transition-colors">เปลี่ยน</button>
               </div>
-              <button onClick={() => { setService(null); setDate(null); setSlot(null); setShowForm(false) }}
-                className="text-xs text-gray-400 hover:text-red-400 flex-shrink-0">เปลี่ยน</button>
             </div>
 
             {/* ── ปฏิทิน ── */}
