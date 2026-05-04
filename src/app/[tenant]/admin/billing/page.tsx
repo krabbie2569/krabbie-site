@@ -1,3 +1,5 @@
+export const runtime = 'edge'
+
 import { getTenantBySlug } from '@/lib/tenant'
 import { createServerSupabaseClient } from '@/lib/supabase.server'
 import { notFound } from 'next/navigation'

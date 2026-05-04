@@ -49,7 +49,8 @@ export async function middleware(request: NextRequest) {
     return guardAdmin(request, res, url.pathname)
   }
 
-  return NextResponse.next()
+  const rh = withPathname(request.headers, url.pathname)
+  return NextResponse.next({ request: { headers: rh } })
 }
 
 function withPathname(existing: Headers, pathname: string): Headers {
