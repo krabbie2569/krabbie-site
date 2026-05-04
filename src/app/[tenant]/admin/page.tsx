@@ -8,6 +8,7 @@ import { BOOKING_STATUS_LABEL, BOOKING_STATUS_COLOR } from '@/types'
 import type { Booking, Service } from '@/types'
 import StatsCard from '@/components/admin/StatsCard'
 import BookingActions from '@/components/admin/BookingActions'
+import SeedDemoButton from '@/components/admin/SeedDemoButton'
 import TenantAdminSidebar from '@/components/tenant/TenantAdminSidebar'
 
 interface Props {
@@ -72,7 +73,7 @@ export default async function TenantAdminPage({ params }: Props) {
               </div>
             ))}
             {(!services || services.length === 0) && (
-              <div className="card text-center py-8 text-gray-400 text-sm">ยังไม่มีบริการ</div>
+              <SeedDemoButton slug={tenantSlug} />
             )}
           </div>
         </div>
