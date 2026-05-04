@@ -57,17 +57,19 @@
 .navLinks a:hover { color: white; }
 
 .navLogin {
-  color: rgba(255,255,255,0.8) !important;
-  border: 1px solid rgba(255,255,255,0.3);
+  color: white !important;
+  border: 1.5px solid rgba(255,255,255,0.65) !important;
+  background: rgba(255,255,255,0.12) !important;
   padding: 0.4rem 1rem;
   border-radius: 100px;
   font-size: 0.82rem !important;
-  transition: background 0.2s, color 0.2s !important;
+  font-weight: 700 !important;
+  transition: background 0.2s, border-color 0.2s !important;
 }
 
 .navLogin:hover {
-  background: rgba(255,255,255,0.15) !important;
-  color: white !important;
+  background: rgba(255,255,255,0.25) !important;
+  border-color: rgba(255,255,255,0.9) !important;
 }
 
 .navBtn {

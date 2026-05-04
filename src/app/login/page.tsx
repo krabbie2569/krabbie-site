@@ -49,7 +49,7 @@ export default function LoginPage() {
 
     // Regular user → dashboard
     const next = new URLSearchParams(window.location.search).get('next')
-    window.location.href = next || '/dashboard'
+    window.location.href = next || '/'
   }
 
   return (

@@ -2,6 +2,7 @@ import Link from 'next/link'
 import styles from './page.module.css'
 import ScrollReveal from '@/components/ScrollReveal'
 import TemplatesSection from '@/components/TemplatesSection'
+import HomeNav from '@/components/HomeNav'
 
 export default function HomePage() {
   const s = styles
@@ -14,13 +15,7 @@ export default function HomePage() {
         <Link href="/" className={s.logo}>
           🦀 Krabbie<span className={s.logoAccent}>.com</span>
         </Link>
-        <div className={s.navLinks}>
-          <a href="#how">วิธีใช้</a>
-          <a href="#templates">Template</a>
-          <a href="#pricing">ราคา</a>
-          <Link href="/login" className={s.navLogin}>เข้าสู่ระบบ</Link>
-          <Link href="/signup" className={s.navBtn}>ทดลองฟรี →</Link>
-        </div>
+        <HomeNav />
       </nav>
 
       {/* ── HERO ── */}
