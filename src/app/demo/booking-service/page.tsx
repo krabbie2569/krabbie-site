@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic'
+export const runtime = 'edge'
 
 import Link from 'next/link'
 import { formatPrice, formatDuration } from '@/lib/utils'
