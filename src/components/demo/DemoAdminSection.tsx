@@ -230,21 +230,28 @@ export default function DemoAdminSection() {
             </div>
 
             {/* Mini revenue bar */}
-            <div className="bg-white rounded-xl border border-krabbie-border p-4">
-              <div className="flex items-center justify-between mb-3">
-                <div className="sec-label">รายได้สัปดาห์นี้</div>
-                <div className="font-syne font-bold text-green-600">{formatPrice(WEEKLY_TOTAL)}</div>
-              </div>
-              <div className="flex items-end gap-1.5 h-16">
-                {WEEKLY_REVENUE.map(d => (
-                  <div key={d.day} className="flex-1 flex flex-col items-center gap-1">
-                    <div className="w-full bg-orange-500 rounded-t-sm transition-all"
-                      style={{ height: `${Math.round((d.amount / WEEKLY_MAX) * 52)}px` }} />
-                    <span className="text-[0.55rem] text-gray-400 font-mono">{d.day}</span>
+            {(() => {
+              const weekBars = REVENUE.week.bars
+              const weekMax  = Math.max(...weekBars.map(b => b.value))
+              const weekTotal = weekBars.reduce((s, b) => s + b.value, 0)
+              return (
+                <div className="bg-white rounded-xl border border-krabbie-border p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="sec-label">รายได้สัปดาห์นี้</div>
+                    <div className="font-syne font-bold text-green-600">{formatPrice(weekTotal)}</div>
                   </div>
-                ))}
-              </div>
-            </div>
+                  <div className="flex items-end gap-1.5 h-16">
+                    {weekBars.map((b, i) => (
+                      <div key={i} className="flex-1 flex flex-col items-center gap-1">
+                        <div className={`w-full rounded-t-sm transition-all ${b.isCurrent ? 'bg-orange-500' : 'bg-orange-300'}`}
+                          style={{ height: `${Math.round((b.value / weekMax) * 52)}px` }} />
+                        <span className="text-[0.55rem] text-gray-400 font-mono">{b.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )
+            })()}
 
             <div>
               <div className="sec-label mb-2">การจองล่าสุด</div>
