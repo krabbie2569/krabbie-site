@@ -4,16 +4,17 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 const NAV = [
-  { href: '/admin',        label: 'Dashboard', icon: '▤' },
-  { href: '/admin/users',  label: 'Users',     icon: '◎' },
-  { href: '/admin/shops',  label: 'Shops',     icon: '⊞' },
-  { href: '/admin/seeds',  label: 'Seeds',     icon: '◈' },
+  { href: '/admin',             label: 'Dashboard', icon: '▤' },
+  { href: '/admin/shops',       label: 'Shops',     icon: '⊞' },
+  { href: '/admin/templates',   label: 'Templates', icon: '◧' },
+  { href: '/admin/users',       label: 'Users',     icon: '◎' },
+  { href: '/admin/seeds',       label: 'Seeds',     icon: '◈' },
 ]
 
 export default function AdminSidebar() {
   const pathname = usePathname()
   return (
-    <aside className="w-52 bg-krabbie-dark flex-shrink-0 flex flex-col min-h-screen sticky top-0">
+    <aside className="w-56 bg-krabbie-dark flex-shrink-0 flex flex-col min-h-screen sticky top-0">
       <div className="px-5 py-5 border-b border-white/10">
         <div className="flex items-center gap-2.5">
           <span className="text-2xl">🦀</span>
@@ -24,7 +25,7 @@ export default function AdminSidebar() {
         </div>
       </div>
 
-      <nav className="flex-1 py-3 px-2 space-y-0.5">
+      <nav className="flex-1 py-4 px-3 space-y-1">
         {NAV.map(n => {
           const active = n.href === '/admin'
             ? pathname === '/admin'
@@ -33,13 +34,13 @@ export default function AdminSidebar() {
             <Link
               key={n.href}
               href={n.href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all border ${
                 active
-                  ? 'bg-orange-500 text-white shadow-sm'
-                  : 'text-white/60 hover:text-white hover:bg-white/10'
+                  ? 'bg-orange-500 text-white border-orange-400 shadow-md'
+                  : 'text-white border-white/10 bg-white/5 hover:bg-white/15 hover:border-white/20 hover:text-white'
               }`}
             >
-              <span className="text-base w-5 text-center opacity-80">{n.icon}</span>
+              <span className="text-base w-5 text-center">{n.icon}</span>
               {n.label}
             </Link>
           )
@@ -47,8 +48,8 @@ export default function AdminSidebar() {
       </nav>
 
       <div className="px-4 py-4 border-t border-white/10">
-        <p className="font-mono text-white/25 text-[0.5rem] truncate">stock@4k.co.th</p>
-        <Link href="/" className="font-mono text-white/40 text-[0.55rem] hover:text-white/70 transition-colors">
+        <p className="font-mono text-white/40 text-[0.55rem] truncate mb-1">stock@4k.co.th</p>
+        <Link href="/" className="font-mono text-white/60 text-[0.6rem] hover:text-white transition-colors">
           ← กลับหน้าหลัก
         </Link>
       </div>
