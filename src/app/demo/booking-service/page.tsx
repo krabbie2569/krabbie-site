@@ -2,6 +2,7 @@ export const runtime = 'edge'
 
 import Link from 'next/link'
 import { formatPrice, formatDuration } from '@/lib/utils'
+import DemoAdminSection from '@/components/demo/DemoAdminSection'
 
 const SERVICES = [
   {
@@ -280,6 +281,28 @@ export default function DemoBookingService() {
           </div>
         </div>
       </section>
+
+      {/* Admin section divider */}
+      <div className="max-w-xl mx-auto px-4 pb-6">
+        <div className="flex items-center gap-4 my-2">
+          <div className="flex-1 h-px bg-krabbie-border" />
+          <div className="flex items-center gap-2 bg-krabbie-dark text-white text-xs font-mono px-4 py-2 rounded-full">
+            <span>🔐</span>
+            <span>หน้าแอดมิน</span>
+          </div>
+          <div className="flex-1 h-px bg-krabbie-border" />
+        </div>
+        <p className="text-center text-xs text-gray-400 mt-3 mb-5">
+          จัดการร้านทั้งหมดจากหน้านี้ — การจอง บริการ พนักงาน ตารางเวลา ตั้งค่า
+        </p>
+      </div>
+
+      {/* Admin preview — fully interactive demo */}
+      <div className="max-w-xl mx-auto px-4 pb-8">
+        <div className="rounded-2xl overflow-hidden border border-krabbie-border shadow-lg">
+          <DemoAdminSection />
+        </div>
+      </div>
 
       <div className="text-center font-mono text-xs text-gray-300 mt-4 pb-8">
         Powered by <span className="text-orange-400">🦀 Krabbie.com</span>
