@@ -4,6 +4,7 @@ import { createServerSupabaseClient, createServiceClient } from '@/lib/supabase.
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import DashboardSidebar from '@/components/account/DashboardSidebar'
+import ExtendShopButton from '@/components/account/ExtendShopButton'
 import { shopDisplayUrl } from '@/lib/utils'
 
 export default async function DashboardPage() {
@@ -39,6 +40,14 @@ export default async function DashboardPage() {
     if (shop.plan === 'trial')     return { label: 'TRIAL',     cls: 'badge-trial' }
     if (shop.plan === 'suspended') return { label: 'SUSPENDED', cls: 'bg-red-100 text-red-600 font-mono text-[0.6rem] px-2 py-0.5 rounded' }
     return { label: shop.plan.toUpperCase(), cls: 'bg-gray-100 text-gray-500 font-mono text-[0.6rem] px-2 py-0.5 rounded' }
+  }
+
+  const daysLeft = (shop: any): number | null => {
+    const end = shop.expires_at ? new Date(shop.expires_at)
+      : shop.trial_ends_at ? new Date(shop.trial_ends_at)
+      : null
+    if (!end) return null
+    return Math.ceil((end.getTime() - Date.now()) / 86_400_000)
   }
 
   return (
@@ -79,37 +88,34 @@ export default async function DashboardPage() {
               <div className="space-y-3">
                 {shops.map((shop: any) => {
                   const badge = planBadge(shop)
-                  const expired = shop.expires_at && new Date(shop.expires_at) < new Date()
-                  const trialEnd = shop.trial_ends_at ? new Date(shop.trial_ends_at) : null
-                  const trialExpired = trialEnd && trialEnd < new Date()
+                  const days  = daysLeft(shop)
+                  const expired = days !== null && days <= 0
                   return (
                     <div key={shop.id} className="card flex items-center gap-4">
                       <div className="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center text-xl flex-shrink-0">🏪</div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                          <span className="font-bold text-sm">{shop.name}</span>
+                          <Link href={`/${shop.slug}/admin`} className="font-bold text-sm hover:text-orange-500 transition-colors">
+                            {shop.name} →
+                          </Link>
                           <span className={badge.cls}>{badge.label}</span>
-                          {expired && <span className="font-mono text-[0.55rem] text-red-400">หมดอายุ</span>}
                         </div>
                         <div className="font-mono text-xs text-gray-400">{shopDisplayUrl(shop.slug)}</div>
-                        {shop.plan === 'trial' && trialEnd && (
-                          <div className={`font-mono text-[0.6rem] mt-0.5 ${trialExpired ? 'text-red-400' : 'text-teal-500'}`}>
-                            ทดลองฟรี · หมด {trialEnd.toLocaleDateString('th-TH')}
-                          </div>
-                        )}
-                        {shop.plan === 'active' && shop.expires_at && (
-                          <div className={`font-mono text-[0.6rem] mt-0.5 ${expired ? 'text-red-400' : 'text-gray-400'}`}>
-                            หมดอายุ {new Date(shop.expires_at).toLocaleDateString('th-TH')}
+                        {days !== null && (
+                          <div className={`font-mono text-[0.6rem] mt-0.5 font-bold ${
+                            expired        ? 'text-red-500' :
+                            days <= 7      ? 'text-orange-500' :
+                                             'text-teal-600'
+                          }`}>
+                            {expired ? 'หมดอายุแล้ว' : `เหลืออีก ${days} วัน`}
                           </div>
                         )}
                       </div>
-                      <div className="flex gap-2 flex-shrink-0">
+                      <div className="flex gap-2 flex-shrink-0 items-start">
                         <Link href={`/${shop.slug}`} target="_blank" className="text-xs px-3 py-1.5 rounded-lg border border-krabbie-border text-gray-500 hover:border-orange-300 transition-colors">
                           ดูเว็บ ↗
                         </Link>
-                        <Link href={`/${shop.slug}/admin`} className="text-xs px-3 py-1.5 rounded-lg bg-orange-500 text-white font-semibold hover:bg-orange-600 transition-colors">
-                          จัดการ →
-                        </Link>
+                        <ExtendShopButton shopId={shop.id} seeds={seeds} />
                       </div>
                     </div>
                   )
