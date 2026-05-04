@@ -15,6 +15,14 @@ const INIT_SERVICES = [
   { id: '5', name: 'ทำสีผม (Balayage)',       description: 'ระบายสีธรรมชาติ ดูแพง',     duration_minutes: 150, price: 1200, is_active: true },
 ]
 
+const INIT_STAFF = [
+  { id: 'p1', name: 'พี่นุ่น',  role: 'ช่างนวดแผนไทย / สปา',   exp: '5 ปี', rating: 4.9, avatar: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=80&h=80&q=80&fit=crop&auto=format' },
+  { id: 'p2', name: 'น้องแพร',  role: 'ช่างเล็บ / ผิวหน้า',     exp: '3 ปี', rating: 4.8, avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=80&h=80&q=80&fit=crop&auto=format' },
+  { id: 'p3', name: 'พี่ออย',   role: 'ช่างนวดแผนไทย / สปา',   exp: '4 ปี', rating: 4.9, avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&q=80&fit=crop&auto=format' },
+  { id: 'p4', name: 'พี่หนิง',  role: 'ช่างทำสีผม / Balayage', exp: '6 ปี', rating: 5.0, avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=80&h=80&q=80&fit=crop&auto=format' },
+  { id: 'p5', name: 'คุณกิ่ง',  role: 'ช่างผิวหน้า / เล็บ',    exp: '2 ปี', rating: 4.7, avatar: 'https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=80&h=80&q=80&fit=crop&auto=format' },
+]
+
 const INIT_BOOKINGS = [
   { id: '1', name: 'คุณมินตรา สุขใจ', phone: '081-234-5678', service: 'นวดแผนไทย',           price: 350,  date: '2025-05-06', time: '10:00', status: 'pending'   as Status },
   { id: '2', name: 'คุณปิยะ นิลกาล',  phone: '089-876-5432', service: 'สปาตัวทั้งตัว',       price: 890,  date: '2025-05-06', time: '13:00', status: 'confirmed' as Status },
@@ -53,11 +61,12 @@ const TOP_SERVICES = [
 ]
 const TOP_MAX = TOP_SERVICES[0].revenue
 
-type NavKey = 'overview' | 'bookings' | 'services' | 'revenue' | 'slots' | 'settings'
+type NavKey = 'overview' | 'bookings' | 'services' | 'staff' | 'revenue' | 'slots' | 'settings'
 const NAV: { key: NavKey; label: string; icon: string }[] = [
   { key: 'overview', label: 'ภาพรวม',    icon: '▤'  },
   { key: 'bookings', label: 'การจอง',    icon: '📋' },
   { key: 'services', label: 'บริการ',    icon: '✂️' },
+  { key: 'staff',    label: 'พนักงาน',   icon: '👤' },
   { key: 'revenue',  label: 'รายได้',    icon: '💰' },
   { key: 'slots',    label: 'ตารางเวลา', icon: '🗓' },
   { key: 'settings', label: 'ตั้งค่า',   icon: '⚙️' },
@@ -76,6 +85,10 @@ export default function DemoAdminSection() {
   const [nav,       setNav]       = useState<NavKey>('overview')
   const [services,  setServices]  = useState(INIT_SERVICES)
   const [bookings,  setBookings]  = useState(INIT_BOOKINGS)
+  const [staff,     setStaff]     = useState(INIT_STAFF)
+  const [newStaffName, setNewStaffName] = useState('')
+  const [newStaffRole, setNewStaffRole] = useState('')
+  const [addingStaff,  setAddingStaff]  = useState(false)
   const [slots,     setSlots]     = useState<Record<string, boolean[]>>(
     Object.fromEntries(DEMO_DATES.map(d => [d, DEMO_SLOTS_TIMES.map(t => !!(BOOKED_MAP[d]?.includes(t)))]))
   )
@@ -311,6 +324,53 @@ export default function DemoAdminSection() {
               <ServiceFormInline value={newSvc} onSave={v => saveService(v)} onCancel={() => setAddSvc(false)} />
             ) : (
               <button onClick={() => setAddSvc(true)} className="btn-outline w-full text-sm">+ เพิ่มบริการ</button>
+            )}
+          </div>
+        )}
+
+        {/* ── พนักงาน ── */}
+        {nav === 'staff' && (
+          <div className="space-y-3">
+            {staff.map(s => (
+              <div key={s.id} className="bg-white rounded-xl border border-krabbie-border p-3 flex items-center gap-3">
+                <img src={s.avatar} alt={s.name} className="w-11 h-11 rounded-full object-cover flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <div className="font-bold text-sm">{s.name}</div>
+                  <div className="text-xs text-gray-400">{s.role}</div>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <span className="text-orange-400 text-xs font-mono">{'★'.repeat(Math.floor(s.rating))} {s.rating.toFixed(1)}</span>
+                    <span className="text-[0.65rem] text-gray-400 font-mono">· {s.exp}</span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => { setStaff(p => p.filter(x => x.id !== s.id)); showToast('✕ ลบพนักงานแล้ว') }}
+                  className="text-xs text-red-400 hover:underline flex-shrink-0">ลบ</button>
+              </div>
+            ))}
+
+            {addingStaff ? (
+              <div className="bg-white rounded-xl border border-orange-300 p-4 space-y-3">
+                <div>
+                  <label className="block text-xs font-semibold mb-1">ชื่อพนักงาน</label>
+                  <input className="input text-sm" placeholder="เช่น พี่นิด" value={newStaffName} onChange={e => setNewStaffName(e.target.value)} />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold mb-1">ตำแหน่ง / ความเชี่ยวชาญ</label>
+                  <input className="input text-sm" placeholder="เช่น ช่างเล็บ / ผิวหน้า" value={newStaffRole} onChange={e => setNewStaffRole(e.target.value)} />
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    disabled={!newStaffName.trim()}
+                    onClick={() => {
+                      setStaff(p => [...p, { id: String(Date.now()), name: newStaffName, role: newStaffRole || 'พนักงาน', exp: 'ใหม่', rating: 5.0, avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(newStaffName)}&background=f97316&color=fff&size=80` }])
+                      setNewStaffName(''); setNewStaffRole(''); setAddingStaff(false); showToast('✓ เพิ่มพนักงานแล้ว')
+                    }}
+                    className="btn-primary flex-1 text-sm disabled:opacity-40">เพิ่ม</button>
+                  <button onClick={() => setAddingStaff(false)} className="btn-outline flex-1 text-sm">ยกเลิก</button>
+                </div>
+              </div>
+            ) : (
+              <button onClick={() => setAddingStaff(true)} className="btn-outline w-full text-sm">+ เพิ่มพนักงาน</button>
             )}
           </div>
         )}
