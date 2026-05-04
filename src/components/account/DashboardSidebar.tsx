@@ -52,6 +52,9 @@ export default function DashboardSidebar({ email }: { email: string }) {
       </nav>
 
       <div className="px-4 py-4 border-t border-white/10 space-y-2">
+        <Link href="/" className="flex items-center gap-2 text-white/50 hover:text-white text-xs font-mono transition-colors">
+          ← หน้าแรก
+        </Link>
         <p className="font-mono text-white/40 text-[0.55rem] truncate">{email}</p>
         <LogoutButton />
       </div>
