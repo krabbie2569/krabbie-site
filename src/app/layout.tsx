@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Syne, Sarabun, Space_Mono } from 'next/font/google'
 import './globals.css'
+import DevSwitcher from '@/components/DevSwitcher'
 
 const syne = Syne({
   subsets:  ['latin'],
@@ -42,7 +43,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="th" className={`${syne.variable} ${sarabun.variable} ${spaceMono.variable}`}>
-      <body>{children}</body>
+      <body>
+        {children}
+        <DevSwitcher />
+      </body>
     </html>
   )
 }
