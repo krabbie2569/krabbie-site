@@ -35,8 +35,8 @@ const TEMPLATES = [
     pills:     ['ตะกร้าสินค้า', 'จัดการสต็อก', 'อัพสลิป'],
     grad:      styles.tg2,
     emoji:     '🛍️',
-    available: false,
-    demoPath:  null,
+    available: true,
+    demoPath:  '/demo/shop',
   },
   {
     id:        'qr-menu',
@@ -46,8 +46,8 @@ const TEMPLATES = [
     pills:     ['QR รายโต๊ะ', 'real-time', 'ใบเสร็จ'],
     grad:      styles.tg2,
     emoji:     '🍜',
-    available: false,
-    demoPath:  null,
+    available: true,
+    demoPath:  '/demo/qr-menu',
   },
 ]
 

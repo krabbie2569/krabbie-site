@@ -99,7 +99,7 @@ export default function DemoShop() {
 
       <footer style={{ background:'#1a1a2e', padding:'24px 20px', textAlign:'center' }}>
         <div style={{ fontWeight:800, fontSize:'0.9rem', background:GRAD, WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', marginBottom:'6px' }}>Green Shop</div>
-        <div style={{ fontSize:'0.72rem', color:'#4B5563' }}>Powered by <span style={{ color:'#ff6b00', fontWeight:700 }}>🦀 Krabbie.com</span></div>
+        <div style={{ fontSize:'0.72rem', color:'rgba(255,255,255,0.55)' }}>Powered by <span style={{ color:'#ff6b00', fontWeight:700 }}>🦀 Krabbie.com</span></div>
       </footer>
     </div>
   )

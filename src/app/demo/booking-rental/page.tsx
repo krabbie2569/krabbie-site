@@ -497,9 +497,9 @@ export default function DemoBookingRental() {
         <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
           <div>
             <div style={{ fontWeight: 800, fontSize: '1rem', background: GRAD, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', marginBottom: '4px' }}>BoBBoB Camera Rental</div>
-            <div style={{ fontSize: '0.75rem', color: '#6B7280' }}>📍 โคราช · 📞 081-234-5678 · ⏰ 09:00–20:00</div>
+            <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.6)' }}>📍 โคราช · 📞 081-234-5678 · ⏰ 09:00–20:00</div>
           </div>
-          <div style={{ fontSize: '0.75rem', color: '#4B5563', textAlign: 'right' }}>
+          <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', textAlign: 'right' }}>
             Powered by <a href="/" style={{ color: '#ff6b00', textDecoration: 'none', fontWeight: 700 }}>🦀 Krabbie.com</a>
           </div>
         </div>
