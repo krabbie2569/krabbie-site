@@ -3,6 +3,7 @@ export const runtime = 'edge'
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient, createServiceClient } from '@/lib/supabase.server'
 import { isValidSlug } from '@/lib/utils'
+import { seedDemoData } from '@/lib/seed-demo'
 
 export async function POST(req: NextRequest) {
   const supabaseAuth = await createServerSupabaseClient() as any
@@ -84,7 +85,7 @@ export async function POST(req: NextRequest) {
   const { data: tenant, error } = await supabase
     .from('tenants')
     .insert(insertData)
-    .select('slug')
+    .select('id, slug')
     .single()
 
   if (error || !tenant) {
@@ -101,6 +102,11 @@ export async function POST(req: NextRequest) {
       .from('seed_transactions')
       .insert({ user_id: user.id, delta: -1, note: `สร้างร้าน ${slug}` }),
   ])
+
+  // Seed demo data — fire and forget, don't block the response
+  if (tenant.id) {
+    seedDemoData(tenant.id, templateId || 'booking-service', supabase).catch(() => {})
+  }
 
   return NextResponse.json({ data: { slug: tenant.slug } })
 }
