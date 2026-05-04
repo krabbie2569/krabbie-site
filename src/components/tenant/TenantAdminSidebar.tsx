@@ -13,8 +13,13 @@ export default function TenantAdminSidebar({ slug, shopName, plan }: Props) {
   const pathname = usePathname()
 
   const NAV = [
-    { href: `/${slug}/admin`,         label: 'ภาพรวม',  icon: '▤', exact: true },
-    { href: `/${slug}/admin/billing`, label: 'Billing', icon: '💳' },
+    { href: `/${slug}/admin`,                label: 'ภาพรวม',    icon: '▤',  exact: true },
+    { href: `/${slug}/admin/bookings`,       label: 'การจอง',    icon: '📋' },
+    { href: `/${slug}/admin/services`,       label: 'บริการ',    icon: '✂️' },
+    { href: `/${slug}/admin/staff`,          label: 'พนักงาน',   icon: '👤' },
+    { href: `/${slug}/admin/slots`,          label: 'ตารางเวลา', icon: '🗓' },
+    { href: `/${slug}/admin/settings`,       label: 'ตั้งค่า',   icon: '⚙️' },
+    { href: `/${slug}/admin/billing`,        label: 'Billing',   icon: '💳' },
   ]
 
   return (
