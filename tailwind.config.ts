@@ -39,7 +39,7 @@ const config: Config = {
       fontFamily: {
         // CSS vars set by next/font in layout.tsx; hardcoded names are fallbacks for CSS modules
         sans:    ['var(--font-sarabun)', 'Sarabun', 'sans-serif'],
-        syne:    ['var(--font-syne)', 'Syne', 'Sarabun', 'sans-serif'], // Sarabun fallback = Thai chars in headings look right
+        syne:    ['var(--font-syne)', 'Prompt', 'Sarabun', 'sans-serif'],
         mono:    ['var(--font-mono)', 'Space Mono', 'monospace'],
         display: ['Bricolage Grotesque', 'sans-serif'],
       },

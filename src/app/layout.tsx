@@ -1,11 +1,11 @@
 import type { Metadata } from 'next'
-import { Syne, Sarabun, Space_Mono } from 'next/font/google'
+import { Prompt, Sarabun, Space_Mono } from 'next/font/google'
 import './globals.css'
 import DevSwitcher from '@/components/DevSwitcher'
 
-const syne = Syne({
-  subsets:  ['latin'],
-  weight:   ['700', '800'],
+const prompt = Prompt({
+  subsets:  ['thai', 'latin'],
+  weight:   ['600', '700', '800'],
   variable: '--font-syne',
   display:  'swap',
 })
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="th" className={`${syne.variable} ${sarabun.variable} ${spaceMono.variable}`}>
+    <html lang="th" className={`${prompt.variable} ${sarabun.variable} ${spaceMono.variable}`}>
       <body>
         {children}
         <DevSwitcher />
