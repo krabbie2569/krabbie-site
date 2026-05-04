@@ -15,7 +15,7 @@
     --coral:  #ff4d4d;
   }
 
-  html { scroll-behavior: smooth; }
+  html { scroll-behavior: smooth; font-size: 150%; }
 
   body {
     @apply font-sans text-krabbie-dark bg-krabbie-bg;
