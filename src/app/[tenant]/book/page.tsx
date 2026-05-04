@@ -32,7 +32,7 @@ export default function BookPage({ params }: Props) {
     customerNote:  '',
   })
 
-  const { submitBooking, loading, bookingRef } = useBooking(tenant)
+  const { submitBooking, loading, bookingRef, error: bookingError } = useBooking(tenant)
 
   function updateDraft(patch: Partial<BookingDraft>) {
     setDraft(prev => ({ ...prev, ...patch }))
@@ -132,13 +132,20 @@ export default function BookPage({ params }: Props) {
         )}
 
         {step === 3 && (
-          <BookingForm
-            draft={draft}
-            onChange={updateDraft}
-            onBack={() => setStep(2)}
-            onSubmit={handleConfirm}
-            loading={loading}
-          />
+          <>
+            {bookingError && (
+              <div className="mb-4 bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3">
+                {bookingError}
+              </div>
+            )}
+            <BookingForm
+              draft={draft}
+              onChange={updateDraft}
+              onBack={() => setStep(2)}
+              onSubmit={handleConfirm}
+              loading={loading}
+            />
+          </>
         )}
 
       </div>

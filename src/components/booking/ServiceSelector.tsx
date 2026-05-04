@@ -1,37 +1,30 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase'
 import { formatPrice, formatDuration } from '@/lib/utils'
 import type { Service } from '@/types'
 
 interface Props {
-  tenantId: string
+  tenantId:   string
   selectedId: string | null
-  onSelect: (id: string) => void
+  onSelect:   (id: string) => void
 }
 
 export default function ServiceSelector({ tenantId, selectedId, onSelect }: Props) {
   const [services, setServices] = useState<Service[]>([])
-  const [loading, setLoading]   = useState(true)
+  const [loading,  setLoading]  = useState(true)
 
   useEffect(() => {
-    const supabase = createClient() as any
-    supabase
-      .from('services')
-      .select('*')
-      .eq('tenant_id', tenantId)
-      .eq('is_active', true)
-      .order('sort_order')
-      .then(({ data }: { data: any[] | null }) => { setServices(data ?? []); setLoading(false) })
+    fetch(`/api/booking/services?slug=${tenantId}`)
+      .then(r => r.json())
+      .then(({ services }) => { setServices(services ?? []); setLoading(false) })
+      .catch(() => setLoading(false))
   }, [tenantId])
 
   if (loading) {
     return (
       <div className="space-y-3">
-        {[1, 2, 3].map(i => (
-          <div key={i} className="card animate-pulse h-20 bg-gray-100" />
-        ))}
+        {[1,2,3].map(i => <div key={i} className="card animate-pulse h-20 bg-gray-100" />)}
       </div>
     )
   }
@@ -49,14 +42,12 @@ export default function ServiceSelector({ tenantId, selectedId, onSelect }: Prop
     <div>
       <div className="sec-label mb-4">เลือกบริการ</div>
       <div className="space-y-3">
-        {services.map((s) => (
+        {services.map(s => (
           <button
             key={s.id}
             onClick={() => onSelect(s.id)}
             className={`w-full card text-left flex items-center gap-4 transition-all ${
-              selectedId === s.id
-                ? 'border-orange-500 bg-orange-50'
-                : 'hover:border-orange-300'
+              selectedId === s.id ? 'border-orange-500 bg-orange-50' : 'hover:border-orange-300'
             }`}
           >
             <div className="flex-1">
